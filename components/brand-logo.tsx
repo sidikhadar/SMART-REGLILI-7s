@@ -1,41 +1,60 @@
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
-export function BrandLogo({
-  size = 48,
-  withText = false,
+/**
+ * Affiche l'image complète du logo Smart Reglili.
+ * L'image contient déjà le titre, les sous-titres et le slogan,
+ * donc on ne réécrit aucun texte par-dessus.
+ */
+export function BrandLogoFull({
+  className,
+  priority = true,
+}: {
+  className?: string
+  priority?: boolean
+}) {
+  return (
+    <div className={cn('relative mx-auto w-full', className)}>
+      <Image
+        src="/logo-smart-reglili.jpeg"
+        alt="Smart Reglili — Gérez, Contrôlez, Développez. Votre stock, notre intelligence."
+        width={1213}
+        height={1182}
+        sizes="(max-width: 768px) 80vw, 360px"
+        className="h-auto w-full object-contain"
+        priority={priority}
+      />
+    </div>
+  )
+}
+
+/**
+ * Petite icône carrée (logo recadré) pour la barre supérieure ou les puces.
+ */
+export function BrandMark({
+  size = 40,
   className,
 }: {
   size?: number
-  withText?: boolean
   className?: string
 }) {
   return (
-    <div className={cn('flex items-center gap-3', className)}>
-      <div
-        className="relative shrink-0 overflow-hidden rounded-2xl bg-card shadow-soft ring-1 ring-border"
-        style={{ width: size, height: size }}
-      >
-        <Image
-          src="/logo-smart-reglili.jpeg"
-          alt="Logo Smart Reglili"
-          fill
-          sizes={`${size}px`}
-          className="object-cover"
-          priority
-        />
-      </div>
-      {withText && (
-        <div className="leading-tight">
-          <p className="font-heading text-lg font-extrabold tracking-tight">
-            <span className="text-navy">SMART</span>{' '}
-            <span className="text-brand">REGLILI</span>
-          </p>
-          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-            Gérez · Contrôlez · Développez
-          </p>
-        </div>
+    <div
+      className={cn(
+        'relative shrink-0 overflow-hidden rounded-xl bg-card shadow-soft ring-1 ring-border',
+        className,
       )}
+      style={{ width: size, height: size }}
+    >
+      <Image
+        src="/logo-smart-reglili.jpeg"
+        alt="Logo Smart Reglili"
+        fill
+        sizes={`${size}px`}
+        // L'icône principale (boîte + chariot) est dans le haut-centre de l'image
+        className="scale-[1.7] object-contain object-top"
+        priority
+      />
     </div>
   )
 }
