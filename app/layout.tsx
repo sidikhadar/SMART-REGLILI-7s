@@ -2,7 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Inter, Poppins, Geist_Mono } from 'next/font/google'
 import './globals.css'
-import { AppProvider } from '@/components/app-provider'
+import { AppProvider } from '@/lib/app-context'
 
 const inter = Inter({
   variable: '--font-inter',
