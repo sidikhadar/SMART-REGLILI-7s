@@ -275,18 +275,18 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* ---------- PIED DE PAGE : 3 infos sur une seule ligne ---------- */}
-        <div className="mt-5 flex flex-row flex-nowrap items-center justify-between gap-1.5 px-3 py-4 text-[9px] leading-tight text-muted-foreground sm:gap-3 sm:text-xs">
-          <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-            <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-brand sm:h-4 sm:w-4" aria-hidden />
+        {/* ---------- PIED DE PAGE : 3 infos avec icônes ---------- */}
+        <div className="mt-5 flex flex-col items-center justify-center gap-3 px-6 py-4 text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:gap-x-6">
+          <span className="flex items-center gap-1.5">
+            <ShieldCheck className="h-4 w-4 text-brand" aria-hidden />
             {t('secure_encrypted')}
           </span>
-          <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-            <Headphones className="h-3.5 w-3.5 shrink-0 text-brand sm:h-4 sm:w-4" aria-hidden />
+          <span className="flex items-center gap-1.5">
+            <Headphones className="h-4 w-4 text-brand" aria-hidden />
             {t('support_label')} : +222 37 16 20 16
           </span>
-          <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-            <Globe className="h-3.5 w-3.5 shrink-0 text-brand sm:h-4 sm:w-4" aria-hidden />
+          <span className="flex items-center gap-1.5">
+            <Globe className="h-4 w-4 text-brand" aria-hidden />
             {t('contact_label')} : contact@reglili.mr
           </span>
         </div>
