@@ -1,0 +1,265 @@
+import type {
+  Product,
+  Sale,
+  Client,
+  Debt,
+  Expense,
+  Supplier,
+  Employee,
+  Alert,
+} from './types'
+
+const today = new Date()
+function daysFromNow(d: number) {
+  const date = new Date(today)
+  date.setDate(date.getDate() + d)
+  return date.toISOString().slice(0, 10)
+}
+function hoursAgo(h: number) {
+  const date = new Date(today)
+  date.setHours(date.getHours() - h)
+  return date.toISOString()
+}
+
+export const PRODUCTS: Product[] = [
+  {
+    id: 'p1',
+    name: 'Lait Candia 1L',
+    barcode: '6111035000123',
+    category: 'alimentation',
+    buyPrice: 28,
+    sellPrice: 35,
+    image: '/products/milk.jpg',
+    lowStockThreshold: 12,
+    lots: [
+      { id: 'l1', quantity: 24, expiry: daysFromNow(40), number: 'LT-2401' },
+      { id: 'l2', quantity: 6, expiry: daysFromNow(5), number: 'LT-2312' },
+    ],
+  },
+  {
+    id: 'p2',
+    name: 'Riz Basmati 5kg',
+    barcode: '6111035000456',
+    category: 'alimentation',
+    buyPrice: 320,
+    sellPrice: 410,
+    image: '/products/rice.jpg',
+    lowStockThreshold: 8,
+    lots: [{ id: 'l3', quantity: 32, number: 'RZ-88' }],
+  },
+  {
+    id: 'p3',
+    name: 'Crème Nivea 200ml',
+    barcode: '4005900123456',
+    category: 'cosmetique',
+    buyPrice: 95,
+    sellPrice: 140,
+    tva: 20,
+    image: '/products/cream.jpg',
+    lowStockThreshold: 6,
+    lots: [{ id: 'l4', quantity: 18, expiry: daysFromNow(220) }],
+  },
+  {
+    id: 'p4',
+    name: 'Paracétamol 500mg',
+    barcode: '3400930000111',
+    category: 'sante',
+    buyPrice: 12,
+    sellPrice: 25,
+    image: '/products/paracetamol.jpg',
+    lowStockThreshold: 20,
+    lots: [
+      { id: 'l5', quantity: 40, expiry: daysFromNow(18), number: 'PH-LOT-A' },
+      { id: 'l6', quantity: 60, expiry: daysFromNow(400), number: 'PH-LOT-B' },
+    ],
+  },
+  {
+    id: 'p5',
+    name: 'Coca-Cola 1.5L',
+    barcode: '5449000000996',
+    category: 'alimentation',
+    buyPrice: 18,
+    sellPrice: 30,
+    image: '/products/cola.jpg',
+    lowStockThreshold: 24,
+    lots: [{ id: 'l7', quantity: 9, expiry: daysFromNow(2) }],
+  },
+  {
+    id: 'p6',
+    name: 'Savon Dove 100g',
+    barcode: '8717163000222',
+    category: 'cosmetique',
+    buyPrice: 22,
+    sellPrice: 40,
+    tva: 20,
+    image: '/products/soap.jpg',
+    lowStockThreshold: 10,
+    lots: [{ id: 'l8', quantity: 3 }],
+  },
+  {
+    id: 'p7',
+    name: 'Thé vert Sultan 200g',
+    barcode: '6111035000789',
+    category: 'alimentation',
+    buyPrice: 45,
+    sellPrice: 70,
+    image: '/products/tea.jpg',
+    lowStockThreshold: 15,
+    lots: [{ id: 'l9', quantity: 50 }],
+  },
+  {
+    id: 'p8',
+    name: 'Huile Afia 1L',
+    barcode: '6111035000990',
+    category: 'alimentation',
+    buyPrice: 60,
+    sellPrice: 85,
+    image: '/products/oil.jpg',
+    lowStockThreshold: 12,
+    lots: [{ id: 'l10', quantity: 28 }],
+  },
+]
+
+export const CLIENTS: Client[] = [
+  { id: 'c1', name: 'Ahmed Ould Salem', phone: '+222 22 33 44 55', totalDebt: 1605 },
+  { id: 'c2', name: 'Fatimetou Mint Cheikh', phone: '+222 41 22 11 00', totalDebt: 320 },
+  { id: 'c3', name: 'Mohamed Lemine', phone: '+222 36 99 88 77', totalDebt: 0 },
+  { id: 'c4', name: 'Aïcha Mint Brahim', phone: '+222 30 12 34 56', totalDebt: 740 },
+]
+
+export const SALES: Sale[] = [
+  {
+    id: 's1',
+    date: hoursAgo(1),
+    items: [
+      { productId: 'p1', name: 'Lait Candia 1L', qty: 3, unitPrice: 35 },
+      { productId: 'p5', name: 'Coca-Cola 1.5L', qty: 2, unitPrice: 30 },
+    ],
+    total: 165,
+    paid: 165,
+    method: 'especes',
+    cashier: 'Caissier 1',
+    register: 'Caisse 1',
+  },
+  {
+    id: 's2',
+    date: hoursAgo(3),
+    items: [{ productId: 'p2', name: 'Riz Basmati 5kg', qty: 1, unitPrice: 410 }],
+    total: 410,
+    paid: 410,
+    method: 'bankily',
+    cashier: 'Caissier 1',
+    register: 'Caisse 1',
+  },
+  {
+    id: 's3',
+    date: hoursAgo(5),
+    items: [
+      { productId: 'p4', name: 'Paracétamol 500mg', qty: 4, unitPrice: 25 },
+      { productId: 'p3', name: 'Crème Nivea 200ml', qty: 1, unitPrice: 140 },
+    ],
+    total: 240,
+    paid: 1000,
+    method: 'especes',
+    cashier: 'Caissier 2',
+    register: 'Caisse 2',
+  },
+  {
+    id: 's4',
+    date: hoursAgo(7),
+    items: [{ productId: 'p8', name: 'Huile Afia 1L', qty: 5, unitPrice: 85 }],
+    total: 2605,
+    paid: 1000,
+    method: 'partiel',
+    cashier: 'Caissier 1',
+    register: 'Caisse 1',
+    clientId: 'c1',
+  },
+  {
+    id: 's5',
+    date: hoursAgo(26),
+    items: [{ productId: 'p7', name: 'Thé vert Sultan 200g', qty: 6, unitPrice: 70 }],
+    total: 420,
+    paid: 420,
+    method: 'sedad',
+    cashier: 'Caissier 1',
+    register: 'Caisse 1',
+  },
+]
+
+export const DEBTS: Debt[] = [
+  {
+    id: 'd1',
+    clientId: 'c1',
+    clientName: 'Ahmed Ould Salem',
+    amount: 1605,
+    date: hoursAgo(7),
+    saleId: 's4',
+    status: 'open',
+  },
+  {
+    id: 'd2',
+    clientId: 'c2',
+    clientName: 'Fatimetou Mint Cheikh',
+    amount: 320,
+    date: hoursAgo(50),
+    status: 'open',
+  },
+  {
+    id: 'd3',
+    clientId: 'c4',
+    clientName: 'Aïcha Mint Brahim',
+    amount: 740,
+    date: hoursAgo(80),
+    status: 'open',
+  },
+]
+
+export const EXPENSES: Expense[] = [
+  { id: 'e1', label: 'Loyer boutique', amount: 8000, category: 'Loyer', date: daysFromNow(-2) },
+  { id: 'e2', label: 'Électricité', amount: 2400, category: 'Charges', date: daysFromNow(-4) },
+  { id: 'e3', label: 'Transport marchandise', amount: 1200, category: 'Logistique', date: daysFromNow(-1) },
+  { id: 'e4', label: 'Salaire caissier', amount: 15000, category: 'Salaires', date: daysFromNow(-6) },
+]
+
+export const SUPPLIERS: Supplier[] = [
+  { id: 'sup1', name: 'Grossiste Nouakchott', phone: '+222 45 25 36 14', balance: 12000 },
+  { id: 'sup2', name: 'Import Maghreb', phone: '+222 22 11 33 44', balance: 0 },
+  { id: 'sup3', name: 'Pharma Distrib', phone: '+222 36 78 90 12', balance: 4500 },
+]
+
+export const EMPLOYEES: Employee[] = [
+  { id: 'emp1', name: 'Sidi Mohamed', role: 'patron', active: true },
+  { id: 'emp2', name: 'Caissier 1', role: 'caissier', register: 'Caisse 1', active: true },
+  { id: 'emp3', name: 'Caissier 2', role: 'caissier', register: 'Caisse 2', active: true },
+]
+
+export const ALERTS: Alert[] = [
+  { id: 'a1', type: 'stock', level: 'danger', message: 'Savon Dove 100g — stock critique (3 restants)', date: hoursAgo(2) },
+  { id: 'a2', type: 'expiry', level: 'danger', message: 'Coca-Cola 1.5L — expire dans 2 jours', date: hoursAgo(4) },
+  { id: 'a3', type: 'expiry', level: 'warning', message: 'Lait Candia 1L (LT-2312) — expire dans 5 jours', date: hoursAgo(6) },
+  { id: 'a4', type: 'debt', level: 'info', message: 'Nouvelle dette de 1 605 MRU — Ahmed Ould Salem', date: hoursAgo(7) },
+  { id: 'a5', type: 'expiry', level: 'warning', message: 'Paracétamol 500mg (PH-LOT-A) — expire dans 18 jours', date: hoursAgo(8) },
+]
+
+export const PAYMENT_TOTALS: Record<string, number> = {
+  especes: 9450,
+  bankily: 6200,
+  sedad: 2100,
+  bik: 1750,
+  click: 980,
+  masrivi: 540,
+  bamis: 0,
+  credit: 2665,
+  partiel: 1000,
+}
+
+export const SALES_LAST_7_DAYS = [
+  { day: 'Lun', ventes: 4200, benefice: 980 },
+  { day: 'Mar', ventes: 5100, benefice: 1240 },
+  { day: 'Mer', ventes: 3800, benefice: 870 },
+  { day: 'Jeu', ventes: 6300, benefice: 1560 },
+  { day: 'Ven', ventes: 7400, benefice: 1820 },
+  { day: 'Sam', ventes: 8900, benefice: 2240 },
+  { day: 'Dim', ventes: 5600, benefice: 1330 },
+]
