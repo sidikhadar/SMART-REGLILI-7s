@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useApp } from '@/lib/app-context'
 import { navForRole, type NavItem } from '@/lib/nav'
-import { BrandLogo } from '@/components/brand-logo'
+import { BrandMark } from '@/components/brand-logo'
 import { LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
@@ -31,7 +31,7 @@ export function AppSidebar() {
   return (
     <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-e border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
       <div className="flex items-center gap-3 px-5 py-5">
-        <BrandLogo size={40} />
+        <BrandMark size={40} />
         <div className="leading-tight">
           <p className="font-heading text-sm font-extrabold text-sidebar-accent-foreground">
             SMART REGLILI

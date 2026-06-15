@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useApp } from '@/lib/app-context'
 import { navForRole, type NavItem } from '@/lib/nav'
 import { LanguageSwitcher } from '@/components/language-switcher'
-import { BrandLogo } from '@/components/brand-logo'
+import { BrandMark } from '@/components/brand-logo'
 import { Menu, X, Bell, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ALERTS } from '@/lib/mock-data'
@@ -76,7 +76,7 @@ export function AppTopbar({ title }: { title: string }) {
           />
           <div className="absolute inset-y-0 start-0 flex w-[82%] max-w-xs flex-col bg-sidebar text-sidebar-foreground shadow-soft-lg animate-float-up">
             <div className="flex items-center justify-between px-4 py-4">
-              <BrandLogo size={36} withText={false} />
+              <BrandMark size={36} />
               <span className="font-heading text-sm font-extrabold text-sidebar-accent-foreground">
                 SMART REGLILI
               </span>
