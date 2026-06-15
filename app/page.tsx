@@ -221,7 +221,8 @@ export default function LoginPage() {
             <RoleCard
               active={role === 'patron'}
               onClick={() => setRole('patron')}
-              img="/role-patron.png"
+              img="/role-patron-navy.png"
+              imgActive="/role-patron.png"
               title={t('role_patron')}
               desc={t('patron_short')}
             />
@@ -229,6 +230,7 @@ export default function LoginPage() {
               active={role === 'caissier'}
               onClick={() => setRole('caissier')}
               img="/role-caissier.png"
+              imgActive="/role-caissier-green.png"
               title={t('role_caissier')}
               desc={t('caissier_short')}
             />
@@ -373,12 +375,14 @@ function RoleCard({
   active,
   onClick,
   img,
+  imgActive,
   title,
   desc,
 }: {
   active: boolean
   onClick: () => void
   img: string
+  imgActive: string
   title: string
   desc: string
 }) {
@@ -406,7 +410,7 @@ function RoleCard({
         )}
       >
         <img
-          src={img || '/placeholder.svg'}
+          src={(active ? imgActive : img) || '/placeholder.svg'}
           alt={title}
           className="h-12 w-12 object-contain mix-blend-multiply"
           crossOrigin="anonymous"
