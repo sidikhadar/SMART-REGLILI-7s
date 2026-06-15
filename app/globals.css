@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-heading: var(--font-poppins), 'Poppins Fallback', system-ui, sans-serif;
-  --font-sans: var(--font-inter), 'Inter Fallback', system-ui, sans-serif;
+  --font-heading: var(--font-poppins), var(--font-arabic), 'Poppins Fallback', system-ui, sans-serif;
+  --font-sans: var(--font-inter), var(--font-arabic), 'Inter Fallback', system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), 'Geist Mono Fallback';
 
   --color-brand: var(--brand);

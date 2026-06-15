@@ -46,12 +46,23 @@ export default function LoginPage() {
     <main dir={dir} className="flex min-h-dvh items-center justify-center bg-[#05070f] p-3 sm:p-6">
       <div className="w-full max-w-md overflow-hidden rounded-[2rem] bg-card shadow-2xl">
         {/* ---------- HEADER NAVY + ARCHE CONCAVE ---------- */}
-        <header className="relative bg-navy px-6 pb-24 pt-6 text-navy-foreground">
+        <header className="relative bg-navy px-6 pb-16 pt-6 text-navy-foreground">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="flex items-center gap-1.5 text-xs font-medium text-navy-foreground/70">
                 <Globe className="h-3.5 w-3.5" aria-hidden />
-                {t('lang_label')}
+                <span>
+                  Langue /{' '}
+                  <span
+                    style={{
+                      fontFamily:
+                        'var(--font-arabic), "Noto Sans Arabic", "Geeza Pro", "Segoe UI", Tahoma, sans-serif',
+                    }}
+                  >
+                    اللغة
+                  </span>{' '}
+                  / Language
+                </span>
               </p>
               <div className="mt-2 flex items-center gap-2">
                 {LANGS.map((l) => (
@@ -84,20 +95,24 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {/* Vague concave : le navy descend au centre, le blanc remonte sur les côtés */}
+          {/* Vague douce : courbe montante/descendante, le blanc remonte au centre
+              pour laisser de la place au logo (le navy ne coupe pas le logo) */}
           <svg
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-20 w-full text-card"
-            viewBox="0 0 500 80"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-16 w-full text-card"
+            viewBox="0 0 500 64"
             preserveAspectRatio="none"
             aria-hidden
           >
-            <path d="M0,80 L0,18 Q250,80 500,18 L500,80 Z" fill="currentColor" />
+            <path
+              d="M0,64 L500,64 L500,34 C400,30 345,12 250,12 C155,12 100,30 0,34 Z"
+              fill="currentColor"
+            />
           </svg>
         </header>
 
-        {/* ---------- LOGO (chevauche la vague) ---------- */}
-        <div className="-mt-16 px-6">
-          <BrandLogoFull className="max-w-[260px]" />
+        {/* ---------- LOGO (posé dans le blanc, non coupé) ---------- */}
+        <div className="-mt-6 px-6">
+          <BrandLogoFull className="max-w-[280px]" />
         </div>
 
         {/* ---------- PASTILLES FONCTIONNALITÉS ---------- */}
@@ -260,21 +275,36 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* ---------- PIED DE PAGE ---------- */}
-        <div className="mt-4 flex flex-col items-center gap-2 border-t border-border px-6 py-4 text-xs text-muted-foreground sm:flex-row sm:justify-between">
+        {/* ---------- PIED DE PAGE : 3 infos avec icônes ---------- */}
+        <div className="mt-5 flex flex-col items-center justify-center gap-3 px-6 py-4 text-xs text-muted-foreground sm:flex-row sm:flex-wrap sm:gap-x-6">
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="h-4 w-4 text-brand" aria-hidden />
             {t('secure_encrypted')}
           </span>
           <span className="flex items-center gap-1.5">
-            <Headphones className="h-4 w-4 text-navy" aria-hidden />
+            <Headphones className="h-4 w-4 text-brand" aria-hidden />
             {t('support_label')} : +222 37 16 20 16
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Globe className="h-4 w-4 text-brand" aria-hidden />
+            {t('contact_label')} : contact@reglili.mr
           </span>
         </div>
 
-        <div className="bg-navy px-6 py-3 text-center text-xs text-navy-foreground/80">
-          <Lock className="mb-0.5 me-1 inline h-3 w-3" aria-hidden /> © 2025{' '}
-          <span className="font-semibold text-brand">SMART REGLILI</span> — {t('footer_rights')}
+        {/* ---------- BARRE NAVY AVEC ARC MONTANT ---------- */}
+        <div className="relative">
+          <svg
+            className="block h-6 w-full text-navy"
+            viewBox="0 0 500 24"
+            preserveAspectRatio="none"
+            aria-hidden
+          >
+            <path d="M0,24 L0,24 Q250,-12 500,24 Z" fill="currentColor" />
+          </svg>
+          <div className="-mt-px bg-navy px-6 pb-4 pt-1 text-center text-xs text-navy-foreground/85">
+            <Lock className="mb-0.5 me-1 inline h-3 w-3" aria-hidden /> © 2025{' '}
+            <span className="font-semibold text-brand">SMART REGLILI</span> — {t('footer_rights')}
+          </div>
         </div>
       </div>
 

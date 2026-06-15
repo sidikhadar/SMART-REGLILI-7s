@@ -1,6 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Inter, Poppins, Geist_Mono } from 'next/font/google'
+import { Inter, Poppins, Geist_Mono, Noto_Sans_Arabic } from 'next/font/google'
 import './globals.css'
 import { AppProvider } from '@/lib/app-context'
 
@@ -16,6 +16,11 @@ const poppins = Poppins({
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+})
+const notoArabic = Noto_Sans_Arabic({
+  variable: '--font-arabic',
+  subsets: ['arabic'],
+  weight: ['400', '500', '600', '700'],
 })
 
 export const metadata: Metadata = {
@@ -48,7 +53,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${inter.variable} ${poppins.variable} ${geistMono.variable} bg-background`}
+      className={`${inter.variable} ${poppins.variable} ${geistMono.variable} ${notoArabic.variable} bg-background`}
     >
       <body className="font-sans antialiased">
         <AppProvider>{children}</AppProvider>
