@@ -2,238 +2,342 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useApp } from '@/lib/app-context'
-import { BrandLogoFull } from '@/components/brand-logo'
-import { LanguageSwitcher } from '@/components/language-switcher'
-import { Button } from '@/components/ui/button'
 import {
-  ShieldCheck,
-  Store,
-  ArrowRight,
-  Lock,
-  Mail,
   User,
-  HelpCircle,
-  Check,
+  Lock,
   Eye,
   EyeOff,
-  Sparkles,
+  HelpCircle,
+  Crown,
+  Store,
+  LogIn,
+  UserPlus,
+  Package,
+  BarChart3,
+  ShoppingCart,
+  ShieldCheck,
+  Headphones,
+  Globe,
+  Check,
   X,
 } from 'lucide-react'
+import { useApp } from '@/lib/app-context'
+import { LANGS } from '@/lib/i18n'
+import { BrandLogoFull } from '@/components/brand-logo'
 import type { Role } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 export default function LoginPage() {
-  const { t, login, dir } = useApp()
+  const { t, lang, setLang, login, dir } = useApp()
   const router = useRouter()
 
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
-  const [role, setRole] = useState<Role | null>(null)
-  const [showPwd, setShowPwd] = useState(false)
+  const [role, setRole] = useState<Role | null>('patron')
+  const [showPassword, setShowPassword] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [remember, setRemember] = useState(true)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!role) return
-    setLoading(true)
-    setTimeout(() => {
-      login(role)
-      router.push(role === 'caissier' ? '/caisse' : '/dashboard')
-    }, 650)
+    login(role)
+    router.push(role === 'patron' ? '/dashboard' : '/caisse')
   }
 
   return (
-    <main
-      dir={dir}
-      className="relative flex min-h-dvh flex-col overflow-hidden bg-background"
-    >
-      {/* Decorative brand panel */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[38dvh] bg-navy"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-24 right-[-12%] h-72 w-72 rounded-full bg-brand/30 blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute top-10 left-[-12%] h-64 w-64 rounded-full bg-navy-foreground/10 blur-3xl"
-      />
-
-      {/* Top bar: help button + language switcher */}
-      <header className="relative z-10 flex items-center justify-between px-5 pt-6">
-        <button
-          type="button"
-          onClick={() => setShowHelp(true)}
-          aria-label={t('help')}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-navy-foreground/20 bg-navy-foreground/10 text-navy-foreground backdrop-blur-sm transition hover:bg-navy-foreground/20"
-        >
-          <HelpCircle className="h-5 w-5" />
-        </button>
-        <LanguageSwitcher />
-      </header>
-
-      <div className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col items-center px-5 pb-10 pt-3">
-        {/* Full logo (titles, subtitles, footer baked into the image) */}
-        <div className="w-full animate-float-up">
-          <BrandLogoFull className="mx-auto max-w-[260px] drop-shadow-[0_8px_30px_rgba(13,33,55,0.18)]" />
-        </div>
-
-        {/* Card */}
-        <div className="mt-4 w-full rounded-3xl border border-border bg-card p-5 shadow-soft-lg animate-float-up">
-          {/* Tabs */}
-          <div className="mb-5 grid grid-cols-2 gap-1 rounded-2xl bg-muted p-1">
-            {(['signin', 'signup'] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setMode(m)}
-                className={cn(
-                  'rounded-xl px-3 py-2.5 text-sm font-semibold transition',
-                  mode === m
-                    ? 'bg-card text-foreground shadow-soft'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-              >
-                {t(m === 'signin' ? 'tab_signin' : 'tab_signup')}
-              </button>
-            ))}
-          </div>
-
-          <p className="mb-5 text-center text-sm text-muted-foreground text-pretty">
-            {t(mode === 'signin' ? 'signin_hint' : 'signup_hint')}
-          </p>
-
-          {/* Role selection */}
-          <div className="grid grid-cols-2 gap-3">
-            <RoleCard
-              active={role === 'caissier'}
-              onClick={() => setRole('caissier')}
-              icon={<Store className="h-6 w-6" />}
-              title={t('role_caissier')}
-              desc={t('caissier_desc')}
-              accent="navy"
-            />
-            <RoleCard
-              active={role === 'patron'}
-              onClick={() => setRole('patron')}
-              icon={<ShieldCheck className="h-6 w-6" />}
-              title={t('role_patron')}
-              desc={t('patron_desc')}
-              accent="brand"
-            />
-          </div>
-
-          {/* Credentials */}
-          <form onSubmit={handleSubmit} className="mt-5 space-y-3">
-            {mode === 'signup' && (
-              <>
-                <Field icon={<User className="h-4 w-4" />} type="text" placeholder={t('full_name')} dir={dir} />
-                <Field icon={<Store className="h-4 w-4" />} type="text" placeholder={t('shop_name')} dir={dir} />
-              </>
-            )}
-            <Field icon={<Mail className="h-4 w-4" />} type="email" placeholder={t('email')} dir={dir} />
-            <Field
-              icon={<Lock className="h-4 w-4" />}
-              type={showPwd ? 'text' : 'password'}
-              placeholder={t('password')}
-              dir={dir}
-              trailing={
-                <button
-                  type="button"
-                  onClick={() => setShowPwd((s) => !s)}
-                  aria-label={showPwd ? 'Hide' : 'Show'}
-                  className="text-muted-foreground transition hover:text-foreground"
-                >
-                  {showPwd ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              }
-            />
-            {mode === 'signup' && (
-              <Field icon={<Lock className="h-4 w-4" />} type="password" placeholder={t('confirm_password')} dir={dir} />
-            )}
-
-            {mode === 'signin' && (
-              <div className="flex items-center justify-between px-1 text-xs">
-                <label className="flex items-center gap-2 text-muted-foreground">
-                  <input type="checkbox" className="h-4 w-4 rounded border-border accent-brand" />
-                  {t('remember_me')}
-                </label>
-                <button type="button" className="font-medium text-brand hover:underline">
-                  {t('forgot')}
-                </button>
+    <main dir={dir} className="flex min-h-dvh items-center justify-center bg-[#05070f] p-3 sm:p-6">
+      <div className="w-full max-w-md overflow-hidden rounded-[2rem] bg-card shadow-2xl">
+        {/* ---------- HEADER NAVY + ARCHE CONCAVE ---------- */}
+        <header className="relative bg-navy px-6 pb-24 pt-6 text-navy-foreground">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="flex items-center gap-1.5 text-xs font-medium text-navy-foreground/70">
+                <Globe className="h-3.5 w-3.5" aria-hidden />
+                {t('lang_label')}
+              </p>
+              <div className="mt-2 flex items-center gap-2">
+                {LANGS.map((l) => (
+                  <button
+                    key={l.code}
+                    type="button"
+                    onClick={() => setLang(l.code)}
+                    aria-pressed={lang === l.code}
+                    aria-label={l.label}
+                    className={cn(
+                      'flex h-10 w-12 items-center justify-center rounded-lg text-xl transition-all',
+                      lang === l.code
+                        ? 'bg-navy-foreground/15 ring-2 ring-brand'
+                        : 'bg-navy-foreground/5 ring-1 ring-navy-foreground/10 hover:bg-navy-foreground/10',
+                    )}
+                  >
+                    <span aria-hidden>{l.flag}</span>
+                  </button>
+                ))}
               </div>
-            )}
-
-            <Button
-              type="submit"
-              disabled={!role || loading}
-              className="group h-12 w-full rounded-xl bg-brand text-base font-semibold text-brand-foreground shadow-soft transition hover:bg-brand/90 disabled:opacity-50"
-            >
-              {loading ? (
-                <span className="inline-flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 animate-pulse" />
-                  ...
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-2">
-                  {t(mode === 'signin' ? 'enter' : 'create_account')}
-                  <ArrowRight className="h-5 w-5 flip-rtl transition group-hover:translate-x-0.5" />
-                </span>
-              )}
-            </Button>
+            </div>
 
             <button
               type="button"
-              onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-              className="w-full pt-1 text-center text-sm text-muted-foreground"
+              onClick={() => setShowHelp(true)}
+              className="flex items-center gap-1.5 rounded-full bg-navy-foreground/10 px-3 py-2 text-sm font-medium ring-1 ring-navy-foreground/15 transition-colors hover:bg-navy-foreground/20"
             >
-              {t(mode === 'signin' ? 'no_account' : 'have_account')}{' '}
-              <span className="font-semibold text-brand hover:underline">
-                {t(mode === 'signin' ? 'tab_signup' : 'tab_signin')}
-              </span>
+              <HelpCircle className="h-4 w-4" aria-hidden />
+              {t('help')}
             </button>
-          </form>
+          </div>
+
+          {/* Vague concave */}
+          <svg
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-16 w-full text-card"
+            viewBox="0 0 500 64"
+            preserveAspectRatio="none"
+            aria-hidden
+          >
+            <path d="M0,64 L0,40 Q250,-12 500,40 L500,64 Z" fill="currentColor" />
+          </svg>
+        </header>
+
+        {/* ---------- LOGO (chevauche la vague) ---------- */}
+        <div className="-mt-16 px-6">
+          <BrandLogoFull className="max-w-[260px]" />
         </div>
 
-        <p className="mt-6 text-center text-xs text-muted-foreground">
-          {t('slogan')}
-        </p>
+        {/* ---------- PASTILLES FONCTIONNALITÉS ---------- */}
+        <div className="mt-1 flex items-center justify-center gap-3 px-6 text-sm font-medium text-navy">
+          <span className="flex items-center gap-1.5">
+            <Package className="h-4 w-4 text-navy" aria-hidden />
+            {t('feat_stock')}
+          </span>
+          <span className="text-border">|</span>
+          <span className="flex items-center gap-1.5">
+            <BarChart3 className="h-4 w-4 text-brand" aria-hidden />
+            {t('feat_reports')}
+          </span>
+          <span className="text-border">|</span>
+          <span className="flex items-center gap-1.5">
+            <ShoppingCart className="h-4 w-4 text-navy" aria-hidden />
+            {t('feat_commerce')}
+          </span>
+        </div>
+
+        {/* ---------- FORMULAIRE ---------- */}
+        <form onSubmit={handleSubmit} className="space-y-4 px-6 pb-2 pt-6">
+          {mode === 'signup' && (
+            <Field icon={<User className="h-5 w-5" />}>
+              <input
+                type="text"
+                required
+                dir={dir}
+                placeholder={t('full_name')}
+                className="w-full bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
+              />
+            </Field>
+          )}
+
+          <Field icon={<User className="h-5 w-5" />}>
+            <input
+              type="text"
+              required
+              dir={dir}
+              placeholder={t('email')}
+              autoComplete="username"
+              className="w-full bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
+            />
+          </Field>
+
+          <Field icon={<Lock className="h-5 w-5" />}>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              required
+              dir={dir}
+              placeholder={t('password')}
+              autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+              className="w-full bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? 'Masquer' : 'Afficher'}
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
+          </Field>
+
+          {mode === 'signup' && (
+            <Field icon={<Lock className="h-5 w-5" />}>
+              <input
+                type="password"
+                required
+                dir={dir}
+                placeholder={t('confirm_password')}
+                autoComplete="new-password"
+                className="w-full bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
+              />
+            </Field>
+          )}
+
+          {mode === 'signin' && (
+            <div className="flex items-center justify-between">
+              <label className="flex cursor-pointer items-center gap-2 text-sm text-foreground">
+                <button
+                  type="button"
+                  onClick={() => setRemember((v) => !v)}
+                  aria-pressed={remember}
+                  className={cn(
+                    'flex h-5 w-5 items-center justify-center rounded-md border-2 transition-colors',
+                    remember
+                      ? 'border-brand bg-brand text-brand-foreground'
+                      : 'border-border bg-card',
+                  )}
+                >
+                  {remember && <Check className="h-3.5 w-3.5" />}
+                </button>
+                {t('remember_me')}
+              </label>
+              <button type="button" className="text-sm font-medium text-brand hover:underline">
+                {t('forgot')}
+              </button>
+            </div>
+          )}
+
+          {/* ---------- CHOIX DU RÔLE ---------- */}
+          <Divider label={t('choose_role')} />
+
+          <div className="grid grid-cols-2 gap-3">
+            <RoleCard
+              active={role === 'patron'}
+              onClick={() => setRole('patron')}
+              icon={<Crown className="h-9 w-9" />}
+              title={t('role_patron')}
+              desc={t('patron_short')}
+            />
+            <RoleCard
+              active={role === 'caissier'}
+              onClick={() => setRole('caissier')}
+              icon={<Store className="h-9 w-9" />}
+              title={t('role_caissier')}
+              desc={t('caissier_short')}
+            />
+          </div>
+
+          {/* ---------- BOUTON PRINCIPAL ---------- */}
+          <button
+            type="submit"
+            disabled={!role}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-semibold text-brand-foreground shadow-soft transition-all hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {mode === 'signin' ? (
+              <>
+                <LogIn className="h-5 w-5 flip-rtl" aria-hidden />
+                {t('tab_signin')}
+              </>
+            ) : (
+              <>
+                <UserPlus className="h-5 w-5" aria-hidden />
+                {t('create_account')}
+              </>
+            )}
+          </button>
+
+          {/* ---------- BASCULE SIGNUP / SIGNIN ---------- */}
+          <Divider label={mode === 'signin' ? t('new_here') : t('have_account')} />
+
+          <button
+            type="button"
+            onClick={() => setMode((m) => (m === 'signin' ? 'signup' : 'signin'))}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-brand/40 py-3.5 text-base font-semibold text-brand transition-colors hover:bg-brand/5"
+          >
+            {mode === 'signin' ? (
+              <>
+                <UserPlus className="h-5 w-5" aria-hidden />
+                {t('create_account')}
+              </>
+            ) : (
+              <>
+                <LogIn className="h-5 w-5 flip-rtl" aria-hidden />
+                {t('tab_signin')}
+              </>
+            )}
+          </button>
+        </form>
+
+        {/* ---------- PIED DE PAGE ---------- */}
+        <div className="mt-4 flex flex-col items-center gap-2 border-t border-border px-6 py-4 text-xs text-muted-foreground sm:flex-row sm:justify-between">
+          <span className="flex items-center gap-1.5">
+            <ShieldCheck className="h-4 w-4 text-brand" aria-hidden />
+            {t('secure_encrypted')}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Headphones className="h-4 w-4 text-navy" aria-hidden />
+            {t('support_label')} : +222 37 16 20 16
+          </span>
+        </div>
+
+        <div className="bg-navy px-6 py-3 text-center text-xs text-navy-foreground/80">
+          <Lock className="mb-0.5 me-1 inline h-3 w-3" aria-hidden /> © 2025{' '}
+          <span className="font-semibold text-brand">SMART REGLILI</span> — {t('footer_rights')}
+        </div>
       </div>
 
-      {/* Help dialog */}
+      {/* ---------- MODAL AIDE ---------- */}
       {showHelp && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-navy/50 p-4 backdrop-blur-sm sm:items-center">
-          <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-soft-lg animate-float-up">
-            <div className="mb-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-accent text-brand">
-                  <HelpCircle className="h-5 w-5" />
-                </span>
-                <h2 className="font-heading text-lg font-bold text-foreground">{t('help_title')}</h2>
-              </div>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onClick={() => setShowHelp(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between">
+              <h2 className="flex items-center gap-2 text-lg font-bold text-foreground">
+                <HelpCircle className="h-5 w-5 text-brand" aria-hidden />
+                {t('help_title')}
+              </h2>
               <button
                 type="button"
                 onClick={() => setShowHelp(false)}
-                aria-label="Close"
-                className="text-muted-foreground hover:text-foreground"
+                aria-label="Fermer"
+                className="rounded-full p-1 text-muted-foreground hover:bg-muted"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <p className="text-sm leading-relaxed text-muted-foreground text-pretty">{t('help_text')}</p>
-            <Button
-              onClick={() => setShowHelp(false)}
-              className="mt-5 h-11 w-full rounded-xl bg-brand font-semibold text-brand-foreground hover:bg-brand/90"
-            >
-              OK
-            </Button>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t('help_text')}</p>
+            <div className="mt-4 rounded-xl bg-muted p-3 text-sm text-foreground">
+              <p className="flex items-center gap-2">
+                <Headphones className="h-4 w-4 text-brand" aria-hidden /> +222 37 16 20 16
+              </p>
+              <p className="mt-1 flex items-center gap-2">
+                <Globe className="h-4 w-4 text-brand" aria-hidden /> contact@reglili.mr
+              </p>
+            </div>
           </div>
         </div>
       )}
     </main>
+  )
+}
+
+/* ---------- Sous-composants ---------- */
+
+function Field({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-3.5 shadow-sm transition-colors focus-within:border-brand">
+      <span className="text-brand">{icon}</span>
+      {children}
+    </div>
+  )
+}
+
+function Divider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3 py-1">
+      <span className="h-px flex-1 bg-border" />
+      <span className="text-sm font-medium text-muted-foreground">{label}</span>
+      <span className="h-px flex-1 bg-border" />
+    </div>
   )
 }
 
@@ -243,14 +347,12 @@ function RoleCard({
   icon,
   title,
   desc,
-  accent,
 }: {
   active: boolean
   onClick: () => void
   icon: React.ReactNode
   title: string
   desc: string
-  accent: 'brand' | 'navy'
 }) {
   return (
     <button
@@ -258,64 +360,20 @@ function RoleCard({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        'group relative flex flex-col items-start gap-2 overflow-hidden rounded-2xl border p-4 text-start transition-all duration-200',
+        'relative flex flex-col items-center gap-2 rounded-2xl border-2 p-4 text-center transition-all',
         active
-          ? 'border-brand bg-accent shadow-soft ring-2 ring-brand/40 -translate-y-0.5'
-          : 'border-border bg-card hover:border-brand/40 hover:bg-muted hover:-translate-y-0.5',
+          ? 'border-brand bg-brand/5 shadow-soft'
+          : 'border-border bg-card hover:border-brand/40',
       )}
     >
-      {/* Glow that appears only on the selected card */}
       {active && (
-        <span
-          aria-hidden
-          className={cn(
-            'pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full blur-2xl',
-            accent === 'brand' ? 'bg-brand/30' : 'bg-navy/25',
-          )}
-        />
-      )}
-      {active && (
-        <span className="absolute end-3 top-3 inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand text-brand-foreground shadow-soft">
-          <Check className="h-3.5 w-3.5" />
+        <span className="absolute end-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-brand text-brand-foreground">
+          <Check className="h-4 w-4" />
         </span>
       )}
-      <span
-        className={cn(
-          'flex h-11 w-11 items-center justify-center rounded-xl transition-colors',
-          active
-            ? accent === 'brand'
-              ? 'bg-brand text-brand-foreground'
-              : 'bg-navy text-navy-foreground'
-            : 'bg-muted text-navy',
-        )}
-      >
-        {icon}
-      </span>
-      <span className="font-heading text-sm font-bold text-foreground">{title}</span>
+      <span className={cn('transition-colors', active ? 'text-brand' : 'text-navy')}>{icon}</span>
+      <span className="text-base font-bold uppercase tracking-wide text-foreground">{title}</span>
       <span className="text-xs leading-snug text-muted-foreground">{desc}</span>
     </button>
-  )
-}
-
-function Field({
-  icon,
-  trailing,
-  dir,
-  ...props
-}: {
-  icon: React.ReactNode
-  trailing?: React.ReactNode
-  dir: 'rtl' | 'ltr'
-} & React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <div className="flex items-center gap-2 rounded-xl border border-input bg-background px-3.5 transition focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/30">
-      <span className="text-muted-foreground">{icon}</span>
-      <input
-        {...props}
-        dir={dir}
-        className="h-12 w-full bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
-      />
-      {trailing}
-    </div>
   )
 }
