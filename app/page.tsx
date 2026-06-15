@@ -8,8 +8,6 @@ import {
   Eye,
   EyeOff,
   HelpCircle,
-  Crown,
-  Store,
   LogIn,
   UserPlus,
   Package,
@@ -86,14 +84,14 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {/* Vague concave */}
+          {/* Vague concave : le navy descend au centre, le blanc remonte sur les côtés */}
           <svg
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-16 w-full text-card"
-            viewBox="0 0 500 64"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-20 w-full text-card"
+            viewBox="0 0 500 80"
             preserveAspectRatio="none"
             aria-hidden
           >
-            <path d="M0,64 L0,40 Q250,-12 500,40 L500,64 Z" fill="currentColor" />
+            <path d="M0,80 L0,18 Q250,80 500,18 L500,80 Z" fill="currentColor" />
           </svg>
         </header>
 
@@ -208,14 +206,14 @@ export default function LoginPage() {
             <RoleCard
               active={role === 'patron'}
               onClick={() => setRole('patron')}
-              icon={<Crown className="h-9 w-9" />}
+              img="/role-patron.png"
               title={t('role_patron')}
               desc={t('patron_short')}
             />
             <RoleCard
               active={role === 'caissier'}
               onClick={() => setRole('caissier')}
-              icon={<Store className="h-9 w-9" />}
+              img="/role-caissier.png"
               title={t('role_caissier')}
               desc={t('caissier_short')}
             />
@@ -344,13 +342,13 @@ function Divider({ label }: { label: string }) {
 function RoleCard({
   active,
   onClick,
-  icon,
+  img,
   title,
   desc,
 }: {
   active: boolean
   onClick: () => void
-  icon: React.ReactNode
+  img: string
   title: string
   desc: string
 }) {
@@ -371,7 +369,19 @@ function RoleCard({
           <Check className="h-4 w-4" />
         </span>
       )}
-      <span className={cn('transition-colors', active ? 'text-brand' : 'text-navy')}>{icon}</span>
+      <span
+        className={cn(
+          'flex h-16 w-16 items-center justify-center rounded-2xl bg-card ring-1 transition-colors',
+          active ? 'ring-brand/30' : 'ring-border',
+        )}
+      >
+        <img
+          src={img || '/placeholder.svg'}
+          alt={title}
+          className="h-12 w-12 object-contain mix-blend-multiply"
+          crossOrigin="anonymous"
+        />
+      </span>
       <span className="text-base font-bold uppercase tracking-wide text-foreground">{title}</span>
       <span className="text-xs leading-snug text-muted-foreground">{desc}</span>
     </button>
