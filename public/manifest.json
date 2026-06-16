@@ -4,7 +4,7 @@
   "description": "Votre stock, notre intelligence — gestion de stock et caisse pour commerçants.",
   "start_url": "/",
   "display": "standalone",
-  "orientation": "any",
+  "orientation": "portrait",
   "background_color": "#f7f9fc",
   "theme_color": "#0d2137",
   "icons": [

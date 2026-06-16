@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useApp } from '@/lib/app-context'
 import { navForRole, type NavItem } from '@/lib/nav'
 import { LanguageSwitcher } from '@/components/language-switcher'
-import { BrandSquare } from '@/components/brand-logo'
+import { BrandEmblem } from '@/components/brand-logo'
 import { SwitchRoleDialog } from '@/components/switch-role-dialog'
 import { LogoutDialog } from '@/components/logout-dialog'
 import { Menu, X, Bell, LogOut, ArrowLeftRight } from 'lucide-react'
@@ -82,7 +82,9 @@ export function AppTopbar({ title }: { title: string }) {
           <div className="absolute inset-y-0 start-0 flex w-[82%] max-w-xs flex-col bg-sidebar text-sidebar-foreground shadow-soft-lg animate-float-up">
             <div className="flex items-center justify-between gap-2 border-b border-sidebar-border px-4 py-4">
               <div className="flex min-w-0 items-center gap-2.5">
-                <BrandSquare size={36} />
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-card shadow-soft ring-1 ring-sidebar-border">
+                  <BrandEmblem size={34} />
+                </span>
                 <span className="truncate font-display text-base font-black tracking-wide text-sidebar-accent-foreground">
                   SMART <span className="text-brand">REGLILI</span>
                 </span>
