@@ -36,25 +36,28 @@ export function WelcomeScreen({
         </button>
       </header>
 
-      {/* Centre : logo + slogan */}
-      <main className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-        <div className="animate-float-up flex h-32 w-32 items-center justify-center overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/10 sm:h-40 sm:w-40">
+      {/* Logo en haut au centre (position d'atterrissage de l'animation) */}
+      <div className="flex shrink-0 flex-col items-center px-6 pt-6 text-center">
+        <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/10 sm:h-24 sm:w-24">
           <Image
             src="/logo-smart-reglili.jpeg"
             alt="SMART REGLILI"
-            width={160}
-            height={160}
+            width={176}
+            height={176}
             className="h-full w-full object-cover"
             priority
           />
         </div>
-        <h1 className="mt-5 font-display text-3xl font-black tracking-wide sm:text-4xl">
+        <h1 className="mt-3 font-display text-2xl font-black tracking-wide sm:text-3xl">
           SMART <span className="text-brand">REGLILI</span>
         </h1>
         <p className="mt-2 max-w-xs text-pretty text-sm text-navy-foreground/70 sm:text-base">
           {t('slogan')}
         </p>
-      </main>
+      </div>
+
+      {/* Espace central flexible */}
+      <div className="flex-1" />
 
       {/* Bas : boutons */}
       <div className="shrink-0 px-6 pb-2">

@@ -237,7 +237,7 @@
 .launch-arc { animation: arc-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
 .launch-glow { animation: logo-glow 0.6s ease-in-out 0.9s 1; }
 .launch-assembled { animation: slide-up-out 0.7s cubic-bezier(0.5, 0, 0.75, 0) 1.7s both; }
-.welcome-reveal { animation: fade-in 0.7s ease-out 1.9s both; }
+.welcome-reveal { animation: fade-in 0.6s ease-out both; }
 
 /* ---------- Transitions horizontales entre pages d'auth ---------- */
 @keyframes slide-in-right {

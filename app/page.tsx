@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { HelpCircle, X, Headphones, Globe } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
@@ -20,13 +20,6 @@ export default function AuthFlow() {
   const [step, setStep] = useState<Step>('launch')
   const [showHelp, setShowHelp] = useState(false)
 
-  // Fin de l'animation de lancement (~2.5s) → Welcome Screen
-  useEffect(() => {
-    if (step !== 'launch') return
-    const id = setTimeout(() => setStep('welcome'), 2500)
-    return () => clearTimeout(id)
-  }, [step])
-
   function handleLoginSuccess(_role: Role) {
     router.push('/dashboard')
   }
@@ -35,13 +28,13 @@ export default function AuthFlow() {
     <main dir={dir} className="relative h-dvh overflow-hidden bg-navy">
       {step === 'launch' && (
         <>
-          {/* Welcome préparée dessous pour le fondu */}
+          {/* Welcome préparée dessous : elle apparaît pendant que le logo glisse vers le haut */}
           <WelcomeScreen
             onLogin={() => setStep('login')}
             onSignup={() => setStep('signup')}
             onHelp={() => setShowHelp(true)}
           />
-          <LaunchAnimation />
+          <LaunchAnimation onComplete={() => setStep('welcome')} />
         </>
       )}
 
