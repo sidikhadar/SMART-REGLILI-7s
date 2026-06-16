@@ -26,6 +26,7 @@ interface AppState {
   userName: string
   setLang: (l: Lang) => void
   login: (role: Role, name?: string) => void
+  switchRole: () => void
   logout: () => void
   t: (key: string) => string
   // cart
@@ -80,6 +81,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('sr_name', finalName)
   }
 
+  function switchRole() {
+    const next: Role = role === 'caissier' ? 'patron' : 'caissier'
+    const finalName = next === 'caissier' ? 'Caissier 1' : 'Sidi Mohamed'
+    setRole(next)
+    setUserName(finalName)
+    localStorage.setItem('sr_role', next)
+    localStorage.setItem('sr_name', finalName)
+  }
+
   function logout() {
     setRole(null)
     setUserName('')
@@ -130,6 +140,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     userName,
     setLang,
     login,
+    switchRole,
     logout,
     t: (key: string) => translate(lang, key),
     cart,

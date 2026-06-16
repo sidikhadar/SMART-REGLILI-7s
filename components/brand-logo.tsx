@@ -29,6 +29,34 @@ export function BrandLogoFull({
 }
 
 /**
+ * Emblème circulaire complet (logo SR rond) — affiché entier, jamais recadré.
+ * Idéal pour le header du menu latéral.
+ */
+export function BrandEmblem({
+  size = 48,
+  className,
+}: {
+  size?: number
+  className?: string
+}) {
+  return (
+    <div
+      className={cn('relative shrink-0', className)}
+      style={{ width: size, height: size }}
+    >
+      <Image
+        src="/logo-emblem.png"
+        alt="Logo Smart Reglili"
+        fill
+        sizes={`${size}px`}
+        className="object-contain"
+        priority
+      />
+    </div>
+  )
+}
+
+/**
  * Petite icône carrée (logo recadré) pour la barre supérieure ou les puces.
  */
 export function BrandMark({

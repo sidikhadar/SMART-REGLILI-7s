@@ -8,6 +8,7 @@
   --font-heading: var(--font-poppins), var(--font-arabic), 'Poppins Fallback', system-ui, sans-serif;
   --font-sans: var(--font-inter), var(--font-arabic), 'Inter Fallback', system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), 'Geist Mono Fallback';
+  --font-display: var(--font-display), Georgia, 'Times New Roman', serif;
 
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);

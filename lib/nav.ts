@@ -32,14 +32,17 @@ export interface NavItem {
 
 const ALL: Role[] = ['patron', 'owner', 'caissier']
 const BOSS: Role[] = ['patron', 'owner']
+const CAISS: Role[] = ['caissier']
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard', key: 'dashboard', icon: LayoutDashboard, roles: BOSS, group: 'main', bottom: true },
-  { href: '/caisse', key: 'caisse', icon: ShoppingCart, roles: ALL, group: 'main', bottom: true },
+  // --- Principal ---
+  { href: '/dashboard', key: 'dashboard', icon: LayoutDashboard, roles: ALL, group: 'main', bottom: true },
+  { href: '/caisse', key: 'caisse', icon: ShoppingCart, roles: CAISS, group: 'main', bottom: true },
+  { href: '/scanner', key: 'scanner', icon: ScanLine, roles: CAISS, group: 'main', bottom: true },
   { href: '/stock', key: 'stock', icon: Package, roles: ALL, group: 'main', bottom: true },
-  { href: '/scanner', key: 'scanner', icon: ScanLine, roles: ALL, group: 'main' },
   { href: '/alerts', key: 'alerts', icon: Bell, roles: ALL, group: 'main', bottom: true },
 
+  // --- Gestion ---
   { href: '/clients', key: 'clients', icon: Users, roles: ALL, group: 'manage' },
   { href: '/debts', key: 'debts', icon: HandCoins, roles: ALL, group: 'manage' },
   { href: '/expenses', key: 'expenses', icon: Receipt, roles: BOSS, group: 'manage' },
@@ -48,6 +51,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: '/employees', key: 'employees', icon: UserCog, roles: BOSS, group: 'manage' },
   { href: '/invoices', key: 'invoices', icon: FileText, roles: BOSS, group: 'manage' },
 
+  // --- Système ---
   { href: '/finances', key: 'finances', icon: Wallet, roles: BOSS, group: 'system' },
   { href: '/ai-reports', key: 'ai_reports', icon: Sparkles, roles: BOSS, group: 'system' },
   { href: '/subscription', key: 'subscription', icon: CreditCard, roles: BOSS, group: 'system' },

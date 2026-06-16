@@ -6,8 +6,9 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useApp } from '@/lib/app-context'
 import { navForRole, type NavItem } from '@/lib/nav'
 import { LanguageSwitcher } from '@/components/language-switcher'
-import { BrandMark } from '@/components/brand-logo'
-import { Menu, X, Bell, LogOut } from 'lucide-react'
+import { BrandEmblem } from '@/components/brand-logo'
+import { SwitchRoleDialog } from '@/components/switch-role-dialog'
+import { Menu, X, Bell, LogOut, ArrowLeftRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ALERTS } from '@/lib/mock-data'
 
@@ -22,6 +23,7 @@ export function AppTopbar({ title }: { title: string }) {
   const router = useRouter()
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [switchOpen, setSwitchOpen] = useState(false)
   const items = navForRole(role)
   const groups: NavItem['group'][] = ['main', 'manage', 'system']
   const alertCount = ALERTS.filter((a) => a.level !== 'info').length
@@ -75,16 +77,20 @@ export function AppTopbar({ title }: { title: string }) {
             aria-hidden
           />
           <div className="absolute inset-y-0 start-0 flex w-[82%] max-w-xs flex-col bg-sidebar text-sidebar-foreground shadow-soft-lg animate-float-up">
-            <div className="flex items-center justify-between px-4 py-4">
-              <BrandMark size={36} />
-              <span className="font-heading text-sm font-extrabold text-sidebar-accent-foreground">
-                SMART REGLILI
-              </span>
+            <div className="flex items-center justify-between gap-2 border-b border-sidebar-border px-4 py-4">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-card shadow-soft ring-1 ring-sidebar-border">
+                  <BrandEmblem size={34} />
+                </span>
+                <span className="truncate font-display text-base font-black tracking-wide text-sidebar-accent-foreground">
+                  SMART <span className="text-brand">REGLILI</span>
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Fermer"
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-sidebar-foreground hover:bg-sidebar-accent"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sidebar-foreground hover:bg-sidebar-accent"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -146,6 +152,17 @@ export function AppTopbar({ title }: { title: string }) {
               </div>
               <button
                 type="button"
+                onClick={() => {
+                  setOpen(false)
+                  setSwitchOpen(true)
+                }}
+                className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              >
+                <ArrowLeftRight className="h-5 w-5 shrink-0" />
+                {t('switch_role')}
+              </button>
+              <button
+                type="button"
                 onClick={handleLogout}
                 className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-destructive/15 hover:text-destructive"
               >
@@ -156,6 +173,8 @@ export function AppTopbar({ title }: { title: string }) {
           </div>
         </div>
       )}
+
+      <SwitchRoleDialog open={switchOpen} onClose={() => setSwitchOpen(false)} />
     </>
   )
 }

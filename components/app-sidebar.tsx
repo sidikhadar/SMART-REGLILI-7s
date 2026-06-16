@@ -2,10 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState } from 'react'
 import { useApp } from '@/lib/app-context'
 import { navForRole, type NavItem } from '@/lib/nav'
-import { BrandMark } from '@/components/brand-logo'
-import { LogOut } from 'lucide-react'
+import { BrandEmblem } from '@/components/brand-logo'
+import { SwitchRoleDialog } from '@/components/switch-role-dialog'
+import { LogOut, ArrowLeftRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 
@@ -20,6 +22,7 @@ export function AppSidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const items = navForRole(role)
+  const [switchOpen, setSwitchOpen] = useState(false)
 
   const groups: NavItem['group'][] = ['main', 'manage', 'system']
 
@@ -30,13 +33,15 @@ export function AppSidebar() {
 
   return (
     <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-e border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
-      <div className="flex items-center gap-3 px-5 py-5">
-        <BrandMark size={40} />
+      <div className="flex items-center gap-3 border-b border-sidebar-border px-5 py-5">
+        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-card shadow-soft ring-1 ring-sidebar-border">
+          <BrandEmblem size={42} />
+        </span>
         <div className="leading-tight">
-          <p className="font-heading text-sm font-extrabold text-sidebar-accent-foreground">
-            SMART REGLILI
+          <p className="font-display text-lg font-black tracking-wide text-sidebar-accent-foreground">
+            SMART <span className="text-brand">REGLILI</span>
           </p>
-          <p className="text-[10px] uppercase tracking-wider text-sidebar-foreground/60">
+          <p className="text-[10px] uppercase tracking-[0.18em] text-sidebar-foreground/60">
             {t('slogan')}
           </p>
         </div>
@@ -96,6 +101,14 @@ export function AppSidebar() {
         </div>
         <button
           type="button"
+          onClick={() => setSwitchOpen(true)}
+          className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        >
+          <ArrowLeftRight className="h-5 w-5 shrink-0" />
+          {t('switch_role')}
+        </button>
+        <button
+          type="button"
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-destructive/15 hover:text-destructive"
         >
@@ -103,6 +116,8 @@ export function AppSidebar() {
           {t('logout')}
         </button>
       </div>
+
+      <SwitchRoleDialog open={switchOpen} onClose={() => setSwitchOpen(false)} />
     </aside>
   )
 }
