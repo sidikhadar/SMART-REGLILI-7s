@@ -12,7 +12,7 @@ import {
 import { SALES_LAST_7_DAYS } from '@/lib/mock-data'
 import { formatMRU } from '@/lib/format'
 
-export function SalesChart() {
+export function SalesChart({ showProfit = true }: { showProfit?: boolean }) {
   return (
     <div className="h-56 w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -60,14 +60,16 @@ export function SalesChart() {
             strokeWidth={2.5}
             fill="url(#grad-ventes)"
           />
-          <Area
-            type="monotone"
-            dataKey="benefice"
-            name="Bénéfice"
-            stroke="var(--navy)"
-            strokeWidth={2.5}
-            fill="url(#grad-benefice)"
-          />
+          {showProfit && (
+            <Area
+              type="monotone"
+              dataKey="benefice"
+              name="Bénéfice"
+              stroke="var(--navy)"
+              strokeWidth={2.5}
+              fill="url(#grad-benefice)"
+            />
+          )}
         </AreaChart>
       </ResponsiveContainer>
     </div>

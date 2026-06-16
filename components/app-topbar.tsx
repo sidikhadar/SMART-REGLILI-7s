@@ -8,6 +8,7 @@ import { navForRole, type NavItem } from '@/lib/nav'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { BrandEmblem } from '@/components/brand-logo'
 import { SwitchRoleDialog } from '@/components/switch-role-dialog'
+import { LogoutDialog } from '@/components/logout-dialog'
 import { Menu, X, Bell, LogOut, ArrowLeftRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ALERTS } from '@/lib/mock-data'
@@ -24,11 +25,13 @@ export function AppTopbar({ title }: { title: string }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [switchOpen, setSwitchOpen] = useState(false)
+  const [logoutOpen, setLogoutOpen] = useState(false)
   const items = navForRole(role)
   const groups: NavItem['group'][] = ['main', 'manage', 'system']
   const alertCount = ALERTS.filter((a) => a.level !== 'info').length
 
   function handleLogout() {
+    setLogoutOpen(false)
     setOpen(false)
     logout()
     router.push('/')
@@ -163,7 +166,10 @@ export function AppTopbar({ title }: { title: string }) {
               </button>
               <button
                 type="button"
-                onClick={handleLogout}
+                onClick={() => {
+                  setOpen(false)
+                  setLogoutOpen(true)
+                }}
                 className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-destructive/15 hover:text-destructive"
               >
                 <LogOut className="h-5 w-5 flip-rtl" />
@@ -175,6 +181,11 @@ export function AppTopbar({ title }: { title: string }) {
       )}
 
       <SwitchRoleDialog open={switchOpen} onClose={() => setSwitchOpen(false)} />
+      <LogoutDialog
+        open={logoutOpen}
+        onClose={() => setLogoutOpen(false)}
+        onConfirm={handleLogout}
+      />
     </>
   )
 }

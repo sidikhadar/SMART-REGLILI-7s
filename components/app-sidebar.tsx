@@ -7,6 +7,7 @@ import { useApp } from '@/lib/app-context'
 import { navForRole, type NavItem } from '@/lib/nav'
 import { BrandEmblem } from '@/components/brand-logo'
 import { SwitchRoleDialog } from '@/components/switch-role-dialog'
+import { LogoutDialog } from '@/components/logout-dialog'
 import { LogOut, ArrowLeftRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
@@ -23,10 +24,12 @@ export function AppSidebar() {
   const router = useRouter()
   const items = navForRole(role)
   const [switchOpen, setSwitchOpen] = useState(false)
+  const [logoutOpen, setLogoutOpen] = useState(false)
 
   const groups: NavItem['group'][] = ['main', 'manage', 'system']
 
   function handleLogout() {
+    setLogoutOpen(false)
     logout()
     router.push('/')
   }
@@ -109,7 +112,7 @@ export function AppSidebar() {
         </button>
         <button
           type="button"
-          onClick={handleLogout}
+          onClick={() => setLogoutOpen(true)}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-destructive/15 hover:text-destructive"
         >
           <LogOut className="h-5 w-5 flip-rtl" />
@@ -118,6 +121,11 @@ export function AppSidebar() {
       </div>
 
       <SwitchRoleDialog open={switchOpen} onClose={() => setSwitchOpen(false)} />
+      <LogoutDialog
+        open={logoutOpen}
+        onClose={() => setLogoutOpen(false)}
+        onConfirm={handleLogout}
+      />
     </aside>
   )
 }

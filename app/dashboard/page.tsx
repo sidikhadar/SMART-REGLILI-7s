@@ -11,6 +11,7 @@ import {
   ShoppingCart,
   AlertTriangle,
   Clock,
+  Users,
 } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
 import { AppShell } from '@/components/app-shell'
@@ -27,7 +28,8 @@ import { formatMRU, formatTime, productStock } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 export default function DashboardPage() {
-  const { t, lang, userName } = useApp()
+  const { t, lang, userName, role } = useApp()
+  const isCaissier = role === 'caissier'
 
   // ----- Calculs dérivés des données -----
   const todaySales = SALES.filter((s) => {
@@ -36,6 +38,7 @@ export default function DashboardPage() {
   })
   const todayTotal = todaySales.reduce((sum, s) => sum + s.total, 0)
   const todayProfit = Math.round(todayTotal * 0.24)
+  const clientsServed = todaySales.length
   const openDebts = DEBTS.filter((d) => d.status === 'open').reduce((s, d) => s + d.amount, 0)
   const stockValue = PRODUCTS.reduce(
     (sum, p) => sum + productStock(p.lots) * p.buyPrice,
@@ -88,14 +91,24 @@ export default function DashboardPage() {
           tone="brand"
           trend={{ value: '+12%', up: true }}
         />
-        <StatCard
-          label={t('profit')}
-          value={formatMRU(todayProfit)}
-          unit={t('currency')}
-          icon={Wallet}
-          tone="navy"
-          trend={{ value: '+8%', up: true }}
-        />
+        {isCaissier ? (
+          <StatCard
+            label={t('clients_served')}
+            value={String(clientsServed)}
+            icon={Users}
+            tone="navy"
+            trend={{ value: '+5', up: true }}
+          />
+        ) : (
+          <StatCard
+            label={t('profit')}
+            value={formatMRU(todayProfit)}
+            unit={t('currency')}
+            icon={Wallet}
+            tone="navy"
+            trend={{ value: '+8%', up: true }}
+          />
+        )}
         <StatCard
           label={t('products_count')}
           value={String(PRODUCTS.length)}
@@ -121,12 +134,14 @@ export default function DashboardPage() {
               <span className="flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-brand" /> {t('todays_sales')}
               </span>
-              <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-navy" /> {t('profit')}
-              </span>
+              {!isCaissier && (
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2.5 w-2.5 rounded-full bg-navy" /> {t('profit')}
+                </span>
+              )}
             </div>
           </div>
-          <SalesChart />
+          <SalesChart showProfit={!isCaissier} />
         </section>
 
         <section className="rounded-2xl border border-border bg-card p-4 shadow-soft">
