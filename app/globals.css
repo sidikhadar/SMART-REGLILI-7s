@@ -192,6 +192,84 @@
   animation: float-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* ---------- Animation de lancement premium ---------- */
+@keyframes piece-from-left {
+  0% { opacity: 0; transform: translateX(-160px) rotate(-12deg); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: translateX(0) rotate(0); }
+}
+@keyframes piece-from-right {
+  0% { opacity: 0; transform: translateX(160px) rotate(12deg); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: translateX(0) rotate(0); }
+}
+@keyframes piece-from-bottom {
+  0% { opacity: 0; transform: translateY(140px) scale(0.6); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes piece-from-top {
+  0% { opacity: 0; transform: translateY(-140px) scale(0.6); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes arc-in {
+  0% { opacity: 0; transform: scaleX(0.2); }
+  100% { opacity: 1; transform: scaleX(1); }
+}
+@keyframes logo-glow {
+  0%, 100% { filter: drop-shadow(0 0 0 rgba(30, 126, 62, 0)); }
+  50% { filter: drop-shadow(0 0 22px rgba(30, 126, 62, 0.7)); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slide-up-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-60px) scale(0.86); }
+}
+
+.launch-piece-left { animation: piece-from-left 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.launch-piece-right { animation: piece-from-right 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.launch-piece-bottom { animation: piece-from-bottom 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
+.launch-piece-top { animation: piece-from-top 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
+.launch-arc { animation: arc-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
+.launch-glow { animation: logo-glow 0.6s ease-in-out 0.9s 1; }
+.launch-assembled { animation: slide-up-out 0.7s cubic-bezier(0.5, 0, 0.75, 0) 1.7s both; }
+.welcome-reveal { animation: fade-in 0.7s ease-out 1.9s both; }
+
+/* ---------- Transitions horizontales entre pages d'auth ---------- */
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@utility animate-slide-in-right {
+  animation: slide-in-right 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@utility animate-slide-in-left {
+  animation: slide-in-left 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Pop de validation pour la page succès */
+@keyframes success-pop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@utility animate-success-pop {
+  animation: success-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes success-ring {
+  0% { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+.success-ring { animation: success-ring 1s ease-out 0.3s infinite; }
+
 /* RTL helpers */
 [dir='rtl'] .flip-rtl {
   transform: scaleX(-1);
