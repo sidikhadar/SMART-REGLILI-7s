@@ -192,6 +192,52 @@
   animation: float-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* ---- Animations d'entrée page Welcome ---- */
+@keyframes logo-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.55) translateY(8px);
+  }
+  60% {
+    transform: scale(1.06) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@utility animate-logo-pop {
+  animation: logo-pop 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@utility animate-rise-in {
+  animation: rise-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes header-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@utility animate-header-drop {
+  animation: header-drop 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* RTL helpers */
 [dir='rtl'] .flip-rtl {
   transform: scaleX(-1);
