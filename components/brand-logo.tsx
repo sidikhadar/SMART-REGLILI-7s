@@ -29,37 +29,6 @@ export function BrandLogoFull({
 }
 
 /**
- * Vrai logo de l'application en carré arrondi (jamais recadré).
- * Utilisé dans le menu latéral (40px) et en petit en haut des pages d'auth.
- */
-export function BrandSquare({
-  size = 40,
-  className,
-}: {
-  size?: number
-  className?: string
-}) {
-  return (
-    <div
-      className={cn(
-        'relative shrink-0 overflow-hidden rounded-xl bg-card ring-1 ring-border',
-        className,
-      )}
-      style={{ width: size, height: size }}
-    >
-      <Image
-        src="/logo-smart-reglili.jpeg"
-        alt="Logo Smart Reglili"
-        fill
-        sizes={`${size}px`}
-        className="object-cover"
-        priority
-      />
-    </div>
-  )
-}
-
-/**
  * Emblème circulaire complet (logo SR rond) — affiché entier, jamais recadré.
  * Idéal pour le header du menu latéral.
  */
