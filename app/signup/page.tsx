@@ -15,15 +15,14 @@ import {
 } from '@/components/auth/auth-ui'
 
 export default function SignupPage() {
-  const { t, login, dir } = useApp()
+  const { t, dir } = useApp()
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    // Inscription simulée : on connecte en tant que patron par défaut
-    login('patron')
-    router.push('/dashboard')
+    // Inscription simulée : on redirige vers la vérification de l'email
+    router.push('/verify')
   }
 
   return (

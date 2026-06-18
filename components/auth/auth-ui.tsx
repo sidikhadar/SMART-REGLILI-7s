@@ -135,13 +135,13 @@ export function HelpButton({ onClick }: { onClick: () => void }) {
 }
 
 /* ---- Bouton Retour vers Welcome (Login / Signup) ---- */
-export function BackButton() {
+export function BackButton({ href = '/' }: { href?: string }) {
   const { t } = useApp()
   const router = useRouter()
   return (
     <button
       type="button"
-      onClick={() => router.push('/')}
+      onClick={() => router.push(href)}
       className="flex shrink-0 items-center gap-1.5 rounded-full bg-navy-foreground/10 px-3 py-2 text-sm font-medium ring-1 ring-navy-foreground/15 transition-colors hover:bg-navy-foreground/20"
     >
       <ArrowLeft className="h-4 w-4 flip-rtl" aria-hidden />

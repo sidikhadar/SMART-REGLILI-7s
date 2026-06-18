@@ -1,11 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { User, Lock, Eye, EyeOff, LogIn, Check } from 'lucide-react'
+import { User, Lock, Eye, EyeOff, LogIn, Check, AlertCircle } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
 import type { Role } from '@/lib/types'
 import { cn } from '@/lib/utils'
+
+const MAX_ATTEMPTS = 5
+const LOCK_SECONDS = 5 * 60
+// Identifiants de démonstration acceptés
+const DEMO_EMAIL = 'patron@reglili.mr'
+const DEMO_PASSWORD = '123456'
 import {
   AuthCard,
   NavyHeader,
@@ -27,12 +33,60 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showForgot, setShowForgot] = useState(false)
   const [remember, setRemember] = useState(true)
+  const [emailVal, setEmailVal] = useState('')
+  const [passwordVal, setPasswordVal] = useState('')
+  const [error, setError] = useState('')
+  const [attempts, setAttempts] = useState(0)
+  const [lockLeft, setLockLeft] = useState(0)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const locked = lockLeft > 0
+
+  // Minuteur de blocage
+  useEffect(() => {
+    if (lockLeft <= 0) return
+    timerRef.current = setInterval(() => {
+      setLockLeft((s) => {
+        if (s <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current)
+          setAttempts(0)
+          setError('')
+          return 0
+        }
+        return s - 1
+      })
+    }, 1000)
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+    }
+  }, [lockLeft])
+
+  function formatTimer(s: number) {
+    const m = Math.floor(s / 60)
+    const sec = s % 60
+    return `${m}:${sec.toString().padStart(2, '0')}`
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!role) return
-    login(role)
-    router.push(role === 'patron' ? '/dashboard' : '/caisse')
+    if (!role || locked) return
+
+    const ok = emailVal.trim() === DEMO_EMAIL && passwordVal === DEMO_PASSWORD
+    if (ok) {
+      setError('')
+      login(role)
+      router.push(role === 'patron' ? '/dashboard' : '/caisse')
+      return
+    }
+
+    const next = attempts + 1
+    setAttempts(next)
+    if (next >= MAX_ATTEMPTS) {
+      setLockLeft(LOCK_SECONDS)
+      setError(t('account_locked'))
+    } else {
+      setError(`${t('login_error')} — ${MAX_ATTEMPTS - next} ${t('attempts_left')}`)
+    }
   }
 
   return (
@@ -50,9 +104,12 @@ export default function LoginPage() {
             type="text"
             required
             dir={dir}
+            value={emailVal}
+            onChange={(e) => setEmailVal(e.target.value)}
+            disabled={locked}
             placeholder={t('email')}
             autoComplete="username"
-            className="w-full bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
+            className="w-full bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground disabled:opacity-60"
           />
         </Field>
 
@@ -61,9 +118,12 @@ export default function LoginPage() {
             type={showPassword ? 'text' : 'password'}
             required
             dir={dir}
+            value={passwordVal}
+            onChange={(e) => setPasswordVal(e.target.value)}
+            disabled={locked}
             placeholder={t('password')}
             autoComplete="current-password"
-            className="w-full bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
+            className="w-full bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground disabled:opacity-60"
           />
           <button
             type="button"
@@ -120,9 +180,26 @@ export default function LoginPage() {
           />
         </div>
 
+        {error && (
+          <div
+            role="alert"
+            className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive"
+          >
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            <div className="flex-1">
+              <p>{error}</p>
+              {locked && (
+                <p className="mt-1 font-mono text-base font-bold tabular-nums">
+                  {formatTimer(lockLeft)}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
         <button
           type="submit"
-          disabled={!role}
+          disabled={!role || locked}
           className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-4 text-base font-semibold text-brand-foreground shadow-soft transition-all hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <LogIn className="h-5 w-5 flip-rtl" aria-hidden />
