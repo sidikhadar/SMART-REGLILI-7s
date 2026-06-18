@@ -57,6 +57,37 @@ export function BrandEmblem({
 }
 
 /**
+ * Vrai logo de l'application en carré arrondi (image complète, jamais recadrée).
+ * Utilisé dans le header du menu latéral en 40x40.
+ */
+export function BrandSquare({
+  size = 40,
+  className,
+}: {
+  size?: number
+  className?: string
+}) {
+  return (
+    <div
+      className={cn(
+        'relative shrink-0 overflow-hidden rounded-xl bg-card ring-1 ring-border',
+        className,
+      )}
+      style={{ width: size, height: size }}
+    >
+      <Image
+        src="/logo-smart-reglili.jpeg"
+        alt="Logo Smart Reglili"
+        fill
+        sizes={`${size}px`}
+        className="object-cover"
+        priority
+      />
+    </div>
+  )
+}
+
+/**
  * Petite icône carrée (logo recadré) pour la barre supérieure ou les puces.
  */
 export function BrandMark({

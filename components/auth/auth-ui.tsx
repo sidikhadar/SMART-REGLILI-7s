@@ -18,6 +18,7 @@ import {
 import { useApp } from '@/lib/app-context'
 import { LANGS } from '@/lib/i18n'
 import { BrandEmblem } from '@/components/brand-logo'
+import { Flag } from '@/components/flag'
 import { cn } from '@/lib/utils'
 
 /* ============================================================
@@ -100,13 +101,17 @@ export function LangFlags() {
             aria-pressed={lang === l.code}
             aria-label={l.label}
             className={cn(
-              'flex h-10 w-12 items-center justify-center rounded-lg text-xl transition-all',
+              'flex h-10 w-12 items-center justify-center overflow-hidden rounded-lg text-xl transition-all',
               lang === l.code
                 ? 'bg-navy-foreground/15 ring-2 ring-brand'
                 : 'bg-navy-foreground/5 ring-1 ring-navy-foreground/10 hover:bg-navy-foreground/10',
             )}
           >
-            <span aria-hidden>{l.flag}</span>
+            <Flag
+              country={l.country}
+              emoji={l.flag}
+              className="h-5 w-7 rounded-sm object-cover shadow-sm"
+            />
           </button>
         ))}
       </div>

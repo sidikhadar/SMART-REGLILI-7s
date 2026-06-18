@@ -1,9 +1,15 @@
 import type { Lang } from './types'
 
-export const LANGS: { code: Lang; label: string; flag: string; dir: 'rtl' | 'ltr' }[] = [
-  { code: 'ar', label: 'العربية', flag: '🇲🇷', dir: 'rtl' },
-  { code: 'fr', label: 'Français', flag: '🇫🇷', dir: 'ltr' },
-  { code: 'en', label: 'English', flag: '🇬🇧', dir: 'ltr' },
+export const LANGS: {
+  code: Lang
+  label: string
+  flag: string
+  country: string
+  dir: 'rtl' | 'ltr'
+}[] = [
+  { code: 'ar', label: 'العربية', flag: '🇲🇷', country: 'mr', dir: 'rtl' },
+  { code: 'fr', label: 'Français', flag: '🇫🇷', country: 'fr', dir: 'ltr' },
+  { code: 'en', label: 'English', flag: '🇬🇧', country: 'gb', dir: 'ltr' },
 ]
 
 type Dict = Record<string, string>
@@ -53,6 +59,22 @@ const fr: Dict = {
   footer_rights: 'Tous droits réservés',
   patron_short: 'Accès complet à toutes les fonctionnalités',
   caissier_short: 'Accès à la caisse et aux fonctions de base',
+
+  // vérification email + succès
+  verify_title: 'Vérification de l’email',
+  verify_subtitle: 'Entrez le code à 6 chiffres envoyé à votre adresse email',
+  verify_btn: 'Vérifier',
+  resend_code: 'Renvoyer le code',
+  code_sent: 'Un nouveau code a été envoyé',
+  invalid_code: 'Code incorrect, réessayez',
+  success_title: 'Compte créé avec succès !',
+  success_msg: 'Bienvenue sur SMART REGLILI',
+  login_now: 'Se connecter maintenant',
+  // erreurs login
+  login_error: 'Email ou mot de passe incorrect',
+  attempts_left: 'tentative(s) restante(s)',
+  account_locked: 'Compte temporairement bloqué, réessayez dans 5 minutes',
+  try_again_in: 'Réessayez dans',
 
   // nav
   dashboard: 'Tableau de bord',
