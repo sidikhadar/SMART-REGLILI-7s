@@ -8,9 +8,9 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import type { Lang, Role, Product, PaymentMethod } from './types'
+import type { Lang, Role, Product, PaymentMethod, Register } from './types'
 import { translate, LANGS } from './i18n'
-import { PRODUCTS } from './mock-data'
+import { PRODUCTS, REGISTERS } from './mock-data'
 
 export interface CartItem {
   productId: string
@@ -36,6 +36,12 @@ interface AppState {
   removeFromCart: (productId: string) => void
   clearCart: () => void
   cartTotal: number
+  // registers (multi-caisses)
+  registers: Register[]
+  activeRegister: string
+  setActiveRegister: (id: string) => void
+  addRegister: (name: string) => void
+  removeRegister: (id: string) => void
 }
 
 const AppContext = createContext<AppState | null>(null)

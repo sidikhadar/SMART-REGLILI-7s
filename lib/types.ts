@@ -10,8 +10,15 @@ export type PaymentMethod =
   | 'click'
   | 'masrivi'
   | 'bamis'
+  | 'amanety'
   | 'credit'
   | 'partiel'
+
+export interface Register {
+  id: string
+  name: string
+  active: boolean
+}
 
 export type ProductCategory =
   | 'alimentation'

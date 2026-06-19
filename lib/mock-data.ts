@@ -7,6 +7,7 @@ import type {
   Supplier,
   Employee,
   Alert,
+  Register,
 } from './types'
 
 const today = new Date()
@@ -263,3 +264,47 @@ export const SALES_LAST_7_DAYS = [
   { day: 'Sam', ventes: 8900, benefice: 2240 },
   { day: 'Dim', ventes: 5600, benefice: 1330 },
 ]
+
+// --- Caisses (toutes partagent le même stock) ---
+export const REGISTERS: Register[] = [
+  { id: 'r1', name: 'Caisse 1', active: true },
+  { id: 'r2', name: 'Caisse 2', active: true },
+]
+
+// --- Historique de ventes sur 1 an (données fictives déterministes) ---
+export interface DailyPoint {
+  date: string // YYYY-MM-DD
+  total: number
+  profit: number
+  r1: number
+  r2: number
+}
+
+// pseudo-aléatoire déterministe pour des données stables entre les rendus
+function seeded(n: number): number {
+  const x = Math.sin(n * 9973.13) * 43758.5453
+  return x - Math.floor(x)
+}
+
+export const DAILY_SALES: DailyPoint[] = (() => {
+  const out: DailyPoint[] = []
+  const start = new Date()
+  start.setHours(0, 0, 0, 0)
+  // 0 = dimanche ... 6 = samedi (week-ends plus actifs en Mauritanie : jeu/ven/sam)
+  const weekdayFactor = [0.9, 0.85, 0.9, 0.95, 1.2, 1.4, 1.15]
+  for (let i = 364; i >= 0; i--) {
+    const d = new Date(start)
+    d.setDate(d.getDate() - i)
+    const dow = d.getDay()
+    const month = d.getMonth()
+    const seasonal = 1 + 0.14 * Math.sin((month / 12) * Math.PI * 2)
+    const growth = 1 + (364 - i) / 364 * 0.25 // légère croissance sur l'année
+    const noise = 0.78 + seeded(i + 1) * 0.5
+    const total = Math.round(6200 * weekdayFactor[dow] * seasonal * growth * noise)
+    const r1 = Math.round(total * (0.52 + seeded(i + 100) * 0.12))
+    const r2 = total - r1
+    const profit = Math.round(total * (0.21 + seeded(i + 200) * 0.07))
+    out.push({ date: d.toISOString().slice(0, 10), total, profit, r1, r2 })
+  }
+  return out
+})()
