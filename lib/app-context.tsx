@@ -51,6 +51,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<Role | null>(null)
   const [userName, setUserName] = useState('')
   const [cart, setCart] = useState<CartItem[]>([])
+  const [registers, setRegisters] = useState<Register[]>(REGISTERS)
+  const [activeRegister, setActiveRegisterState] = useState<string>(REGISTERS[0].id)
 
   // hydrate from localStorage (UI preference only, not data persistence)
   useEffect(() => {
@@ -139,6 +141,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [cart],
   )
 
+  function setActiveRegister(id: string) {
+    setActiveRegisterState(id)
+  }
+
+  function addRegister(name: string) {
+    const trimmed = name.trim()
+    if (!trimmed) return
+    setRegisters((prev) => [
+      ...prev,
+      { id: `r${Date.now()}`, name: trimmed, active: true },
+    ])
+  }
+
+  function removeRegister(id: string) {
+    setRegisters((prev) => {
+      if (prev.length <= 1) return prev // garder au moins une caisse
+      const next = prev.filter((r) => r.id !== id)
+      if (activeRegister === id && next.length) {
+        setActiveRegisterState(next[0].id)
+      }
+      return next
+    })
+  }
+
   const value: AppState = {
     lang,
     dir,
@@ -155,6 +181,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     removeFromCart,
     clearCart,
     cartTotal,
+    registers,
+    activeRegister,
+    setActiveRegister,
+    addRegister,
+    removeRegister,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
@@ -167,4 +198,4 @@ export function useApp() {
 }
 
 // re-export for convenience
-export type { Product, PaymentMethod }
+export type { Product, PaymentMethod, Register }
