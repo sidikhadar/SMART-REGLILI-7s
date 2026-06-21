@@ -9,9 +9,6 @@ import { cn } from '@/lib/utils'
 
 const MAX_ATTEMPTS = 5
 const LOCK_SECONDS = 5 * 60
-// Identifiants de démonstration acceptés
-const DEMO_EMAIL = 'patron@reglili.mr'
-const DEMO_PASSWORD = '123456'
 import {
   AuthCard,
   NavyHeader,
@@ -71,9 +68,12 @@ export default function LoginPage() {
     e.preventDefault()
     if (!role || locked) return
 
-    const ok = emailVal.trim() === DEMO_EMAIL && passwordVal === DEMO_PASSWORD
+    // Pas encore de backend : tout identifiant non vide est accepté.
+    // (La logique de blocage 5 tentatives reste prête pour la vraie API.)
+    const ok = emailVal.trim().length > 0 && passwordVal.length > 0
     if (ok) {
       setError('')
+      setAttempts(0)
       login(role)
       router.push(role === 'patron' ? '/dashboard' : '/caisse')
       return
