@@ -129,10 +129,10 @@ export default function DashboardPage() {
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         <section className="rounded-2xl border border-border bg-card p-4 shadow-soft lg:col-span-2">
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="font-heading text-base font-bold text-foreground">{t('sales_7d')}</h2>
+            <h2 className="font-heading text-base font-bold text-foreground">{t('sales_chart')}</h2>
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
               <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-brand" /> {t('todays_sales')}
+                <span className="h-2.5 w-2.5 rounded-full bg-brand" /> {t('ventes')}
               </span>
               {!isCaissier && (
                 <span className="flex items-center gap-1.5">
