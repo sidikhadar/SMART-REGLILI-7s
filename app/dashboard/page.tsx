@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   TrendingUp,
   Wallet,
@@ -28,8 +29,17 @@ import { formatMRU, formatTime, productStock } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 export default function DashboardPage() {
-  const { t, lang, userName, role } = useApp()
+  const { t, lang, userName, role, addToCart } = useApp()
+  const router = useRouter()
   const isCaissier = role === 'caissier'
+
+  // Ajoute un top produit au panier de la caisse puis ouvre la page Caisse
+  function sendToCaisse(productId: string) {
+    const p = PRODUCTS.find((x) => x.id === productId)
+    if (!p) return
+    addToCart(p) // quantité initialisée à 1 (ou +1 si déjà présent)
+    router.push('/caisse')
+  }
 
   // ----- Calculs dérivés des données -----
   const todaySales = SALES.filter((s) => {
@@ -56,7 +66,7 @@ export default function DashboardPage() {
     .map(([id, qty]) => ({ product: PRODUCTS.find((p) => p.id === id)!, qty }))
     .filter((x) => x.product)
     .sort((a, b) => b.qty - a.qty)
-    .slice(0, 4)
+    .slice(0, 2)
   const maxQty = Math.max(...topProducts.map((x) => x.qty), 1)
 
   // paiements (on retire les valeurs nulles)
@@ -179,26 +189,36 @@ export default function DashboardPage() {
           </div>
           <ul className="space-y-3">
             {topProducts.map(({ product, qty }, i) => (
-              <li key={product.id} className="flex items-center gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-sm font-bold text-brand">
-                  {i + 1}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="mb-1 flex items-center justify-between gap-2">
-                    <span className="truncate text-sm font-medium text-foreground">
-                      {product.name}
-                    </span>
-                    <span className="shrink-0 text-xs text-muted-foreground">
-                      {qty} {t('units_sold')}
-                    </span>
+              <li key={product.id}>
+                <button
+                  type="button"
+                  onClick={() => sendToCaisse(product.id)}
+                  className="flex w-full items-center gap-3 rounded-xl p-1 text-start transition-colors hover:bg-muted"
+                  title={t('add_to_cart')}
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-sm font-bold text-brand">
+                    {i + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      <span className="truncate text-sm font-medium text-foreground">
+                        {product.name}
+                      </span>
+                      <span className="shrink-0 text-xs text-muted-foreground">
+                        {qty} {t('units_sold')}
+                      </span>
+                    </div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-brand"
+                        style={{ width: `${(qty / maxQty) * 100}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-brand"
-                      style={{ width: `${(qty / maxQty) * 100}%` }}
-                    />
-                  </div>
-                </div>
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
+                    <Plus className="h-4 w-4" />
+                  </span>
+                </button>
               </li>
             ))}
           </ul>
