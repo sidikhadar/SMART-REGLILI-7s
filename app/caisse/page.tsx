@@ -11,25 +11,29 @@ import {
   ShoppingCart,
   Check,
   X,
+  Banknote,
+  Send,
+  UserPlus,
+  Wallet,
+  ChevronLeft,
 } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
 import { AppShell } from '@/components/app-shell'
-import { PRODUCTS } from '@/lib/mock-data'
+import { PRODUCTS, CLIENTS } from '@/lib/mock-data'
 import { formatMRU, productStock } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import type { PaymentMethod } from '@/lib/types'
 
-const PAY_METHODS: PaymentMethod[] = [
-  'especes',
-  'bankily',
-  'masrivi',
-  'sedad',
-  'click',
-  'bik',
-  'bamis',
-  'amanety',
-  'credit',
-]
+// Les 4 modes de paiement demandés
+type PayMode = 'especes' | 'transfert' | 'dette' | 'partiel'
+
+const TRANSFER_APPS = [
+  { id: 'bankily', label: 'Bankily', color: '#f59e0b' },
+  { id: 'sedad', label: 'Sedad', color: '#2563eb' },
+  { id: 'bik', label: 'BIK', color: '#059669' },
+  { id: 'click', label: 'Click', color: '#0d9488' },
+  { id: 'masrivi', label: 'Masrivi', color: '#7c3aed' },
+  { id: 'bamis', label: 'Bamis', color: '#15803d' },
+] as const
 
 export default function CaissePage() {
   const {
