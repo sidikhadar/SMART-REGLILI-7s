@@ -282,10 +282,10 @@ export default function CaissePage() {
             </div>
           )}
 
-          {/* Raccourcis produits populaires si pas de recherche */}
+          {/* Liste complète des produits si pas de recherche (seule zone scrollable) */}
           {!query && (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {PRODUCTS.slice(0, 9).map((p) => (
+            <div className="grid max-h-[60vh] grid-cols-2 gap-2 overflow-y-auto pr-1 sm:grid-cols-3">
+              {PRODUCTS.map((p) => (
                 <button
                   key={p.id}
                   type="button"
