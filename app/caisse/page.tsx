@@ -54,10 +54,23 @@ export default function CaissePage() {
   const [showRegisters, setShowRegisters] = useState(false)
   const [editingQty, setEditingQty] = useState<string | null>(null)
   const [payOpen, setPayOpen] = useState(false)
-  const [method, setMethod] = useState<PaymentMethod>('especes')
+  const [mode, setMode] = useState<PayMode | null>(null)
   const [received, setReceived] = useState('')
+  const [transferApp, setTransferApp] = useState<string | null>(null)
+  const [partialAmount, setPartialAmount] = useState('')
+  const [clientMode, setClientMode] = useState<'existing' | 'new'>('existing')
+  const [clientId, setClientId] = useState<string>('')
+  const [newClientName, setNewClientName] = useState('')
+  const [newClientPhone, setNewClientPhone] = useState('')
   const [done, setDone] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null)
+
+  const PAY_MODES: { id: PayMode; label: string; icon: typeof Banknote }[] = [
+    { id: 'especes', label: t('pay_mode_especes'), icon: Banknote },
+    { id: 'transfert', label: t('pay_mode_transfert'), icon: Send },
+    { id: 'dette', label: t('pay_mode_dette'), icon: UserPlus },
+    { id: 'partiel', label: t('pay_mode_partiel'), icon: Wallet },
+  ]
 
   const activeName =
     registers.find((r) => r.id === activeRegister)?.name ?? registers[0]?.name
@@ -96,12 +109,52 @@ export default function CaissePage() {
   const change = Math.max(0, received_n - cartTotal)
   const remaining = Math.max(0, cartTotal - received_n)
 
+  // Montant payé maintenant en mode partiel (le reste devient une dette)
+  const partial_n = Math.min(Number(partialAmount) || 0, cartTotal)
+  const partialRemaining = Math.max(0, cartTotal - partial_n)
+
+  // Le bouton Confirmer est-il actif selon le mode choisi ?
+  const canConfirm = (() => {
+    if (cart.length === 0) return false
+    switch (mode) {
+      case 'especes':
+        return received_n >= cartTotal
+      case 'transfert':
+        return !!transferApp
+      case 'dette':
+        return clientMode === 'existing'
+          ? !!clientId
+          : newClientName.trim().length > 0
+      case 'partiel':
+        return (
+          partial_n > 0 &&
+          (clientMode === 'existing'
+            ? !!clientId
+            : newClientName.trim().length > 0)
+        )
+      default:
+        return false
+    }
+  })()
+
+  function openPay() {
+    setMode(null)
+    setReceived('')
+    setTransferApp(null)
+    setPartialAmount('')
+    setClientMode('existing')
+    setClientId('')
+    setNewClientName('')
+    setNewClientPhone('')
+    setPayOpen(true)
+  }
+
   function validateSale() {
+    if (!canConfirm) return
     setDone(true)
     setTimeout(() => {
       setDone(false)
       setPayOpen(false)
-      setReceived('')
       clearCart()
     }, 1400)
   }
@@ -384,7 +437,7 @@ export default function CaissePage() {
               <button
                 type="button"
                 disabled={cart.length === 0}
-                onClick={() => setPayOpen(true)}
+                onClick={openPay}
                 className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-base font-semibold text-brand-foreground shadow-soft transition-all hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Check className="h-5 w-5" />
@@ -430,60 +483,215 @@ export default function CaissePage() {
                   </p>
                 </div>
 
-                {/* Méthodes de paiement */}
-                <div className="mb-4 grid grid-cols-3 gap-2">
-                  {PAY_METHODS.map((m) => (
-                    <button
-                      key={m}
-                      type="button"
-                      onClick={() => setMethod(m)}
-                      className={cn(
-                        'rounded-xl border px-2 py-2.5 text-xs font-semibold transition-colors',
-                        method === m
-                          ? 'border-brand bg-brand/10 text-brand'
-                          : 'border-border text-muted-foreground hover:bg-muted',
-                      )}
-                    >
-                      {t(`pay_${m}`)}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Montant reçu + monnaie (espèces) */}
-                {method === 'especes' && (
-                  <div className="mb-4">
-                    <label className="mb-1 block text-sm font-medium text-foreground">
-                      {t('cash_received')}
-                    </label>
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      value={received}
-                      onChange={(e) => setReceived(e.target.value)}
-                      placeholder="0"
-                      className="w-full rounded-xl border border-border bg-background px-4 py-3 text-lg font-bold tabular-nums text-foreground outline-none focus:border-brand"
-                    />
-                    {received_n > 0 && (
-                      <div className="mt-2 flex items-center justify-between rounded-xl bg-muted/60 px-4 py-2 text-sm">
-                        <span className="text-muted-foreground">
-                          {remaining > 0 ? t('remaining') : t('change')}
-                        </span>
-                        <span className="font-heading font-bold tabular-nums text-foreground">
-                          {formatMRU(remaining > 0 ? remaining : change)} {t('mru')}
-                        </span>
-                      </div>
-                    )}
+                {/* Étape 1 : choix du mode (4 options) */}
+                {!mode && (
+                  <div className="grid grid-cols-2 gap-3">
+                    {PAY_MODES.map((m) => {
+                      const Icon = m.icon
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => setMode(m.id)}
+                          className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-card px-3 py-5 text-center shadow-soft transition-all hover:border-brand hover:bg-brand/5 active:scale-95"
+                        >
+                          <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand/10 text-brand">
+                            <Icon className="h-6 w-6" />
+                          </span>
+                          <span className="text-sm font-semibold text-foreground">
+                            {m.label}
+                          </span>
+                        </button>
+                      )
+                    })}
                   </div>
                 )}
 
-                <button
-                  type="button"
-                  onClick={validateSale}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-base font-semibold text-brand-foreground shadow-soft transition-all hover:brightness-110 active:scale-[0.99]"
-                >
-                  <Check className="h-5 w-5" />
-                  {t('validate_sale')}
-                </button>
+                {/* Étape 2 : écran dédié selon le mode */}
+                {mode && (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setMode(null)}
+                      className="mb-3 flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      <ChevronLeft className="h-4 w-4 flip-rtl" />
+                      {t('back')}
+                    </button>
+
+                    {/* --- Espèces --- */}
+                    {mode === 'especes' && (
+                      <div>
+                        <label className="mb-1 block text-sm font-medium text-foreground">
+                          {t('cash_received')}
+                        </label>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          autoFocus
+                          value={received}
+                          onChange={(e) => setReceived(e.target.value)}
+                          placeholder="0"
+                          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-lg font-bold tabular-nums text-foreground outline-none focus:border-brand"
+                        />
+                        {received_n > 0 && (
+                          <div className="mt-2 flex items-center justify-between rounded-xl bg-muted/60 px-4 py-2 text-sm">
+                            <span className="text-muted-foreground">
+                              {remaining > 0 ? t('remaining') : t('change')}
+                            </span>
+                            <span className="font-heading font-bold tabular-nums text-foreground">
+                              {formatMRU(remaining > 0 ? remaining : change)} {t('mru')}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* --- Transfert : choix de l'application --- */}
+                    {mode === 'transfert' && (
+                      <div>
+                        <p className="mb-2 text-sm font-medium text-foreground">
+                          {t('choose_app')}
+                        </p>
+                        <div className="grid grid-cols-3 gap-2">
+                          {TRANSFER_APPS.map((app) => (
+                            <button
+                              key={app.id}
+                              type="button"
+                              onClick={() => setTransferApp(app.id)}
+                              className={cn(
+                                'flex flex-col items-center gap-2 rounded-xl border px-2 py-3 transition-all active:scale-95',
+                                transferApp === app.id
+                                  ? 'border-brand bg-brand/10'
+                                  : 'border-border hover:bg-muted',
+                              )}
+                            >
+                              <span
+                                className="flex h-9 w-9 items-center justify-center rounded-lg text-sm font-extrabold text-white"
+                                style={{ backgroundColor: app.color }}
+                              >
+                                {app.label.charAt(0)}
+                              </span>
+                              <span className="text-xs font-semibold text-foreground">
+                                {app.label}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* --- Dette / Partiel : sélection client --- */}
+                    {(mode === 'dette' || mode === 'partiel') && (
+                      <div className="space-y-3">
+                        {mode === 'partiel' && (
+                          <div>
+                            <label className="mb-1 block text-sm font-medium text-foreground">
+                              {t('amount')} ({t('to_pay')})
+                            </label>
+                            <input
+                              type="number"
+                              inputMode="numeric"
+                              value={partialAmount}
+                              onChange={(e) => setPartialAmount(e.target.value)}
+                              placeholder="0"
+                              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-lg font-bold tabular-nums text-foreground outline-none focus:border-brand"
+                            />
+                            {partial_n > 0 && (
+                              <div className="mt-2 flex items-center justify-between rounded-xl bg-muted/60 px-4 py-2 text-sm">
+                                <span className="text-muted-foreground">
+                                  {t('recorded_as_debt')}
+                                </span>
+                                <span className="font-heading font-bold tabular-nums text-destructive">
+                                  {formatMRU(partialRemaining)} {t('mru')}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Choix client existant / nouveau */}
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setClientMode('existing')}
+                            className={cn(
+                              'flex-1 rounded-xl border py-2 text-sm font-semibold transition-colors',
+                              clientMode === 'existing'
+                                ? 'border-brand bg-brand/10 text-brand'
+                                : 'border-border text-muted-foreground hover:bg-muted',
+                            )}
+                          >
+                            {t('existing_client')}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setClientMode('new')}
+                            className={cn(
+                              'flex-1 rounded-xl border py-2 text-sm font-semibold transition-colors',
+                              clientMode === 'new'
+                                ? 'border-brand bg-brand/10 text-brand'
+                                : 'border-border text-muted-foreground hover:bg-muted',
+                            )}
+                          >
+                            {t('new_client')}
+                          </button>
+                        </div>
+
+                        {clientMode === 'existing' ? (
+                          <div className="max-h-40 space-y-1 overflow-y-auto rounded-xl border border-border p-1">
+                            {CLIENTS.map((c) => (
+                              <button
+                                key={c.id}
+                                type="button"
+                                onClick={() => setClientId(c.id)}
+                                className={cn(
+                                  'flex w-full items-center justify-between rounded-lg px-3 py-2 text-start text-sm transition-colors',
+                                  clientId === c.id
+                                    ? 'bg-brand/10 text-brand'
+                                    : 'hover:bg-muted',
+                                )}
+                              >
+                                <span className="font-medium text-foreground">
+                                  {c.name}
+                                </span>
+                                {clientId === c.id && (
+                                  <Check className="h-4 w-4 text-brand" />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <input
+                              value={newClientName}
+                              onChange={(e) => setNewClientName(e.target.value)}
+                              placeholder={t('client_name')}
+                              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
+                            />
+                            <input
+                              value={newClientPhone}
+                              onChange={(e) => setNewClientPhone(e.target.value)}
+                              inputMode="tel"
+                              placeholder={t('client_phone')}
+                              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={validateSale}
+                      disabled={!canConfirm}
+                      className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-base font-semibold text-brand-foreground shadow-soft transition-all hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <Check className="h-5 w-5" />
+                      {t('confirm')}
+                    </button>
+                  </div>
+                )}
               </>
             )}
           </div>
