@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
 import { AppShell } from '@/components/app-shell'
-import { PRODUCTS, CLIENTS } from '@/lib/mock-data'
+import { PRODUCTS, CLIENTS, SALES } from '@/lib/mock-data'
 import { formatMRU, productStock } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -34,6 +34,16 @@ const TRANSFER_APPS = [
   { id: 'masrivi', label: 'Masrivi', color: '#7c3aed' },
   { id: 'bamis', label: 'Bamis', color: '#15803d' },
 ] as const
+
+// Le paiement partiel = combinaison de 2 méthodes.
+// m1 = montant saisi (1ère méthode), m2 = reste automatique (2ème méthode)
+type PartialCombo = 'especes_transfert' | 'especes_dette' | 'transfert_dette'
+
+const PARTIAL_COMBOS: { id: PartialCombo; m1: 'especes' | 'transfert'; m2: 'transfert' | 'dette' }[] = [
+  { id: 'especes_transfert', m1: 'especes', m2: 'transfert' },
+  { id: 'especes_dette', m1: 'especes', m2: 'dette' },
+  { id: 'transfert_dette', m1: 'transfert', m2: 'dette' },
+]
 
 export default function CaissePage() {
   const {
@@ -58,6 +68,8 @@ export default function CaissePage() {
   const [received, setReceived] = useState('')
   const [transferApp, setTransferApp] = useState<string | null>(null)
   const [partialAmount, setPartialAmount] = useState('')
+  // combinaison de 2 méthodes pour le paiement partiel
+  const [partialCombo, setPartialCombo] = useState<PartialCombo | null>(null)
   const [clientMode, setClientMode] = useState<'existing' | 'new'>('existing')
   const [clientId, setClientId] = useState<string>('')
   const [newClientName, setNewClientName] = useState('')
@@ -86,10 +98,27 @@ export default function CaissePage() {
     ).slice(0, 8)
   }, [query])
 
+  // Les 2 produits les plus vendus (raccourcis affichés sur la caisse)
+  const topProducts = useMemo(() => {
+    const qtyByProduct = new Map<string, number>()
+    SALES.forEach((s) =>
+      s.items.forEach((it) => {
+        qtyByProduct.set(it.productId, (qtyByProduct.get(it.productId) || 0) + it.qty)
+      }),
+    )
+    return [...qtyByProduct.entries()]
+      .map(([id, qty]) => ({ product: PRODUCTS.find((p) => p.id === id), qty }))
+      .filter((x): x is { product: (typeof PRODUCTS)[number]; qty: number } => !!x.product)
+      .sort((a, b) => b.qty - a.qty)
+      .slice(0, 2)
+      .map((x) => x.product)
+  }, [])
+
   function handleAdd(productId: string) {
     const p = PRODUCTS.find((x) => x.id === productId)
+    console.log('[v0] handleAdd called', productId, p?.name, 'currentCart', cart.length)
     if (!p) return
-    addToCart(p) // incrémente automatiquement si déjà présent
+    addToCart(p) // incrémente automatiquement si déjà présent (quantité initialisée à 1)
     setQuery('')
     searchRef.current?.focus()
   }
@@ -109,9 +138,14 @@ export default function CaissePage() {
   const change = Math.max(0, received_n - cartTotal)
   const remaining = Math.max(0, cartTotal - received_n)
 
-  // Montant payé maintenant en mode partiel (le reste devient une dette)
+  // Paiement partiel : montant de la 1ère méthode (saisi) + reste = 2ème méthode
   const partial_n = Math.min(Number(partialAmount) || 0, cartTotal)
   const partialRemaining = Math.max(0, cartTotal - partial_n)
+  const comboCfg = PARTIAL_COMBOS.find((c) => c.id === partialCombo)
+  const partialHasTransfert = comboCfg?.m1 === 'transfert' || comboCfg?.m2 === 'transfert'
+  const partialHasDette = comboCfg?.m2 === 'dette'
+  const hasClient =
+    clientMode === 'existing' ? !!clientId : newClientName.trim().length > 0
 
   // Le bouton Confirmer est-il actif selon le mode choisi ?
   const canConfirm = (() => {
@@ -122,16 +156,14 @@ export default function CaissePage() {
       case 'transfert':
         return !!transferApp
       case 'dette':
-        return clientMode === 'existing'
-          ? !!clientId
-          : newClientName.trim().length > 0
+        return hasClient
       case 'partiel':
-        return (
-          partial_n > 0 &&
-          (clientMode === 'existing'
-            ? !!clientId
-            : newClientName.trim().length > 0)
-        )
+        if (!comboCfg) return false
+        // les 2 parts doivent être > 0 (vraie répartition entre 2 méthodes)
+        if (!(partial_n > 0 && partialRemaining > 0)) return false
+        if (partialHasTransfert && !transferApp) return false
+        if (partialHasDette && !hasClient) return false
+        return true
       default:
         return false
     }
@@ -142,6 +174,7 @@ export default function CaissePage() {
     setReceived('')
     setTransferApp(null)
     setPartialAmount('')
+    setPartialCombo(null)
     setClientMode('existing')
     setClientId('')
     setNewClientName('')
@@ -157,6 +190,111 @@ export default function CaissePage() {
       setPayOpen(false)
       clearCart()
     }, 1400)
+  }
+
+  function methodLabel(m: 'especes' | 'transfert' | 'dette') {
+    return t(`pay_mode_${m}`)
+  }
+
+  // Sélecteur d'application de transfert (réutilisé en mode Transfert et Partiel)
+  function renderTransferApps() {
+    return (
+      <div>
+        <p className="mb-2 text-sm font-medium text-foreground">{t('choose_app')}</p>
+        <div className="grid grid-cols-3 gap-2">
+          {TRANSFER_APPS.map((app) => (
+            <button
+              key={app.id}
+              type="button"
+              onClick={() => setTransferApp(app.id)}
+              className={cn(
+                'flex flex-col items-center gap-2 rounded-xl border px-2 py-3 transition-all active:scale-95',
+                transferApp === app.id
+                  ? 'border-brand bg-brand/10'
+                  : 'border-border hover:bg-muted',
+              )}
+            >
+              <span
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-sm font-extrabold text-white"
+                style={{ backgroundColor: app.color }}
+              >
+                {app.label.charAt(0)}
+              </span>
+              <span className="text-xs font-semibold text-foreground">{app.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // Sélecteur de client (réutilisé en mode Dette et Partiel avec dette)
+  function renderClientPicker() {
+    return (
+      <div className="space-y-3">
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setClientMode('existing')}
+            className={cn(
+              'flex-1 rounded-xl border py-2 text-sm font-semibold transition-colors',
+              clientMode === 'existing'
+                ? 'border-brand bg-brand/10 text-brand'
+                : 'border-border text-muted-foreground hover:bg-muted',
+            )}
+          >
+            {t('existing_client')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setClientMode('new')}
+            className={cn(
+              'flex-1 rounded-xl border py-2 text-sm font-semibold transition-colors',
+              clientMode === 'new'
+                ? 'border-brand bg-brand/10 text-brand'
+                : 'border-border text-muted-foreground hover:bg-muted',
+            )}
+          >
+            {t('new_client')}
+          </button>
+        </div>
+
+        {clientMode === 'existing' ? (
+          <div className="max-h-40 space-y-1 overflow-y-auto rounded-xl border border-border p-1">
+            {CLIENTS.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setClientId(c.id)}
+                className={cn(
+                  'flex w-full items-center justify-between rounded-lg px-3 py-2 text-start text-sm transition-colors',
+                  clientId === c.id ? 'bg-brand/10 text-brand' : 'hover:bg-muted',
+                )}
+              >
+                <span className="font-medium text-foreground">{c.name}</span>
+                {clientId === c.id && <Check className="h-4 w-4 text-brand" />}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <input
+              value={newClientName}
+              onChange={(e) => setNewClientName(e.target.value)}
+              placeholder={t('client_name')}
+              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
+            />
+            <input
+              value={newClientPhone}
+              onChange={(e) => setNewClientPhone(e.target.value)}
+              inputMode="tel"
+              placeholder={t('client_phone')}
+              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
+            />
+          </div>
+        )}
+      </div>
+    )
   }
 
   return (
@@ -282,10 +420,10 @@ export default function CaissePage() {
             </div>
           )}
 
-          {/* Liste complète des produits si pas de recherche (seule zone scrollable) */}
+          {/* Raccourcis : 2 top produits uniquement (un clic l'ajoute au panier) */}
           {!query && (
-            <div className="grid max-h-[60vh] grid-cols-2 gap-2 overflow-y-auto pr-1 sm:grid-cols-3">
-              {PRODUCTS.map((p) => (
+            <div className="grid grid-cols-2 gap-2">
+              {topProducts.map((p) => (
                 <button
                   key={p.id}
                   type="button"
@@ -548,135 +686,81 @@ export default function CaissePage() {
                     )}
 
                     {/* --- Transfert : choix de l'application --- */}
-                    {mode === 'transfert' && (
-                      <div>
-                        <p className="mb-2 text-sm font-medium text-foreground">
-                          {t('choose_app')}
-                        </p>
-                        <div className="grid grid-cols-3 gap-2">
-                          {TRANSFER_APPS.map((app) => (
+                    {mode === 'transfert' && renderTransferApps()}
+
+                    {/* --- Dette : sélection client (montant total en dette) --- */}
+                    {mode === 'dette' && renderClientPicker()}
+
+                    {/* --- Partiel : combinaison de 2 méthodes de paiement --- */}
+                    {mode === 'partiel' && (
+                      <div className="space-y-3">
+                        {/* Choix de la combinaison */}
+                        <div className="grid grid-cols-1 gap-2">
+                          {PARTIAL_COMBOS.map((c) => (
                             <button
-                              key={app.id}
+                              key={c.id}
                               type="button"
-                              onClick={() => setTransferApp(app.id)}
+                              onClick={() => {
+                                setPartialCombo(c.id)
+                                setPartialAmount('')
+                                setTransferApp(null)
+                                setClientId('')
+                                setNewClientName('')
+                                setNewClientPhone('')
+                              }}
                               className={cn(
-                                'flex flex-col items-center gap-2 rounded-xl border px-2 py-3 transition-all active:scale-95',
-                                transferApp === app.id
-                                  ? 'border-brand bg-brand/10'
-                                  : 'border-border hover:bg-muted',
+                                'rounded-xl border py-2.5 text-sm font-semibold transition-colors',
+                                partialCombo === c.id
+                                  ? 'border-brand bg-brand/10 text-brand'
+                                  : 'border-border text-muted-foreground hover:bg-muted',
                               )}
                             >
-                              <span
-                                className="flex h-9 w-9 items-center justify-center rounded-lg text-sm font-extrabold text-white"
-                                style={{ backgroundColor: app.color }}
-                              >
-                                {app.label.charAt(0)}
-                              </span>
-                              <span className="text-xs font-semibold text-foreground">
-                                {app.label}
-                              </span>
+                              {methodLabel(c.m1)} + {methodLabel(c.m2)}
                             </button>
                           ))}
                         </div>
-                      </div>
-                    )}
 
-                    {/* --- Dette / Partiel : sélection client --- */}
-                    {(mode === 'dette' || mode === 'partiel') && (
-                      <div className="space-y-3">
-                        {mode === 'partiel' && (
-                          <div>
-                            <label className="mb-1 block text-sm font-medium text-foreground">
-                              {t('amount')} ({t('to_pay')})
-                            </label>
-                            <input
-                              type="number"
-                              inputMode="numeric"
-                              value={partialAmount}
-                              onChange={(e) => setPartialAmount(e.target.value)}
-                              placeholder="0"
-                              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-lg font-bold tabular-nums text-foreground outline-none focus:border-brand"
-                            />
-                            {partial_n > 0 && (
+                        {comboCfg && (
+                          <>
+                            {/* Montant de la 1ère méthode */}
+                            <div>
+                              <label className="mb-1 block text-sm font-medium text-foreground">
+                                {t('amount')} — {methodLabel(comboCfg.m1)}
+                              </label>
+                              <input
+                                type="number"
+                                inputMode="numeric"
+                                value={partialAmount}
+                                onChange={(e) => setPartialAmount(e.target.value)}
+                                placeholder="0"
+                                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-lg font-bold tabular-nums text-foreground outline-none focus:border-brand"
+                              />
+                              {/* Reste = 2ème méthode */}
                               <div className="mt-2 flex items-center justify-between rounded-xl bg-muted/60 px-4 py-2 text-sm">
                                 <span className="text-muted-foreground">
-                                  {t('recorded_as_debt')}
+                                  {comboCfg.m2 === 'dette'
+                                    ? t('recorded_as_debt')
+                                    : methodLabel(comboCfg.m2)}
                                 </span>
-                                <span className="font-heading font-bold tabular-nums text-destructive">
+                                <span
+                                  className={cn(
+                                    'font-heading font-bold tabular-nums',
+                                    comboCfg.m2 === 'dette'
+                                      ? 'text-destructive'
+                                      : 'text-foreground',
+                                  )}
+                                >
                                   {formatMRU(partialRemaining)} {t('mru')}
                                 </span>
                               </div>
-                            )}
-                          </div>
-                        )}
+                            </div>
 
-                        {/* Choix client existant / nouveau */}
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setClientMode('existing')}
-                            className={cn(
-                              'flex-1 rounded-xl border py-2 text-sm font-semibold transition-colors',
-                              clientMode === 'existing'
-                                ? 'border-brand bg-brand/10 text-brand'
-                                : 'border-border text-muted-foreground hover:bg-muted',
-                            )}
-                          >
-                            {t('existing_client')}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setClientMode('new')}
-                            className={cn(
-                              'flex-1 rounded-xl border py-2 text-sm font-semibold transition-colors',
-                              clientMode === 'new'
-                                ? 'border-brand bg-brand/10 text-brand'
-                                : 'border-border text-muted-foreground hover:bg-muted',
-                            )}
-                          >
-                            {t('new_client')}
-                          </button>
-                        </div>
+                            {/* App de transfert si la combinaison inclut un transfert */}
+                            {partialHasTransfert && renderTransferApps()}
 
-                        {clientMode === 'existing' ? (
-                          <div className="max-h-40 space-y-1 overflow-y-auto rounded-xl border border-border p-1">
-                            {CLIENTS.map((c) => (
-                              <button
-                                key={c.id}
-                                type="button"
-                                onClick={() => setClientId(c.id)}
-                                className={cn(
-                                  'flex w-full items-center justify-between rounded-lg px-3 py-2 text-start text-sm transition-colors',
-                                  clientId === c.id
-                                    ? 'bg-brand/10 text-brand'
-                                    : 'hover:bg-muted',
-                                )}
-                              >
-                                <span className="font-medium text-foreground">
-                                  {c.name}
-                                </span>
-                                {clientId === c.id && (
-                                  <Check className="h-4 w-4 text-brand" />
-                                )}
-                              </button>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <input
-                              value={newClientName}
-                              onChange={(e) => setNewClientName(e.target.value)}
-                              placeholder={t('client_name')}
-                              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
-                            />
-                            <input
-                              value={newClientPhone}
-                              onChange={(e) => setNewClientPhone(e.target.value)}
-                              inputMode="tel"
-                              placeholder={t('client_phone')}
-                              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
-                            />
-                          </div>
+                            {/* Sélection client si la combinaison inclut une dette */}
+                            {partialHasDette && renderClientPicker()}
+                          </>
                         )}
                       </div>
                     )}
