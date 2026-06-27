@@ -116,7 +116,6 @@ export default function CaissePage() {
 
   function handleAdd(productId: string) {
     const p = PRODUCTS.find((x) => x.id === productId)
-    console.log('[v0] handleAdd called', productId, p?.name, 'currentCart', cart.length)
     if (!p) return
     addToCart(p) // incrémente automatiquement si déjà présent (quantité initialisée à 1)
     setQuery('')

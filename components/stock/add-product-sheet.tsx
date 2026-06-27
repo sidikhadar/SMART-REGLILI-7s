@@ -1,0 +1,356 @@
+'use client'
+
+import { useRef, useState } from 'react'
+import Image from 'next/image'
+import {
+  X,
+  ScanLine,
+  Sparkles,
+  HeartPulse,
+  PencilLine,
+  Search,
+  Loader2,
+  Camera,
+  Check,
+} from 'lucide-react'
+import type { Product, ProductCategory } from '@/lib/types'
+import { lookupBarcode, productMargin, type LookupSource } from '@/lib/stock-utils'
+import { cn } from '@/lib/utils'
+
+type Method = LookupSource | 'manual'
+
+const METHODS: { id: Method; labelKey: string; icon: typeof ScanLine }[] = [
+  { id: 'off', labelKey: 'source_off', icon: ScanLine },
+  { id: 'obf', labelKey: 'source_obf', icon: Sparkles },
+  { id: 'sante', labelKey: 'source_sante', icon: HeartPulse },
+  { id: 'manual', labelKey: 'manual_creation', icon: PencilLine },
+]
+
+const CATEGORIES: ProductCategory[] = ['alimentation', 'cosmetique', 'sante', 'autre']
+
+export function AddProductSheet({
+  t,
+  onClose,
+  onSave,
+}: {
+  t: (k: string) => string
+  onClose: () => void
+  onSave: (p: Product) => void
+}) {
+  const [method, setMethod] = useState<Method | null>(null)
+  const [barcode, setBarcode] = useState('')
+  const [searching, setSearching] = useState(false)
+  const [lookupMsg, setLookupMsg] = useState<'found' | 'notfound' | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  // champs du formulaire
+  const [name, setName] = useState('')
+  const [category, setCategory] = useState<ProductCategory>('alimentation')
+  const [buyPrice, setBuyPrice] = useState('')
+  const [sellPrice, setSellPrice] = useState('')
+  const [tva, setTva] = useState('')
+  const [quantity, setQuantity] = useState('')
+  const [expiry, setExpiry] = useState('')
+  const [lotNumber, setLotNumber] = useState('')
+  const [posology, setPosology] = useState('')
+  const [image, setImage] = useState<string | undefined>()
+
+  const margin =
+    buyPrice && sellPrice ? productMargin(Number(buyPrice), Number(sellPrice)) : null
+  const showForm = method === 'manual' || lookupMsg === 'found'
+  const canSave = name.trim() && Number(sellPrice) > 0
+
+  async function runLookup() {
+    if (!barcode.trim() || method === 'manual' || !method) return
+    setSearching(true)
+    setLookupMsg(null)
+    const res = await lookupBarcode(barcode.trim(), method)
+    setSearching(false)
+    if (res.found) {
+      setName(res.name || '')
+      if (res.category) setCategory(res.category)
+      if (res.vat) setTva(String(res.vat))
+      if (res.posology) setPosology(res.posology)
+      if (res.lotNumber) setLotNumber(res.lotNumber)
+      if (res.image) setImage(res.image)
+      setLookupMsg('found')
+    } else {
+      setLookupMsg('notfound')
+    }
+  }
+
+  function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file) setImage(URL.createObjectURL(file))
+  }
+
+  function save() {
+    if (!canSave) return
+    const qty = Number(quantity) || 0
+    const product: Product = {
+      id: `p-${Date.now()}`,
+      name: name.trim(),
+      barcode: barcode.trim() || undefined,
+      category,
+      buyPrice: Number(buyPrice) || 0,
+      sellPrice: Number(sellPrice) || 0,
+      tva: tva ? Number(tva) : undefined,
+      image,
+      lowStockThreshold: 5,
+      lots: [
+        {
+          id: `lot-${Date.now()}`,
+          quantity: qty,
+          expiry: expiry || undefined,
+          number: lotNumber || undefined,
+        },
+      ],
+    }
+    onSave(product)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/40 sm:items-center">
+      <div className="max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-card p-5 shadow-soft-lg sm:rounded-3xl">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="font-heading text-lg font-bold text-foreground">
+            {t('add_product_title')}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Choix de la méthode */}
+        <div className="mb-4 grid grid-cols-2 gap-2">
+          {METHODS.map((m) => {
+            const Icon = m.icon
+            return (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => {
+                  setMethod(m.id)
+                  setLookupMsg(null)
+                }}
+                className={cn(
+                  'flex items-center gap-2 rounded-xl border px-3 py-3 text-sm font-semibold transition-all active:scale-95',
+                  method === m.id
+                    ? 'border-brand bg-brand/10 text-brand'
+                    : 'border-border text-muted-foreground hover:bg-muted',
+                )}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className="truncate text-start">{t(m.labelKey)}</span>
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Recherche par code-barres */}
+        {method && method !== 'manual' && (
+          <div className="mb-4">
+            <label className="mb-1 block text-sm font-medium text-foreground">
+              {t('barcode')}
+            </label>
+            <div className="flex gap-2">
+              <input
+                value={barcode}
+                onChange={(e) => setBarcode(e.target.value)}
+                inputMode="numeric"
+                placeholder={t('enter_barcode')}
+                className="min-w-0 flex-1 rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
+              />
+              <button
+                type="button"
+                onClick={runLookup}
+                disabled={searching || !barcode.trim()}
+                className="flex shrink-0 items-center justify-center gap-1 rounded-xl bg-navy px-4 text-sm font-semibold text-navy-foreground disabled:opacity-50"
+              >
+                {searching ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Search className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            {searching && (
+              <p className="mt-2 text-xs text-muted-foreground">{t('searching')}</p>
+            )}
+            {lookupMsg === 'found' && (
+              <p className="mt-2 flex items-center gap-1 text-xs font-medium text-brand">
+                <Check className="h-3.5 w-3.5" /> {t('product_found')}
+              </p>
+            )}
+            {lookupMsg === 'notfound' && (
+              <p className="mt-2 text-xs font-medium text-destructive">
+                {t('product_not_found')}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Formulaire produit */}
+        {showForm && (
+          <div className="space-y-3">
+            {/* Photo */}
+            <div className="flex items-center gap-3">
+              <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">
+                {image ? (
+                  <Image
+                    src={image || '/placeholder.svg'}
+                    alt={name || 'product'}
+                    width={64}
+                    height={64}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <Camera className="h-6 w-6 text-muted-foreground" />
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
+              >
+                {t('photo')}
+              </button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhoto}
+                className="hidden"
+              />
+            </div>
+
+            <Field label={t('product_name')}>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
+              />
+            </Field>
+
+            <Field label={t('category')}>
+              <div className="flex flex-wrap gap-2">
+                {CATEGORIES.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setCategory(c)}
+                    className={cn(
+                      'rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
+                      category === c
+                        ? 'border-brand bg-brand text-brand-foreground'
+                        : 'border-border text-muted-foreground hover:bg-muted',
+                    )}
+                  >
+                    {t(`cat_${c}`)}
+                  </button>
+                ))}
+              </div>
+            </Field>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Field label={t('buy_price')}>
+                <input
+                  value={buyPrice}
+                  onChange={(e) => setBuyPrice(e.target.value)}
+                  inputMode="numeric"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base tabular-nums text-foreground outline-none focus:border-brand"
+                />
+              </Field>
+              <Field label={t('sell_price')}>
+                <input
+                  value={sellPrice}
+                  onChange={(e) => setSellPrice(e.target.value)}
+                  inputMode="numeric"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base tabular-nums text-foreground outline-none focus:border-brand"
+                />
+              </Field>
+            </div>
+
+            {margin !== null && (
+              <div className="flex items-center justify-between rounded-xl bg-accent px-4 py-2 text-sm">
+                <span className="text-accent-foreground/80">{t('margin')}</span>
+                <span className="font-heading font-bold text-brand">{margin}%</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-3">
+              <Field label={t('quantity')}>
+                <input
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  inputMode="numeric"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base tabular-nums text-foreground outline-none focus:border-brand"
+                />
+              </Field>
+              <Field label={t('vat')}>
+                <input
+                  value={tva}
+                  onChange={(e) => setTva(e.target.value)}
+                  inputMode="numeric"
+                  placeholder="%"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base tabular-nums text-foreground outline-none focus:border-brand"
+                />
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Field label={t('expiry_optional')}>
+                <input
+                  type="date"
+                  value={expiry}
+                  onChange={(e) => setExpiry(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-background px-3 py-3 text-base text-foreground outline-none focus:border-brand"
+                />
+              </Field>
+              <Field label={t('lot_number')}>
+                <input
+                  value={lotNumber}
+                  onChange={(e) => setLotNumber(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
+                />
+              </Field>
+            </div>
+
+            {(category === 'sante' || posology) && (
+              <Field label={t('posology')}>
+                <input
+                  value={posology}
+                  onChange={(e) => setPosology(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
+                />
+              </Field>
+            )}
+
+            <button
+              type="button"
+              onClick={save}
+              disabled={!canSave}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-base font-semibold text-brand-foreground shadow-soft transition-all hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Check className="h-5 w-5" />
+              {t('save')}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="mb-1 block text-sm font-medium text-foreground">{label}</label>
+      {children}
+    </div>
+  )
+}
