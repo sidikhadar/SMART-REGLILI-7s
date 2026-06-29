@@ -12,10 +12,12 @@ import {
   Loader2,
   Camera,
   Check,
+  Layers,
 } from 'lucide-react'
 import type { Product, ProductCategory } from '@/lib/types'
 import { lookupBarcode, productMargin, type LookupSource } from '@/lib/stock-utils'
 import { cn } from '@/lib/utils'
+import { BarcodeScanner } from './barcode-scanner'
 
 type Method = LookupSource | 'manual'
 
@@ -41,6 +43,7 @@ export function AddProductSheet({
   const [barcode, setBarcode] = useState('')
   const [searching, setSearching] = useState(false)
   const [lookupMsg, setLookupMsg] = useState<'found' | 'notfound' | null>(null)
+  const [scanning, setScanning] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   // champs du formulaire
@@ -60,11 +63,13 @@ export function AddProductSheet({
   const showForm = method === 'manual' || lookupMsg === 'found'
   const canSave = name.trim() && Number(sellPrice) > 0
 
-  async function runLookup() {
-    if (!barcode.trim() || method === 'manual' || !method) return
+  async function runLookup(code?: string) {
+    const bc = (code ?? barcode).trim()
+    const src = method && method !== 'manual' ? method : 'off'
+    if (!bc) return
     setSearching(true)
     setLookupMsg(null)
-    const res = await lookupBarcode(barcode.trim(), method)
+    const res = await lookupBarcode(bc, src)
     setSearching(false)
     if (res.found) {
       setName(res.name || '')
@@ -77,6 +82,13 @@ export function AddProductSheet({
     } else {
       setLookupMsg('notfound')
     }
+  }
+
+  // code détecté par la caméra → on remplit puis on lance la recherche
+  function handleScanDetected(code: string) {
+    setBarcode(code)
+    setScanning(false)
+    runLookup(code)
   }
 
   function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
