@@ -122,8 +122,8 @@ export function AddProductSheet({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/40 sm:items-center">
-      <div className="max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-card p-5 shadow-soft-lg sm:rounded-3xl">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-foreground/40 p-0 sm:p-4">
+      <div className="max-h-[100dvh] w-full max-w-lg overflow-y-auto rounded-b-3xl bg-card p-5 shadow-soft-lg sm:max-h-[92dvh] sm:rounded-3xl">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-heading text-lg font-bold text-foreground">
             {t('add_product_title')}
@@ -179,7 +179,15 @@ export function AddProductSheet({
               />
               <button
                 type="button"
-                onClick={runLookup}
+                onClick={() => setScanning(true)}
+                aria-label={t('use_camera')}
+                className="flex shrink-0 items-center justify-center rounded-xl bg-brand px-4 text-brand-foreground"
+              >
+                <Camera className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => runLookup()}
                 disabled={searching || !barcode.trim()}
                 className="flex shrink-0 items-center justify-center gap-1 rounded-xl bg-navy px-4 text-sm font-semibold text-navy-foreground disabled:opacity-50"
               >
@@ -314,22 +322,30 @@ export function AddProductSheet({
               </Field>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <Field label={t('expiry_optional')}>
-                <input
-                  type="date"
-                  value={expiry}
-                  onChange={(e) => setExpiry(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-background px-3 py-3 text-base text-foreground outline-none focus:border-brand"
-                />
-              </Field>
-              <Field label={t('lot_number')}>
-                <input
-                  value={lotNumber}
-                  onChange={(e) => setLotNumber(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
-                />
-              </Field>
+            {/* Section dédiée au lot : n° de lot + date d'expiration regroupés */}
+            <div className="rounded-2xl border border-border bg-muted/40 p-3">
+              <div className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                <Layers className="h-4 w-4 text-brand" />
+                {t('lot')}
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label={t('lot_number')}>
+                  <input
+                    value={lotNumber}
+                    onChange={(e) => setLotNumber(e.target.value)}
+                    placeholder="LOT-2026"
+                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
+                  />
+                </Field>
+                <Field label={t('expiry_optional')}>
+                  <input
+                    type="date"
+                    value={expiry}
+                    onChange={(e) => setExpiry(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-background px-3 py-3 text-base text-foreground outline-none focus:border-brand"
+                  />
+                </Field>
+              </div>
             </div>
 
             {(category === 'sante' || posology) && (
@@ -354,6 +370,13 @@ export function AddProductSheet({
           </div>
         )}
       </div>
+
+      {scanning && (
+        <BarcodeScanner
+          onDetected={handleScanDetected}
+          onClose={() => setScanning(false)}
+        />
+      )}
     </div>
   )
 }

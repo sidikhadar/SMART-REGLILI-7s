@@ -39,55 +39,72 @@ export function InventoryMode({
     setCounts((prev) => ({ ...prev, [id]: value }))
   }
 
-  function generatePDF() {
-    const date = new Date().toLocaleString('fr-FR')
-    const body = countedRows
-      .map((r) => {
-        const diff = r.diff ?? 0
-        const color = diff === 0 ? '#15233a' : diff > 0 ? '#1e7e3e' : '#dc2626'
-        const sign = diff > 0 ? '+' : ''
-        return `<tr>
-          <td>${r.product.name}</td>
-          <td style="text-align:center">${r.theoretical}</td>
-          <td style="text-align:center">${r.counted}</td>
-          <td style="text-align:center;color:${color};font-weight:700">${sign}${diff}</td>
-        </tr>`
-      })
-      .join('')
+  async function generatePDF() {
+    // Génère un vrai fichier PDF téléchargeable (fonctionne dans l'iframe d'aperçu)
+    const { jsPDF } = await import('jspdf')
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' })
+    const pageW = doc.internal.pageSize.getWidth()
+    const marginX = 40
+    let y = 50
 
-    const html = `<!doctype html><html><head><meta charset="utf-8"/>
-      <title>${t('inventory_report')}</title>
-      <style>
-        body{font-family:Inter,system-ui,sans-serif;color:#15233a;padding:32px;}
-        h1{font-size:20px;margin:0 0 4px;}
-        .meta{color:#62748e;font-size:13px;margin-bottom:20px;}
-        table{width:100%;border-collapse:collapse;font-size:14px;}
-        th{text-align:left;background:#eef2f8;padding:10px;border-bottom:2px solid #e3e9f1;}
-        th.c{text-align:center;}
-        td{padding:9px 10px;border-bottom:1px solid #e3e9f1;}
-        .summary{margin-top:20px;font-size:13px;color:#62748e;}
-      </style></head><body>
-      <h1>SMART REGLILI — ${t('inventory_report')}</h1>
-      <div class="meta">${date}</div>
-      <table>
-        <thead><tr>
-          <th>${t('product_name')}</th>
-          <th class="c">${t('theoretical_qty')}</th>
-          <th class="c">${t('counted_qty')}</th>
-          <th class="c">${t('difference')}</th>
-        </tr></thead>
-        <tbody>${body}</tbody>
-      </table>
-      <div class="summary">${countedRows.length} ${t('items_counted')} · ${diffRows.length} ${t('difference')}</div>
-      </body></html>`
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(16)
+    doc.setTextColor(21, 35, 58)
+    doc.text(`SMART REGLILI - ${t('inventory_report')}`, marginX, y)
 
-    const w = window.open('', '_blank')
-    if (w) {
-      w.document.write(html)
-      w.document.close()
-      w.focus()
-      setTimeout(() => w.print(), 400)
-    }
+    y += 18
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(10)
+    doc.setTextColor(98, 116, 142)
+    doc.text(new Date().toLocaleString('fr-FR'), marginX, y)
+
+    // En-tête du tableau
+    y += 26
+    const cols = [marginX, marginX + 230, marginX + 330, marginX + 430]
+    doc.setFillColor(238, 242, 248)
+    doc.rect(marginX, y - 14, pageW - marginX * 2, 22, 'F')
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.setTextColor(21, 35, 58)
+    doc.text(t('product_name'), cols[0] + 4, y)
+    doc.text(t('theoretical_qty'), cols[1], y)
+    doc.text(t('counted_qty'), cols[2], y)
+    doc.text(t('difference'), cols[3], y)
+    y += 18
+
+    // Lignes
+    doc.setFont('helvetica', 'normal')
+    countedRows.forEach((r) => {
+      if (y > 780) {
+        doc.addPage()
+        y = 50
+      }
+      const diff = r.diff ?? 0
+      const sign = diff > 0 ? '+' : ''
+      doc.setTextColor(21, 35, 58)
+      doc.text(String(r.product.name).slice(0, 38), cols[0] + 4, y)
+      doc.text(String(r.theoretical), cols[1], y)
+      doc.text(String(r.counted), cols[2], y)
+      if (diff === 0) doc.setTextColor(21, 35, 58)
+      else if (diff > 0) doc.setTextColor(30, 126, 62)
+      else doc.setTextColor(220, 38, 38)
+      doc.text(`${sign}${diff}`, cols[3], y)
+      doc.setDrawColor(227, 233, 241)
+      doc.line(marginX, y + 6, pageW - marginX, y + 6)
+      y += 22
+    })
+
+    y += 10
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(10)
+    doc.setTextColor(98, 116, 142)
+    doc.text(
+      `${countedRows.length} ${t('items_counted')} - ${diffRows.length} ${t('difference')}`,
+      marginX,
+      y,
+    )
+
+    doc.save(`inventaire-${new Date().toISOString().slice(0, 10)}.pdf`)
   }
 
   function finish() {
