@@ -104,7 +104,24 @@ export function InventoryMode({
       y,
     )
 
-    doc.save(`inventaire-${new Date().toISOString().slice(0, 10)}.pdf`)
+    // Le téléchargement direct (doc.save) est bloqué dans l'iframe d'aperçu.
+    // On génère un blob puis : nouvel onglet si on est dans une iframe,
+    // sinon téléchargement classique.
+    const fileName = `inventaire-${new Date().toISOString().slice(0, 10)}.pdf`
+    const blob = doc.output('blob')
+    const url = URL.createObjectURL(blob)
+    const inIframe = window.self !== window.top
+    if (inIframe) {
+      window.open(url, '_blank')
+    } else {
+      const a = document.createElement('a')
+      a.href = url
+      a.download = fileName
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 10000)
   }
 
   function finish() {
