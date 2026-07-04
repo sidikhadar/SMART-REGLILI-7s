@@ -227,11 +227,11 @@ function SubscriptionContent() {
       {/* Modal de confirmation d'abonnement */}
       {showConfirm && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/40 sm:items-center"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-foreground/40 p-4"
           onClick={() => setShowConfirm(false)}
         >
           <div
-            className="max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-card p-5 shadow-soft-lg sm:rounded-3xl"
+            className="w-full max-w-md rounded-3xl bg-card p-5 shadow-soft-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
