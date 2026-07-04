@@ -288,6 +288,73 @@
   animation: check-draw 0.45s ease-out 0.35s both;
 }
 
+/* ---- Transitions de pages ---- */
+@keyframes slide-in-forward {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@utility animate-slide-in-forward {
+  animation: slide-in-forward 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes slide-in-back {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@utility animate-slide-in-back {
+  animation: slide-in-back 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@utility animate-slide-in-up {
+  animation: slide-in-up 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* En RTL le sens horizontal est inversé */
+[dir='rtl'] .animate-slide-in-forward {
+  animation-name: slide-in-back;
+}
+[dir='rtl'] .animate-slide-in-back {
+  animation-name: slide-in-forward;
+}
+
+/* Barre de progression de navigation */
+@keyframes route-progress-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-in-forward,
+  .animate-slide-in-back,
+  .animate-slide-in-up {
+    animation: none;
+  }
+}
+
 /* RTL helpers */
 [dir='rtl'] .flip-rtl {
   transform: scaleX(-1);

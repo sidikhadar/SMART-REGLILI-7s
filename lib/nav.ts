@@ -17,6 +17,8 @@ import {
   CreditCard,
   Settings,
   ShieldCheck,
+  RotateCcw,
+  Store,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -45,6 +47,7 @@ export const NAV_ITEMS: NavItem[] = [
   // --- Gestion ---
   { href: '/clients', key: 'clients', icon: Users, roles: ALL, group: 'manage' },
   { href: '/debts', key: 'debts', icon: HandCoins, roles: ALL, group: 'manage' },
+  { href: '/returns', key: 'product_return', icon: RotateCcw, roles: ALL, group: 'manage' },
   { href: '/expenses', key: 'expenses', icon: Receipt, roles: BOSS, group: 'manage' },
   { href: '/suppliers', key: 'suppliers', icon: Truck, roles: BOSS, group: 'manage' },
   { href: '/warehouses', key: 'warehouses', icon: Warehouse, roles: BOSS, group: 'manage' },
@@ -53,6 +56,7 @@ export const NAV_ITEMS: NavItem[] = [
 
   // --- Système ---
   { href: '/finances', key: 'finances', icon: Wallet, roles: BOSS, group: 'system' },
+  { href: '/registers', key: 'multi_register', icon: Store, roles: BOSS, group: 'system' },
   { href: '/ai-reports', key: 'ai_reports', icon: Sparkles, roles: BOSS, group: 'system' },
   { href: '/subscription', key: 'subscription', icon: CreditCard, roles: BOSS, group: 'system' },
   { href: '/admin', key: 'admin', icon: ShieldCheck, roles: ['owner'], group: 'system' },

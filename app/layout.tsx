@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Poppins, Geist_Mono, Noto_Sans_Arabic, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { AppProvider } from '@/lib/app-context'
+import { RouteProgress } from '@/components/route-progress'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -60,7 +61,10 @@ export default function RootLayout({
       className={`${inter.variable} ${poppins.variable} ${geistMono.variable} ${notoArabic.variable} ${playfair.variable} bg-background`}
     >
       <body className="font-sans antialiased">
-        <AppProvider>{children}</AppProvider>
+        <AppProvider>
+          <RouteProgress />
+          {children}
+        </AppProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

@@ -6,6 +6,7 @@ import { useApp } from '@/lib/app-context'
 import { AppSidebar } from '@/components/app-sidebar'
 import { AppTopbar } from '@/components/app-topbar'
 import { BottomNav } from '@/components/bottom-nav'
+import { PageTransition } from '@/components/page-transition'
 
 export function AppShell({
   title,
@@ -29,10 +30,10 @@ export function AppShell({
       <AppSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <AppTopbar title={title} />
-        <main className="flex-1 px-4 pb-24 pt-5 lg:px-8 lg:pb-10">
-          <div className="mx-auto w-full max-w-6xl animate-float-up">
-            {children}
-          </div>
+        <main className="flex-1 overflow-x-hidden px-4 pb-24 pt-5 lg:px-8 lg:pb-10">
+          <PageTransition>
+            <div className="mx-auto w-full max-w-6xl">{children}</div>
+          </PageTransition>
         </main>
         <BottomNav />
       </div>
