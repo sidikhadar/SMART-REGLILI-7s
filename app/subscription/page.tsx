@@ -11,6 +11,7 @@ import {
   MessageCircle,
   Mail,
   AlertTriangle,
+  X,
 } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
 import { AppShell } from '@/components/app-shell'
@@ -43,11 +44,19 @@ function SubscriptionContent() {
   const expired = params.get('expired') === '1'
   const [selected, setSelected] = useState('plan_6months')
   const [copied, setCopied] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+
+  const selectedPlan = PLANS.find((p) => p.key === selected) ?? PLANS[0]
 
   function copyNumber() {
     navigator.clipboard?.writeText(PAYMENT_NUMBER.replace(/\s/g, ''))
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  function waConfirmLink() {
+    const msg = `${t('wa_sub_message')} (${t(selectedPlan.key)} — ${formatMRU(selectedPlan.price)} ${t('mru')})`
+    return `${WHATSAPP_LINK}?text=${encodeURIComponent(msg)}`
   }
 
   return (
@@ -126,6 +135,7 @@ function SubscriptionContent() {
       {/* Bouton principal */}
       <button
         type="button"
+        onClick={() => setShowConfirm(true)}
         className="mb-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-brand py-3.5 text-base font-semibold text-brand-foreground shadow-soft transition-all hover:brightness-110 active:scale-[0.99]"
       >
         <Crown className="h-5 w-5" />
@@ -213,6 +223,99 @@ function SubscriptionContent() {
           </div>
         </a>
       </div>
+
+      {/* Modal de confirmation d'abonnement */}
+      {showConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/40 sm:items-center"
+          onClick={() => setShowConfirm(false)}
+        >
+          <div
+            className="max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-card p-5 shadow-soft-lg sm:rounded-3xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="font-heading text-lg font-extrabold text-foreground">
+                {t('finalize_title')}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowConfirm(false)}
+                aria-label={t('close')}
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Récapitulatif formule */}
+            <div className="mb-4 flex items-center justify-between rounded-2xl border border-brand/30 bg-brand/5 p-4">
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">{t('selected_plan')}</p>
+                <p className="font-semibold text-foreground">{t(selectedPlan.key)}</p>
+              </div>
+              <div className="text-right">
+                <p className="font-heading text-xl font-extrabold tabular-nums text-foreground">
+                  {formatMRU(selectedPlan.price)}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {t('mru')} {t(selectedPlan.periodKey)}
+                </p>
+              </div>
+            </div>
+
+            {/* Étapes */}
+            <ol className="mb-4 space-y-3">
+              <li className="flex gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-navy text-xs font-bold text-navy-foreground">
+                  1
+                </span>
+                <span className="text-sm text-foreground">{t('finalize_step1')}</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-navy text-xs font-bold text-navy-foreground">
+                  2
+                </span>
+                <span className="text-sm text-foreground">{t('finalize_step2')}</span>
+              </li>
+            </ol>
+
+            {/* Numéro de paiement */}
+            <div className="mb-4 flex items-center justify-between rounded-xl border border-border bg-background p-3">
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">{t('payment_number')}</p>
+                <p className="font-heading text-lg font-bold tabular-nums text-foreground">
+                  {PAYMENT_NUMBER}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={copyNumber}
+                className={cn(
+                  'flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
+                  copied
+                    ? 'bg-brand/10 text-brand'
+                    : 'bg-navy text-navy-foreground hover:brightness-110',
+                )}
+              >
+                {copied ? <CheckCircle2 className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copied ? t('copied') : t('copy')}
+              </button>
+            </div>
+
+            {/* Confirmation WhatsApp */}
+            <a
+              href={waConfirmLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand py-3.5 text-base font-semibold text-brand-foreground shadow-soft transition-all hover:brightness-110 active:scale-[0.99]"
+            >
+              <MessageCircle className="h-5 w-5" />
+              {t('send_whatsapp_confirm')}
+            </a>
+          </div>
+        </div>
+      )}
     </AppShell>
   )
 }

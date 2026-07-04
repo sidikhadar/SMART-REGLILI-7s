@@ -184,6 +184,12 @@ const fr: Dict = {
   active_until: "Actif jusqu'au",
   copy: 'Copier',
   copied: 'Copié',
+  finalize_title: 'Finaliser votre abonnement',
+  selected_plan: 'Formule choisie',
+  finalize_step1: 'Payez le montant via une application de paiement au numéro ci-dessous.',
+  finalize_step2: 'Envoyez la confirmation par WhatsApp pour activer votre compte.',
+  send_whatsapp_confirm: 'Confirmer par WhatsApp',
+  wa_sub_message: "Bonjour, je souhaite m'abonner à SMART REGLILI.",
 
   // dashboard
   todays_sales: "Ventes du jour",
@@ -528,6 +534,12 @@ const en: Dict = {
   active_until: 'Active until',
   copy: 'Copy',
   copied: 'Copied',
+  finalize_title: 'Complete your subscription',
+  selected_plan: 'Selected plan',
+  finalize_step1: 'Pay the amount via a payment app to the number below.',
+  finalize_step2: 'Send the confirmation via WhatsApp to activate your account.',
+  send_whatsapp_confirm: 'Confirm via WhatsApp',
+  wa_sub_message: 'Hello, I would like to subscribe to SMART REGLILI.',
 
   todays_sales: "Today's sales",
   profit: 'Profit',
@@ -858,6 +870,12 @@ const ar: Dict = {
   active_until: 'نشط حتى',
   copy: 'نسخ',
   copied: 'تم النسخ',
+  finalize_title: 'إتمام اشتراكك',
+  selected_plan: 'الباقة المختارة',
+  finalize_step1: 'ادفع المبلغ عبر تطبيق دفع إلى الرقم أدناه.',
+  finalize_step2: 'أرسل التأكيد عبر واتساب لتفعيل حسابك.',
+  send_whatsapp_confirm: 'التأكيد عبر واتساب',
+  wa_sub_message: 'مرحباً، أرغب في الاشتراك في SMART REGLILI.',
 
   todays_sales: 'مبيعات اليوم',
   profit: 'الربح',
