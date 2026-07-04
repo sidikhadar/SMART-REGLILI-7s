@@ -114,6 +114,9 @@ export interface Employee {
   role: Role
   register?: string
   active: boolean
+  phone?: string
+  email?: string
+  password?: string
 }
 
 export interface Alert {

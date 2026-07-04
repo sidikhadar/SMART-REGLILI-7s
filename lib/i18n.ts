@@ -531,6 +531,96 @@ const fr: Dict = {
   adm_status_trial: 'Essai',
   adm_status_expired: 'Expiré',
 
+  // compte (paramètres)
+  set_profile_photo: 'Photo de profil',
+  set_change_photo: 'Modifier la photo',
+  set_full_name: 'Nom complet',
+  set_email: 'Email',
+  set_change_password: 'Changer le mot de passe',
+  set_current_password: 'Mot de passe actuel',
+  set_new_password: 'Nouveau mot de passe',
+  set_confirm_password: 'Confirmer le mot de passe',
+  set_password_changed: 'Mot de passe modifié',
+  set_password_mismatch: 'Les mots de passe ne correspondent pas',
+
+  // switch de rôle sécurisé
+  set_security: 'Sécurité',
+  switch_role_secure: 'Changer de rôle',
+  switch_role_code_title: 'Code de sécurité requis',
+  switch_role_code_desc: 'Saisissez le code pour changer de rôle.',
+  code_label: 'Code de sécurité',
+  code_wrong: 'Code incorrect',
+  code_hint: 'Code par défaut : 1234',
+  validate: 'Valider',
+
+  // sections paramètres
+  set_about: 'À propos',
+  set_about_desc: 'Version, créateur et informations',
+  set_legal: 'Légal',
+  set_legal_desc: 'Confidentialité, conditions et mentions',
+  set_help_support: 'Aide et support',
+  set_help_desc: 'FAQ, support et tutoriel',
+  set_caisses: 'Caisses',
+  set_caisses_desc: 'Gérer vos caisses',
+
+  // à propos
+  about_version: 'Version 1.0.0',
+  about_description:
+    'La première application SaaS de gestion de commerce en Mauritanie. Gérez votre stock, suivez vos ventes et développez votre commerce intelligemment.',
+  about_creator: 'Créateur',
+  about_creator_name: 'Sidi Mohamed El Khader',
+  about_website: 'Site web',
+  about_copyright:
+    '© 2025 SMART REGLILI · Créé par Sidi Mohamed El Khader · Tous droits réservés.',
+
+  // légal
+  legal_privacy: 'Politique de confidentialité',
+  legal_terms: "Conditions d'utilisation",
+  legal_notices: 'Mentions légales',
+  legal_updated: 'Dernière mise à jour : janvier 2025',
+  legal_privacy_body:
+    "SMART REGLILI respecte votre vie privée. Nous collectons uniquement les données nécessaires au fonctionnement de l'application : informations de votre commerce, produits, ventes et clients. Ces données vous appartiennent et ne sont jamais vendues à des tiers. Elles sont stockées de manière sécurisée et chiffrée. Vous pouvez à tout moment demander l'export ou la suppression de vos données en contactant le support.",
+  legal_terms_body:
+    "En utilisant SMART REGLILI, vous acceptez d'utiliser l'application dans le respect des lois en vigueur en Mauritanie. L'abonnement est personnel et ne peut être partagé. Nous nous réservons le droit de suspendre un compte en cas d'usage frauduleux. L'application est fournie « telle quelle » ; nous améliorons continuellement le service mais ne garantissons pas une disponibilité ininterrompue.",
+  legal_notices_body:
+    "SMART REGLILI est édité par Sidi Mohamed El Khader, Nouakchott, Mauritanie. Contact : sidimohamedkhadar@gmail.com. Directeur de la publication : Sidi Mohamed El Khader. Hébergement : Vercel Inc. Pour toute question légale, contactez-nous par email ou WhatsApp.",
+
+  // aide et support
+  help_center: "Centre d'aide",
+  help_faq: 'Questions fréquentes (FAQ)',
+  help_contact_support: 'Contacter le support',
+  help_report: 'Signaler un problème',
+  help_tutorial: "Tutoriel d'utilisation",
+  help_report_msg: 'Bonjour, je souhaite signaler un problème sur SMART REGLILI :',
+  faq_q1: 'Comment ajouter un produit à mon stock ?',
+  faq_a1: 'Allez dans la page Stock, appuyez sur le bouton + et remplissez les informations du produit (nom, prix, quantité, date de péremption).',
+  faq_q2: 'Comment enregistrer une vente ?',
+  faq_a2: 'Ouvrez la page Caisse, ajoutez les produits au panier (par scan ou manuellement), puis validez le paiement.',
+  faq_q3: 'Comment ajouter un caissier ?',
+  faq_a3: 'Dans la page Employés, appuyez sur Ajouter, renseignez le nom, téléphone, email et un mot de passe, puis communiquez ces identifiants au caissier.',
+  faq_q4: 'Comment suivre mes bénéfices ?',
+  faq_a4: 'La page Finances calcule automatiquement votre bénéfice net réel à partir de vos ventes, dettes et dépenses.',
+  faq_q5: "Que se passe-t-il si mon abonnement expire ?",
+  faq_a5: 'Vous serez invité à le renouveler depuis la page Abonnement. Vos données restent conservées en sécurité.',
+  tutorial_title: "Tutoriel d'utilisation",
+  tutorial_step1: 'Configurez votre commerce dans les paramètres (nom, téléphone, adresse).',
+  tutorial_step2: 'Ajoutez vos produits dans la page Stock.',
+  tutorial_step3: 'Enregistrez vos ventes depuis la page Caisse.',
+  tutorial_step4: 'Suivez vos performances dans le Tableau de bord et Finances.',
+  tutorial_step5: 'Gérez vos clients, dettes, fournisseurs et employés.',
+
+  // employés (identifiants)
+  emp_phone: 'Téléphone',
+  emp_email: 'Email',
+  emp_password: 'Mot de passe',
+  emp_reset_password: 'Réinitialiser le mot de passe',
+  emp_credentials: 'Identifiants de connexion',
+  emp_credentials_note:
+    'Communiquez ces identifiants au caissier. Il les utilisera pour se connecter en choisissant le rôle Caissier.',
+  emp_password_placeholder: 'Mot de passe à communiquer',
+  emp_new_password: 'Nouveau mot de passe',
+  emp_password_reset_done: 'Mot de passe réinitialisé',
+
   mru: 'MRU',
 }
 
@@ -1018,6 +1108,96 @@ const en: Dict = {
   adm_status_trial: 'Trial',
   adm_status_expired: 'Expired',
 
+  // account (settings)
+  set_profile_photo: 'Profile photo',
+  set_change_photo: 'Change photo',
+  set_full_name: 'Full name',
+  set_email: 'Email',
+  set_change_password: 'Change password',
+  set_current_password: 'Current password',
+  set_new_password: 'New password',
+  set_confirm_password: 'Confirm password',
+  set_password_changed: 'Password changed',
+  set_password_mismatch: 'Passwords do not match',
+
+  // secure role switch
+  set_security: 'Security',
+  switch_role_secure: 'Switch role',
+  switch_role_code_title: 'Security code required',
+  switch_role_code_desc: 'Enter the code to switch role.',
+  code_label: 'Security code',
+  code_wrong: 'Wrong code',
+  code_hint: 'Default code: 1234',
+  validate: 'Validate',
+
+  // settings sections
+  set_about: 'About',
+  set_about_desc: 'Version, creator and information',
+  set_legal: 'Legal',
+  set_legal_desc: 'Privacy, terms and notices',
+  set_help_support: 'Help & support',
+  set_help_desc: 'FAQ, support and tutorial',
+  set_caisses: 'Registers',
+  set_caisses_desc: 'Manage your registers',
+
+  // about
+  about_version: 'Version 1.0.0',
+  about_description:
+    'The first SaaS commerce management app in Mauritania. Manage your stock, track your sales and grow your business intelligently.',
+  about_creator: 'Creator',
+  about_creator_name: 'Sidi Mohamed El Khader',
+  about_website: 'Website',
+  about_copyright:
+    '© 2025 SMART REGLILI · Created by Sidi Mohamed El Khader · All rights reserved.',
+
+  // legal
+  legal_privacy: 'Privacy policy',
+  legal_terms: 'Terms of use',
+  legal_notices: 'Legal notices',
+  legal_updated: 'Last updated: January 2025',
+  legal_privacy_body:
+    'SMART REGLILI respects your privacy. We only collect the data needed to run the app: your business information, products, sales and customers. This data belongs to you and is never sold to third parties. It is stored securely and encrypted. You can request an export or deletion of your data at any time by contacting support.',
+  legal_terms_body:
+    'By using SMART REGLILI, you agree to use the app in compliance with the laws in force in Mauritania. The subscription is personal and cannot be shared. We reserve the right to suspend an account in case of fraudulent use. The app is provided "as is"; we continuously improve the service but do not guarantee uninterrupted availability.',
+  legal_notices_body:
+    'SMART REGLILI is published by Sidi Mohamed El Khader, Nouakchott, Mauritania. Contact: sidimohamedkhadar@gmail.com. Publication director: Sidi Mohamed El Khader. Hosting: Vercel Inc. For any legal question, contact us by email or WhatsApp.',
+
+  // help & support
+  help_center: 'Help center',
+  help_faq: 'Frequently asked questions (FAQ)',
+  help_contact_support: 'Contact support',
+  help_report: 'Report a problem',
+  help_tutorial: 'Usage tutorial',
+  help_report_msg: 'Hello, I would like to report a problem on SMART REGLILI:',
+  faq_q1: 'How do I add a product to my stock?',
+  faq_a1: 'Go to the Stock page, tap the + button and fill in the product information (name, price, quantity, expiry date).',
+  faq_q2: 'How do I record a sale?',
+  faq_a2: 'Open the Checkout page, add products to the cart (by scan or manually), then confirm the payment.',
+  faq_q3: 'How do I add a cashier?',
+  faq_a3: 'On the Employees page, tap Add, fill in the name, phone, email and a password, then share these credentials with the cashier.',
+  faq_q4: 'How do I track my profits?',
+  faq_a4: 'The Finances page automatically computes your real net profit from your sales, debts and expenses.',
+  faq_q5: 'What happens if my subscription expires?',
+  faq_a5: 'You will be prompted to renew it from the Subscription page. Your data is kept safe.',
+  tutorial_title: 'Usage tutorial',
+  tutorial_step1: 'Set up your business in settings (name, phone, address).',
+  tutorial_step2: 'Add your products on the Stock page.',
+  tutorial_step3: 'Record your sales from the Checkout page.',
+  tutorial_step4: 'Track your performance in the Dashboard and Finances.',
+  tutorial_step5: 'Manage your customers, debts, suppliers and employees.',
+
+  // employees (credentials)
+  emp_phone: 'Phone',
+  emp_email: 'Email',
+  emp_password: 'Password',
+  emp_reset_password: 'Reset password',
+  emp_credentials: 'Login credentials',
+  emp_credentials_note:
+    'Share these credentials with the cashier. They will use them to sign in by choosing the Cashier role.',
+  emp_password_placeholder: 'Password to share',
+  emp_new_password: 'New password',
+  emp_password_reset_done: 'Password reset',
+
   mru: 'MRU',
 }
 
@@ -1362,7 +1542,7 @@ const ar: Dict = {
   exp_add: 'إضافة مصروف',
   exp_total_month: 'إجمالي المصاريف هذا الشهر',
   exp_label: 'البيان',
-  exp_category: 'الفئة',
+  exp_category: '��لفئة',
   exp_amount: 'المبلغ',
   exp_date: 'التاريخ',
   exp_all_cats: 'الكل',
@@ -1375,7 +1555,7 @@ const ar: Dict = {
   sup_total_due: 'إجمالي المستحق للموردين',
   sup_balance: 'الرصيد المستحق',
   sup_settled: 'مسدّد',
-  sup_pay: 'دفع',
+  sup_pay: 'دف��',
   sup_call: 'اتصال',
   sup_count: 'موردون',
   sup_name: 'اسم المورّد',
@@ -1504,6 +1684,96 @@ const ar: Dict = {
   adm_status_active: 'نشط',
   adm_status_trial: 'تجريبي',
   adm_status_expired: 'منتهٍ',
+
+  // الحساب (الإعدادات)
+  set_profile_photo: 'صورة الملف الشخصي',
+  set_change_photo: 'تغيير الصورة',
+  set_full_name: 'الاسم الكامل',
+  set_email: 'البريد الإلكتروني',
+  set_change_password: 'تغيير كلمة المرور',
+  set_current_password: 'كلمة المرور الحالية',
+  set_new_password: 'كلمة المرور الجديدة',
+  set_confirm_password: 'تأكيد كلمة المرور',
+  set_password_changed: 'تم تغيير كلمة المرور',
+  set_password_mismatch: 'كلمتا المرور غير متطابقتين',
+
+  // تبديل الدور المؤمّن
+  set_security: 'الأمان',
+  switch_role_secure: 'تغيير الدور',
+  switch_role_code_title: 'رمز الأمان مطلوب',
+  switch_role_code_desc: 'أدخل الرمز لتغيير الدور.',
+  code_label: 'رمز الأمان',
+  code_wrong: 'رمز غير صحيح',
+  code_hint: 'الرمز الافتراضي: 1234',
+  validate: 'تأكيد',
+
+  // أقسام الإعدادات
+  set_about: 'حول التطبيق',
+  set_about_desc: 'الإصدار والمطوّر والمعلومات',
+  set_legal: 'قانوني',
+  set_legal_desc: 'الخصوصية والشروط والإشعارات',
+  set_help_support: 'المساعدة والدعم',
+  set_help_desc: 'الأسئلة الشائعة والدعم والشرح',
+  set_caisses: 'الصناديق',
+  set_caisses_desc: 'إدارة الصناديق',
+
+  // حول التطبيق
+  about_version: 'الإصدار 1.0.0',
+  about_description:
+    'أول تطبيق SaaS لإدارة التجارة في موريتانيا. أدِر مخزونك وتابع مبيعاتك وطوّر تجارتك بذكاء.',
+  about_creator: 'المطوّر',
+  about_creator_name: 'سيدي محمد الخضر',
+  about_website: 'الموقع الإلكتروني',
+  about_copyright:
+    '© 2025 SMART REGLILI · من إنشاء سيدي محمد الخضر · جميع الحقوق محفوظة.',
+
+  // قانوني
+  legal_privacy: 'سياسة الخصوصية',
+  legal_terms: 'شروط الاستخدام',
+  legal_notices: 'إشعارات قانونية',
+  legal_updated: 'آخر تحديث: يناير 2025',
+  legal_privacy_body:
+    'يحترم SMART REGLILI خصوصيتك. نجمع فقط البيانات اللازمة لتشغيل التطبيق: معلومات متجرك ومنتجاتك ومبيعاتك وعملائك. هذه البيانات ملك لك ولا تُباع أبدًا لأطراف ثالثة. تُخزَّن بشكل آمن ومشفّر. يمكنك في أي وقت طلب تصدير بياناتك أو حذفها عبر التواصل مع الدعم.',
+  legal_terms_body:
+    'باستخدامك SMART REGLILI، فإنك توافق على استخدام التطبيق وفقًا للقوانين المعمول بها في موريتانيا. الاشتراك شخصي ولا يمكن مشاركته. نحتفظ بالحق في تعليق أي حساب في حال الاستخدام الاحتيالي. يُقدَّم التطبيق «كما هو»؛ نحسّن الخدمة باستمرار لكننا لا نضمن توفرًا غير منقطع.',
+  legal_notices_body:
+    'يُنشر SMART REGLILI من قبل سيدي محمد الخضر، نواكشوط، موريتانيا. للتواصل: sidimohamedkhadar@gmail.com. مدير النشر: سيدي محمد الخضر. الاستضافة: Vercel Inc. لأي سؤال قانوني تواصل معنا عبر البريد أو واتساب.',
+
+  // المساعدة والدعم
+  help_center: 'مركز المساعدة',
+  help_faq: 'الأسئلة الشائعة',
+  help_contact_support: 'التواصل مع الدعم',
+  help_report: 'الإبلاغ عن مشكلة',
+  help_tutorial: 'شرح الاستخدام',
+  help_report_msg: 'مرحبًا، أرغب في الإبلاغ عن مشكلة في SMART REGLILI:',
+  faq_q1: 'كيف أضيف منتجًا إلى مخزوني؟',
+  faq_a1: 'اذهب إلى صفحة المخزون، اضغط على زر + واملأ معلومات المنتج (الاسم، السعر، الكمية، تاريخ الانتهاء).',
+  faq_q2: 'كيف أسجّل عملية بيع؟',
+  faq_a2: 'افتح صفحة الصندوق، أضِف المنتجات إلى السلة (بالمسح أو يدويًا)، ثم أكّد الدفع.',
+  faq_q3: 'كيف أضيف أمين صندوق؟',
+  faq_a3: 'في صفحة الموظفين، اضغط إضافة، أدخل الاسم والهاتف والبريد وكلمة مرور، ثم سلّم هذه البيانات لأمين الصندوق.',
+  faq_q4: 'كيف أتابع أرباحي؟',
+  faq_a4: 'تحسب صفحة المالية أرباحك الصافية الحقيقية تلقائيًا من مبيعاتك وديونك ومصاريفك.',
+  faq_q5: 'ماذا يحدث إذا انتهى اشتراكي؟',
+  faq_a5: 'ستتم دعوتك لتجديده من صفحة الاشتراك. تبقى بياناتك محفوظة بأمان.',
+  tutorial_title: 'شرح الاستخدام',
+  tutorial_step1: 'اضبط متجرك في الإعدادات (الاسم، الهاتف، العنوان).',
+  tutorial_step2: 'أضِف منتجاتك في صفحة المخزون.',
+  tutorial_step3: 'سجّل مبيعاتك من صفحة الصندوق.',
+  tutorial_step4: 'تابع أداءك في لوحة التحكم والمالية.',
+  tutorial_step5: 'أدِر عملاءك وديونك ومورّديك وموظفيك.',
+
+  // الموظفون (بيانات الدخول)
+  emp_phone: 'الهاتف',
+  emp_email: 'البريد الإلكتروني',
+  emp_password: 'كلمة المرور',
+  emp_reset_password: 'إعادة تعيين كلمة المرور',
+  emp_credentials: 'بيانات تسجيل الدخول',
+  emp_credentials_note:
+    'سلّم هذه البيانات لأمين الصندوق. سيستخدمها لتسجيل الدخول باختيار دور أمين الصندوق.',
+  emp_password_placeholder: 'كلمة المرور المراد تسليمها',
+  emp_new_password: 'كلمة مرور جديدة',
+  emp_password_reset_done: 'تمت إعادة تعيين كلمة المرور',
 
   mru: 'أوقية',
 }

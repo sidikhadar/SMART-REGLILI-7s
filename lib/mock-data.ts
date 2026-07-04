@@ -237,9 +237,9 @@ export const WAREHOUSES: Warehouse[] = [
 ]
 
 export const EMPLOYEES: Employee[] = [
-  { id: 'emp1', name: 'Sidi Mohamed', role: 'patron', active: true },
-  { id: 'emp2', name: 'Caissier 1', role: 'caissier', register: 'Caisse 1', active: true },
-  { id: 'emp3', name: 'Caissier 2', role: 'caissier', register: 'Caisse 2', active: true },
+  { id: 'emp1', name: 'Sidi Mohamed', role: 'patron', active: true, phone: '37 16 20 07', email: 'sidimohamedkhadar@gmail.com' },
+  { id: 'emp2', name: 'Caissier 1', role: 'caissier', register: 'Caisse 1', active: true, phone: '46 12 34 56', email: 'caissier1@reglili.mr', password: 'caisse123' },
+  { id: 'emp3', name: 'Caissier 2', role: 'caissier', register: 'Caisse 2', active: true, phone: '46 78 90 12', email: 'caissier2@reglili.mr', password: 'caisse456' },
 ]
 
 export const ALERTS: Alert[] = [
