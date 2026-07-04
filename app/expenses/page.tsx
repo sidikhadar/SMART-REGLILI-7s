@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Plus, Receipt, X, Check, Trash2, TrendingDown } from 'lucide-react'
+import { Plus, Receipt, X, Check, Trash2, TrendingDown, AlertTriangle } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
 import { AppShell } from '@/components/app-shell'
 import { EXPENSES } from '@/lib/mock-data'
@@ -24,6 +24,7 @@ export default function ExpensesPage() {
   const [label, setLabel] = useState('')
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('Charges')
+  const [toDelete, setToDelete] = useState<Expense | null>(null)
 
   const categories = useMemo(
     () => Array.from(new Set(items.map((e) => e.category))),
@@ -60,18 +61,32 @@ export default function ExpensesPage() {
     <AppShell title={t('expenses')}>
       {/* Total du mois */}
       <div className="mb-4 rounded-3xl border border-destructive/25 bg-destructive/5 p-5 shadow-soft">
-        <div className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-destructive/15 text-destructive">
-            <TrendingDown className="h-5 w-5" />
-          </span>
-          <p className="text-sm font-medium text-muted-foreground">
-            {t('exp_total_month')}
-          </p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-destructive/15 text-destructive">
+                <TrendingDown className="h-5 w-5" />
+              </span>
+              <p className="text-sm font-medium text-muted-foreground">
+                {t('exp_total_month')}
+              </p>
+            </div>
+            <p className="mt-2 font-heading text-3xl font-extrabold tabular-nums text-destructive">
+              {formatMRU(total)}{' '}
+              <span className="text-base font-medium text-muted-foreground">
+                {t('mru')}
+              </span>
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-brand px-4 font-semibold text-brand-foreground shadow-soft transition-transform active:scale-95"
+          >
+            <Plus className="h-5 w-5" />
+            <span className="hidden sm:inline">{t('exp_add')}</span>
+          </button>
         </div>
-        <p className="mt-2 font-heading text-3xl font-extrabold tabular-nums text-destructive">
-          {formatMRU(total)}{' '}
-          <span className="text-base font-medium text-muted-foreground">{t('mru')}</span>
-        </p>
       </div>
 
       {/* Filtres catégories */}
@@ -128,7 +143,7 @@ export default function ExpensesPage() {
                 </span>
                 <button
                   type="button"
-                  onClick={() => setItems((prev) => prev.filter((x) => x.id !== e.id))}
+                  onClick={() => setToDelete(e)}
                   aria-label={t('delete')}
                   className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                 >
@@ -140,25 +155,15 @@ export default function ExpensesPage() {
         )}
       </div>
 
-      {/* FAB ajouter */}
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="fixed bottom-24 end-4 z-30 flex h-14 items-center gap-2 rounded-full bg-brand px-5 font-semibold text-brand-foreground shadow-soft-lg transition-transform active:scale-95 lg:bottom-8 lg:end-8"
-      >
-        <Plus className="h-5 w-5" />
-        <span className="hidden sm:inline">{t('exp_add')}</span>
-      </button>
-
       {/* Modal ajout */}
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-foreground/40 p-4"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-foreground/40 p-4 backdrop-blur-sm"
           onClick={() => setOpen(false)}
         >
           <div
             dir={dir}
-            className="mt-6 w-full max-w-md rounded-3xl bg-card p-5 shadow-soft-lg"
+            className="mt-6 w-full max-w-md animate-slide-in-up rounded-3xl bg-card p-5 shadow-soft-lg"
             onClick={(ev) => ev.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
@@ -216,6 +221,50 @@ export default function ExpensesPage() {
               <Check className="h-5 w-5" />
               {t('save')}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation suppression */}
+      {toDelete && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-sm"
+          onClick={() => setToDelete(null)}
+        >
+          <div
+            dir={dir}
+            className="w-full max-w-sm animate-slide-in-up rounded-3xl bg-card p-5 text-center shadow-soft-lg"
+            onClick={(ev) => ev.stopPropagation()}
+          >
+            <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/15 text-destructive">
+              <AlertTriangle className="h-6 w-6" />
+            </span>
+            <h3 className="mt-3 font-heading text-lg font-extrabold text-foreground">
+              {t('delete')}
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {toDelete.label} · {formatMRU(toDelete.amount)} {t('mru')}
+            </p>
+            <div className="mt-5 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setToDelete(null)}
+                className="flex-1 rounded-2xl border border-border bg-background py-3 font-semibold text-foreground transition-colors hover:bg-muted"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setItems((prev) => prev.filter((x) => x.id !== toDelete.id))
+                  setToDelete(null)
+                }}
+                className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-destructive py-3 font-semibold text-destructive-foreground transition-all hover:brightness-110 active:scale-[0.99]"
+              >
+                <Trash2 className="h-5 w-5" />
+                {t('delete')}
+              </button>
+            </div>
           </div>
         </div>
       )}
