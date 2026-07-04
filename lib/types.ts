@@ -97,6 +97,17 @@ export interface Supplier {
   balance: number
 }
 
+export interface Warehouse {
+  id: string
+  name: string
+  location: string
+  productCount: number
+  units: number
+  value: number
+  fillPercent: number
+  main: boolean
+}
+
 export interface Employee {
   id: string
   name: string

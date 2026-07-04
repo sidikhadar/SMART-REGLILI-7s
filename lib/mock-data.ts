@@ -8,6 +8,7 @@ import type {
   Employee,
   Alert,
   Register,
+  Warehouse,
 } from './types'
 
 const today = new Date()
@@ -227,6 +228,12 @@ export const SUPPLIERS: Supplier[] = [
   { id: 'sup1', name: 'Grossiste Nouakchott', phone: '+222 45 25 36 14', balance: 12000 },
   { id: 'sup2', name: 'Import Maghreb', phone: '+222 22 11 33 44', balance: 0 },
   { id: 'sup3', name: 'Pharma Distrib', phone: '+222 36 78 90 12', balance: 4500 },
+]
+
+export const WAREHOUSES: Warehouse[] = [
+  { id: 'wh1', name: 'Boutique principale', location: 'Nouakchott — Centre', productCount: 8, units: 262, value: 42600, fillPercent: 78, main: true },
+  { id: 'wh2', name: 'Dépôt Ksar', location: 'Nouakchott — Ksar', productCount: 5, units: 140, value: 21800, fillPercent: 54, main: false },
+  { id: 'wh3', name: 'Réserve Arafat', location: 'Nouakchott — Arafat', productCount: 3, units: 60, value: 8400, fillPercent: 31, main: false },
 ]
 
 export const EMPLOYEES: Employee[] = [
