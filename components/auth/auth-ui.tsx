@@ -154,9 +154,7 @@ export function BackButton({ href = '/' }: { href?: string }) {
 export function HeaderLogo() {
   return (
     <div className="flex items-center gap-3">
-      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-card p-1.5 shadow-soft ring-1 ring-navy-foreground/10">
-        <BrandEmblem size={36} />
-      </span>
+      <BrandEmblem size={48} className="rounded-full shadow-soft ring-1 ring-navy-foreground/10" />
       <span className="font-display text-lg font-black tracking-wide text-navy-foreground">
         SMART <span className="text-brand">REGLILI</span>
       </span>

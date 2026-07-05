@@ -22,9 +22,7 @@ export default function AboutPage() {
 
         {/* Logo + identité */}
         <section className="rounded-3xl border border-border bg-card p-6 text-center shadow-soft">
-          <span className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-card p-2 shadow-soft ring-1 ring-border">
-            <BrandEmblem size={56} />
-          </span>
+          <BrandEmblem size={80} className="mx-auto rounded-full shadow-soft ring-1 ring-border" />
           <h1 className="mt-4 font-display text-2xl font-black tracking-wide text-foreground">
             SMART <span className="text-brand">REGLILI</span>
           </h1>
