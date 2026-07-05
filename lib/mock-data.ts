@@ -37,6 +37,11 @@ export const PRODUCTS: Product[] = [
       { id: 'l1', quantity: 24, expiry: daysFromNow(40), number: 'LT-2401' },
       { id: 'l2', quantity: 6, expiry: daysFromNow(5), number: 'LT-2312' },
     ],
+    variants: [
+      { id: 'v-p1-unit', label: 'Unité', barcode: '6111035000123', price: 35, factor: 1 },
+      { id: 'v-p1-pack', label: 'Pack', barcode: '6111035000124', price: 200, factor: 6 },
+      { id: 'v-p1-carton', label: 'Carton', barcode: '6111035000125', price: 380, factor: 12 },
+    ],
   },
   {
     id: 'p2',
@@ -84,7 +89,12 @@ export const PRODUCTS: Product[] = [
     sellPrice: 30,
     image: '/products/cola.png',
     lowStockThreshold: 24,
-    lots: [{ id: 'l7', quantity: 9, expiry: daysFromNow(2) }],
+    lots: [{ id: 'l7', quantity: 96, expiry: daysFromNow(120) }],
+    variants: [
+      { id: 'v-p5-unit', label: 'Unité', barcode: '5449000000996', price: 30, factor: 1 },
+      { id: 'v-p5-pack', label: 'Pack', barcode: '5449000000997', price: 165, factor: 6 },
+      { id: 'v-p5-carton', label: 'Carton', barcode: '5449000000998', price: 620, factor: 24 },
+    ],
   },
   {
     id: 'p6',

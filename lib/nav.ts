@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   Package,
   ShoppingCart,
-  ScanLine,
   Users,
   HandCoins,
   Receipt,
@@ -40,7 +39,6 @@ export const NAV_ITEMS: NavItem[] = [
   // --- Principal ---
   { href: '/dashboard', key: 'dashboard', icon: LayoutDashboard, roles: ALL, group: 'main', bottom: true },
   { href: '/caisse', key: 'caisse', icon: ShoppingCart, roles: CAISS, group: 'main', bottom: true },
-  { href: '/scanner', key: 'scanner', icon: ScanLine, roles: CAISS, group: 'main', bottom: true },
   { href: '/stock', key: 'stock', icon: Package, roles: ALL, group: 'main', bottom: true },
   { href: '/alerts', key: 'alerts', icon: Bell, roles: ALL, group: 'main', bottom: true },
 

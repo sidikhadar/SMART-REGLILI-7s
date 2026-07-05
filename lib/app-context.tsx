@@ -8,15 +8,32 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import type { Lang, Role, Product, PaymentMethod, Register } from './types'
+import type {
+  Lang,
+  Role,
+  Product,
+  ProductVariant,
+  PaymentMethod,
+  Register,
+} from './types'
 import { translate, LANGS } from './i18n'
 import { PRODUCTS, REGISTERS } from './mock-data'
+import { baseVariant } from './stock-utils'
 
+/**
+ * Ligne de panier. L'identifiant `id` combine produit + variante :
+ * un pack et une unité du même produit sont donc 2 lignes distinctes.
+ * `factor` = nombre d'unités décomptées du stock par article vendu.
+ */
 export interface CartItem {
+  id: string
   productId: string
+  variantId: string
   name: string
+  variantLabel: string
   qty: number
   unitPrice: number
+  factor: number
 }
 
 interface AppState {
@@ -31,11 +48,13 @@ interface AppState {
   t: (key: string) => string
   // cart
   cart: CartItem[]
-  addToCart: (p: Product) => void
-  updateQty: (productId: string, qty: number) => void
-  removeFromCart: (productId: string) => void
+  addToCart: (p: Product, variant?: ProductVariant) => void
+  updateQty: (lineId: string, qty: number) => void
+  removeFromCart: (lineId: string) => void
   clearCart: () => void
   cartTotal: number
+  /** Total des unités décomptées du stock (qty × factor). */
+  cartUnits: number
   // registers (multi-caisses)
   registers: Register[]
   activeRegister: string
@@ -105,31 +124,43 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('sr_name')
   }
 
-  function addToCart(p: Product) {
+  function addToCart(p: Product, variant?: ProductVariant) {
+    // Sans variante explicite → variante de base (unité, factor 1)
+    const v = variant ?? baseVariant(p)
+    const lineId = `${p.id}:${v.id}`
     setCart((prev) => {
-      const existing = prev.find((i) => i.productId === p.id)
+      const existing = prev.find((i) => i.id === lineId)
       if (existing) {
         return prev.map((i) =>
-          i.productId === p.id ? { ...i, qty: i.qty + 1 } : i,
+          i.id === lineId ? { ...i, qty: i.qty + 1 } : i,
         )
       }
       return [
         ...prev,
-        { productId: p.id, name: p.name, qty: 1, unitPrice: p.sellPrice },
+        {
+          id: lineId,
+          productId: p.id,
+          variantId: v.id,
+          name: p.name,
+          variantLabel: v.label,
+          qty: 1,
+          unitPrice: v.price,
+          factor: v.factor,
+        },
       ]
     })
   }
 
-  function updateQty(productId: string, qty: number) {
+  function updateQty(lineId: string, qty: number) {
     setCart((prev) =>
       qty <= 0
-        ? prev.filter((i) => i.productId !== productId)
-        : prev.map((i) => (i.productId === productId ? { ...i, qty } : i)),
+        ? prev.filter((i) => i.id !== lineId)
+        : prev.map((i) => (i.id === lineId ? { ...i, qty } : i)),
     )
   }
 
-  function removeFromCart(productId: string) {
-    setCart((prev) => prev.filter((i) => i.productId !== productId))
+  function removeFromCart(lineId: string) {
+    setCart((prev) => prev.filter((i) => i.id !== lineId))
   }
 
   function clearCart() {
@@ -138,6 +169,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const cartTotal = useMemo(
     () => cart.reduce((sum, i) => sum + i.qty * i.unitPrice, 0),
+    [cart],
+  )
+
+  const cartUnits = useMemo(
+    () => cart.reduce((sum, i) => sum + i.qty * i.factor, 0),
     [cart],
   )
 
@@ -181,6 +217,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     removeFromCart,
     clearCart,
     cartTotal,
+    cartUnits,
     registers,
     activeRegister,
     setActiveRegister,
@@ -198,4 +235,4 @@ export function useApp() {
 }
 
 // re-export for convenience
-export type { Product, PaymentMethod, Register }
+export type { Product, ProductVariant, PaymentMethod, Register }

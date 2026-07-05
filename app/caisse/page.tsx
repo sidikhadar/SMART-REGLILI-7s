@@ -19,8 +19,11 @@ import {
 } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
 import { AppShell } from '@/components/app-shell'
+import { InlineScanner } from '@/components/inline-scanner'
 import { PRODUCTS, CLIENTS, SALES } from '@/lib/mock-data'
 import { formatMRU, productStock } from '@/lib/format'
+import { findByBarcode, productVariants } from '@/lib/stock-utils'
+import type { Product, ProductVariant } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 // Les 4 modes de paiement demandés
@@ -55,12 +58,17 @@ export default function CaissePage() {
     removeFromCart,
     clearCart,
     cartTotal,
+    cartUnits,
     registers,
     activeRegister,
     setActiveRegister,
   } = useApp()
 
   const [query, setQuery] = useState('')
+  const [scanOpen, setScanOpen] = useState(false)
+  const [scanFeedback, setScanFeedback] = useState<
+    { type: 'found' | 'notfound'; text: string } | null
+  >(null)
   const [showRegisters, setShowRegisters] = useState(false)
   const [editingQty, setEditingQty] = useState<string | null>(null)
   const [payOpen, setPayOpen] = useState(false)
@@ -114,23 +122,26 @@ export default function CaissePage() {
       .map((x) => x.product)
   }, [])
 
-  function handleAdd(productId: string) {
-    const p = PRODUCTS.find((x) => x.id === productId)
-    if (!p) return
-    addToCart(p) // incrémente automatiquement si déjà présent (quantité initialisée à 1)
+  function handleAdd(product: Product, variant?: ProductVariant) {
+    addToCart(product, variant) // incrémente automatiquement si déjà présent
     setQuery('')
     searchRef.current?.focus()
   }
 
-  // Simule un scan : on prend le premier résultat exact / sinon le 1er résultat
-  function handleScan() {
-    if (results.length) {
-      handleAdd(results[0].id)
-      return
+  // Code détecté par le scanner intégré → recherche par code-barres (variante incluse)
+  function handleScanDetected(code: string) {
+    const match = findByBarcode(code, PRODUCTS)
+    if (match) {
+      addToCart(match.product, match.variant)
+      setScanFeedback({
+        type: 'found',
+        text: `${match.product.name} · ${match.variant.label}`,
+      })
+    } else {
+      setScanFeedback({ type: 'notfound', text: code })
     }
-    // pas de saisie -> ajoute un produit aléatoire pour démo
-    const random = PRODUCTS[Math.floor(Math.random() * PRODUCTS.length)]
-    addToCart(random)
+    // efface le message après un court instant
+    window.setTimeout(() => setScanFeedback(null), 2200)
   }
 
   const received_n = Number(received) || 0
@@ -374,13 +385,52 @@ export default function CaissePage() {
             </div>
             <button
               type="button"
-              onClick={handleScan}
-              className="flex items-center gap-2 rounded-2xl bg-navy px-4 font-semibold text-navy-foreground shadow-soft transition-transform active:scale-95"
+              onClick={() => setScanOpen((v) => !v)}
+              aria-pressed={scanOpen}
+              className={cn(
+                'flex items-center gap-2 rounded-2xl px-4 font-semibold shadow-soft transition-transform active:scale-95',
+                scanOpen
+                  ? 'bg-brand text-brand-foreground'
+                  : 'bg-navy text-navy-foreground',
+              )}
             >
               <ScanLine className="h-5 w-5" />
               <span className="hidden sm:inline">{t('scan')}</span>
             </button>
           </div>
+
+          {/* Scanner intégré (rectangle démarrer/arrêter) */}
+          {scanOpen && (
+            <div className="mb-3">
+              <InlineScanner t={t} onDetected={handleScanDetected} autoStart />
+              {scanFeedback && (
+                <div
+                  className={cn(
+                    'mt-2 flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium',
+                    scanFeedback.type === 'found'
+                      ? 'bg-brand/10 text-brand'
+                      : 'bg-destructive/10 text-destructive',
+                  )}
+                >
+                  {scanFeedback.type === 'found' ? (
+                    <>
+                      <Check className="h-4 w-4 shrink-0" />
+                      <span className="truncate">
+                        {t('added')} · {scanFeedback.text}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <X className="h-4 w-4 shrink-0" />
+                      <span className="truncate">
+                        {t('product_not_found')} · {scanFeedback.text}
+                      </span>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Résultats de recherche */}
           {query && (
@@ -390,31 +440,65 @@ export default function CaissePage() {
                   {t('no_products_found')}
                 </p>
               ) : (
-                results.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => handleAdd(p.id)}
-                    className="flex w-full items-center justify-between gap-3 border-b border-border px-4 py-3 text-start last:border-0 transition-colors hover:bg-muted"
-                  >
-                    <span className="min-w-0">
-                      <span className="block truncate font-medium text-foreground">
-                        {p.name}
-                      </span>
-                      <span className="block text-xs text-muted-foreground">
-                        {productStock(p.lots)} {t('in_stock')} · {p.barcode}
-                      </span>
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <span className="font-heading font-bold tabular-nums text-foreground">
-                        {formatMRU(p.sellPrice)}
-                      </span>
-                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-brand-foreground">
-                        <Plus className="h-4 w-4" />
-                      </span>
-                    </span>
-                  </button>
-                ))
+                results.map((p) => {
+                  const variants = productVariants(p)
+                  const multi = variants.length > 1
+                  return (
+                    <div
+                      key={p.id}
+                      className="border-b border-border px-4 py-3 last:border-0"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="min-w-0">
+                          <span className="block truncate font-medium text-foreground">
+                            {p.name}
+                          </span>
+                          <span className="block text-xs text-muted-foreground">
+                            {productStock(p.lots)} {t('in_stock')} · {p.barcode}
+                          </span>
+                        </span>
+                        {!multi && (
+                          <button
+                            type="button"
+                            onClick={() => handleAdd(p, variants[0])}
+                            className="flex items-center gap-2"
+                            aria-label={t('add_to_cart')}
+                          >
+                            <span className="font-heading font-bold tabular-nums text-foreground">
+                              {formatMRU(variants[0].price)}
+                            </span>
+                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-brand-foreground">
+                              <Plus className="h-4 w-4" />
+                            </span>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Variantes de vente : une puce par variante (unité, pack, carton...) */}
+                      {multi && (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {variants.map((v) => (
+                            <button
+                              key={v.id}
+                              type="button"
+                              onClick={() => handleAdd(p, v)}
+                              className="flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-brand hover:bg-brand/5 active:scale-95"
+                            >
+                              <Plus className="h-3.5 w-3.5 text-brand" />
+                              <span>{v.label}</span>
+                              {v.factor > 1 && (
+                                <span className="text-muted-foreground">×{v.factor}</span>
+                              )}
+                              <span className="font-heading font-bold tabular-nums text-brand">
+                                {formatMRU(v.price)}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })
               )}
             </div>
           )}
@@ -426,7 +510,7 @@ export default function CaissePage() {
                 <button
                   key={p.id}
                   type="button"
-                  onClick={() => handleAdd(p.id)}
+                  onClick={() => handleAdd(p)}
                   className="rounded-2xl border border-border bg-card p-3 text-start shadow-soft transition-transform active:scale-95"
                 >
                   <span className="block truncate text-sm font-medium text-foreground">
@@ -469,19 +553,33 @@ export default function CaissePage() {
                 </div>
               ) : (
                 cart.map((item) => (
-                  <div key={item.productId} className="px-4 py-3">
+                  <div key={item.id} className="px-4 py-3">
                     <div className="flex items-start justify-between gap-2">
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-medium text-foreground">
-                          {item.name}
+                        <span className="flex items-center gap-1.5">
+                          <span className="truncate text-sm font-medium text-foreground">
+                            {item.name}
+                          </span>
+                          {/* Badge de variante (Pack, Carton...) si différent de l'unité */}
+                          {item.factor > 1 && (
+                            <span className="shrink-0 rounded-md bg-navy/10 px-1.5 py-0.5 text-[10px] font-bold text-navy">
+                              {item.variantLabel} ×{item.factor}
+                            </span>
+                          )}
                         </span>
                         <span className="block text-xs text-muted-foreground">
-                          {formatMRU(item.unitPrice)} {t('mru')} / {t('unit')}
+                          {formatMRU(item.unitPrice)} {t('mru')} / {item.variantLabel}
+                          {item.factor > 1 && (
+                            <span className="text-brand">
+                              {' '}
+                              · {item.qty * item.factor} {t('units_word')}
+                            </span>
+                          )}
                         </span>
                       </span>
                       <button
                         type="button"
-                        onClick={() => removeFromCart(item.productId)}
+                        onClick={() => removeFromCart(item.id)}
                         className="text-muted-foreground transition-colors hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -493,14 +591,14 @@ export default function CaissePage() {
                       <div className="flex items-center gap-1 rounded-xl border border-border p-0.5">
                         <button
                           type="button"
-                          onClick={() => updateQty(item.productId, item.qty - 1)}
+                          onClick={() => updateQty(item.id, item.qty - 1)}
                           className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted"
                           aria-label={t('minus')}
                         >
                           <Minus className="h-4 w-4" />
                         </button>
 
-                        {editingQty === item.productId ? (
+                        {editingQty === item.id ? (
                           <input
                             type="number"
                             inputMode="numeric"
@@ -509,7 +607,7 @@ export default function CaissePage() {
                             defaultValue={item.qty}
                             onBlur={(e) => {
                               const v = parseInt(e.target.value, 10)
-                              updateQty(item.productId, isNaN(v) ? item.qty : v)
+                              updateQty(item.id, isNaN(v) ? item.qty : v)
                               setEditingQty(null)
                             }}
                             onKeyDown={(e) => {
@@ -518,7 +616,7 @@ export default function CaissePage() {
                                   (e.target as HTMLInputElement).value,
                                   10,
                                 )
-                                updateQty(item.productId, isNaN(v) ? item.qty : v)
+                                updateQty(item.id, isNaN(v) ? item.qty : v)
                                 setEditingQty(null)
                               }
                             }}
@@ -527,7 +625,7 @@ export default function CaissePage() {
                         ) : (
                           <button
                             type="button"
-                            onClick={() => setEditingQty(item.productId)}
+                            onClick={() => setEditingQty(item.id)}
                             className="h-8 w-12 rounded-lg text-center text-sm font-bold tabular-nums text-foreground transition-colors hover:bg-muted"
                             aria-label={t('qty_short')}
                           >
@@ -537,7 +635,7 @@ export default function CaissePage() {
 
                         <button
                           type="button"
-                          onClick={() => updateQty(item.productId, item.qty + 1)}
+                          onClick={() => updateQty(item.id, item.qty + 1)}
                           className="flex h-8 w-8 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted"
                           aria-label={t('plus')}
                         >
@@ -557,6 +655,15 @@ export default function CaissePage() {
 
             {/* Résumé */}
             <div className="border-t border-border p-4">
+              {/* Total d'unités décomptées du stock (conversion pack → unités) */}
+              {cart.length > 0 && cartUnits !== cart.reduce((s, i) => s + i.qty, 0) && (
+                <div className="mb-2 flex items-center justify-between rounded-xl bg-brand/5 px-3 py-1.5 text-xs">
+                  <span className="text-muted-foreground">{t('units_deducted')}</span>
+                  <span className="font-heading font-bold tabular-nums text-brand">
+                    {cartUnits} {t('units_word')}
+                  </span>
+                </div>
+              )}
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">{t('subtotal')}</span>
                 <span className="tabular-nums text-foreground">

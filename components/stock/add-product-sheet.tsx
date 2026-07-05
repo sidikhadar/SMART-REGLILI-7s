@@ -13,11 +13,14 @@ import {
   Camera,
   Check,
   Layers,
+  Plus,
+  Trash2,
+  Boxes,
 } from 'lucide-react'
-import type { Product, ProductCategory } from '@/lib/types'
+import type { Product, ProductCategory, ProductVariant } from '@/lib/types'
 import { lookupBarcode, productMargin, type LookupSource } from '@/lib/stock-utils'
 import { cn } from '@/lib/utils'
-import { BarcodeScanner } from './barcode-scanner'
+import { InlineScanner } from '@/components/inline-scanner'
 
 type Method = LookupSource | 'manual'
 
@@ -29,6 +32,22 @@ const METHODS: { id: Method; labelKey: string; icon: typeof ScanLine }[] = [
 ]
 
 const CATEGORIES: ProductCategory[] = ['alimentation', 'cosmetique', 'sante', 'autre']
+
+/** Variante éditable dans le formulaire (avant conversion en ProductVariant). */
+interface EditVariant {
+  id: string
+  label: string
+  barcode: string
+  price: string
+  factor: string
+}
+
+/** Préréglages rapides de variantes (facteur = nb d'unités). */
+const VARIANT_PRESETS: { labelKey: string; label: string; factor: number }[] = [
+  { labelKey: 'variant_pack', label: 'Pack', factor: 6 },
+  { labelKey: 'variant_carton', label: 'Carton', factor: 24 },
+  { labelKey: 'variant_palette', label: 'Palette', factor: 480 },
+]
 
 export function AddProductSheet({
   t,
@@ -57,6 +76,9 @@ export function AddProductSheet({
   const [lotNumber, setLotNumber] = useState('')
   const [posology, setPosology] = useState('')
   const [image, setImage] = useState<string | undefined>()
+  // Variantes de vente supplémentaires (pack, carton, palette...). L'unité de
+  // base est implicite (prix de vente / code-barres ci-dessus, facteur 1).
+  const [variants, setVariants] = useState<EditVariant[]>([])
 
   const margin =
     buyPrice && sellPrice ? productMargin(Number(buyPrice), Number(sellPrice)) : null
@@ -96,9 +118,55 @@ export function AddProductSheet({
     if (file) setImage(URL.createObjectURL(file))
   }
 
+  function addVariant(preset?: { label: string; factor: number }) {
+    setVariants((prev) => [
+      ...prev,
+      {
+        id: `ev-${Date.now()}-${prev.length}`,
+        label: preset?.label ?? '',
+        barcode: '',
+        price: '',
+        factor: preset ? String(preset.factor) : '',
+      },
+    ])
+  }
+
+  function updateVariant(id: string, patch: Partial<EditVariant>) {
+    setVariants((prev) => prev.map((v) => (v.id === id ? { ...v, ...patch } : v)))
+  }
+
+  function removeVariant(id: string) {
+    setVariants((prev) => prev.filter((v) => v.id !== id))
+  }
+
   function save() {
     if (!canSave) return
     const qty = Number(quantity) || 0
+
+    // Construit les variantes de vente. L'unité de base est toujours en 1ère
+    // position (facteur 1). Le stock reste géré en unités.
+    const validExtra = variants.filter(
+      (v) => v.label.trim() && Number(v.factor) > 0 && Number(v.price) > 0,
+    )
+    const productVariants: ProductVariant[] | undefined = validExtra.length
+      ? [
+          {
+            id: 'unit',
+            label: 'Unité',
+            barcode: barcode.trim() || undefined,
+            price: Number(sellPrice) || 0,
+            factor: 1,
+          },
+          ...validExtra.map((v, i) => ({
+            id: `v-${Date.now()}-${i}`,
+            label: v.label.trim(),
+            barcode: v.barcode.trim() || undefined,
+            price: Number(v.price) || 0,
+            factor: Number(v.factor) || 1,
+          })),
+        ]
+      : undefined
+
     const product: Product = {
       id: `p-${Date.now()}`,
       name: name.trim(),
@@ -117,6 +185,7 @@ export function AddProductSheet({
           number: lotNumber || undefined,
         },
       ],
+      variants: productVariants,
     }
     onSave(product)
   }

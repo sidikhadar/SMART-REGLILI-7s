@@ -1,5 +1,42 @@
-import type { Lot, Product, Sale } from './types'
+import type { Lot, Product, ProductVariant, Sale } from './types'
 import { daysUntil, productStock } from './format'
+
+/* ------------------------------ Variantes de vente ------------------------------ */
+
+/**
+ * Variante de base (unité) d'un produit. Utilisée quand aucune variante
+ * n'est explicitement choisie. Factor = 1, prix = prix de vente unitaire.
+ */
+export function baseVariant(p: Product): ProductVariant {
+  if (p.variants && p.variants.length > 0) return p.variants[0]
+  return { id: 'unit', label: 'Unité', barcode: p.barcode, price: p.sellPrice, factor: 1 }
+}
+
+/** Liste des variantes vendables d'un produit (au moins l'unité de base). */
+export function productVariants(p: Product): ProductVariant[] {
+  if (p.variants && p.variants.length > 0) return p.variants
+  return [baseVariant(p)]
+}
+
+/**
+ * Recherche un produit par code-barres parmi une liste, en tenant compte
+ * des codes-barres de chaque variante. Renvoie le produit ET la variante
+ * correspondante pour que la caisse décompte le bon nombre d'unités.
+ */
+export function findByBarcode(
+  barcode: string,
+  products: Product[],
+): { product: Product; variant: ProductVariant } | null {
+  const code = barcode.trim()
+  if (!code) return null
+  for (const p of products) {
+    for (const v of productVariants(p)) {
+      if (v.barcode && v.barcode === code) return { product: p, variant: v }
+    }
+    if (p.barcode === code) return { product: p, variant: baseVariant(p) }
+  }
+  return null
+}
 
 /** Marge en pourcentage à partir des prix d'achat / vente */
 export function productMargin(buyPrice: number, sellPrice: number): number {
