@@ -106,11 +106,11 @@ export function AddProductSheet({
     }
   }
 
-  // code détecté par la caméra → on remplit puis on lance la recherche
+  // code détecté par la caméra → on remplit, on ferme le scanner puis on recherche
   function handleScanDetected(code: string) {
     setBarcode(code)
     setScanning(false)
-    runLookup(code)
+    void runLookup(code)
   }
 
   function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
@@ -248,9 +248,15 @@ export function AddProductSheet({
               />
               <button
                 type="button"
-                onClick={() => setScanning(true)}
+                onClick={() => setScanning((v) => !v)}
                 aria-label={t('use_camera')}
-                className="flex shrink-0 items-center justify-center rounded-xl bg-brand px-4 text-brand-foreground"
+                aria-pressed={scanning}
+                className={cn(
+                  'flex shrink-0 items-center justify-center rounded-xl px-4',
+                  scanning
+                    ? 'bg-navy text-navy-foreground'
+                    : 'bg-brand text-brand-foreground',
+                )}
               >
                 <Camera className="h-4 w-4" />
               </button>
@@ -267,6 +273,13 @@ export function AddProductSheet({
                 )}
               </button>
             </div>
+
+            {/* Scanner intégré (rectangle démarrer/arrêter) */}
+            {scanning && (
+              <div className="mt-2">
+                <InlineScanner t={t} onDetected={handleScanDetected} autoStart />
+              </div>
+            )}
             {searching && (
               <p className="mt-2 text-xs text-muted-foreground">{t('searching')}</p>
             )}
@@ -417,6 +430,110 @@ export function AddProductSheet({
               </div>
             </div>
 
+            {/* Variantes de vente : packs, cartons, palettes (stock géré en unités) */}
+            <div className="rounded-2xl border border-border bg-muted/40 p-3">
+              <div className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                <Boxes className="h-4 w-4 text-brand" />
+                {t('sale_units')}
+              </div>
+              <p className="mb-2 text-xs text-muted-foreground">{t('sale_units_hint')}</p>
+
+              {/* Unité de base (implicite, non modifiable) */}
+              <div className="mb-2 flex items-center justify-between rounded-xl bg-background px-3 py-2 text-sm">
+                <span className="font-medium text-foreground">{t('unit')}</span>
+                <span className="text-xs text-muted-foreground">
+                  ×1 · {sellPrice ? `${sellPrice} ${t('mru')}` : '—'}
+                </span>
+              </div>
+
+              {/* Variantes personnalisées */}
+              <div className="space-y-2">
+                {variants.map((v) => (
+                  <div
+                    key={v.id}
+                    className="rounded-xl border border-border bg-background p-2.5"
+                  >
+                    <div className="mb-2 flex items-center gap-2">
+                      <input
+                        value={v.label}
+                        onChange={(e) => updateVariant(v.id, { label: e.target.value })}
+                        placeholder={t('variant_name')}
+                        className="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:border-brand"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeVariant(v.id)}
+                        aria-label={t('delete')}
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <label className="block">
+                        <span className="mb-0.5 block text-[11px] text-muted-foreground">
+                          {t('units_per')}
+                        </span>
+                        <input
+                          value={v.factor}
+                          onChange={(e) => updateVariant(v.id, { factor: e.target.value })}
+                          inputMode="numeric"
+                          placeholder="6"
+                          className="w-full rounded-lg border border-border bg-card px-2.5 py-2 text-sm tabular-nums text-foreground outline-none focus:border-brand"
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="mb-0.5 block text-[11px] text-muted-foreground">
+                          {t('sell_price')}
+                        </span>
+                        <input
+                          value={v.price}
+                          onChange={(e) => updateVariant(v.id, { price: e.target.value })}
+                          inputMode="numeric"
+                          className="w-full rounded-lg border border-border bg-card px-2.5 py-2 text-sm tabular-nums text-foreground outline-none focus:border-brand"
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="mb-0.5 block text-[11px] text-muted-foreground">
+                          {t('barcode')}
+                        </span>
+                        <input
+                          value={v.barcode}
+                          onChange={(e) => updateVariant(v.id, { barcode: e.target.value })}
+                          inputMode="numeric"
+                          placeholder="—"
+                          className="w-full rounded-lg border border-border bg-card px-2.5 py-2 text-sm tabular-nums text-foreground outline-none focus:border-brand"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Ajout rapide via préréglages + variante personnalisée */}
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {VARIANT_PRESETS.map((p) => (
+                  <button
+                    key={p.labelKey}
+                    type="button"
+                    onClick={() => addVariant({ label: t(p.labelKey), factor: p.factor })}
+                    className="flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:border-brand hover:bg-brand/5"
+                  >
+                    <Plus className="h-3.5 w-3.5 text-brand" />
+                    {t(p.labelKey)}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => addVariant()}
+                  className="flex items-center gap-1 rounded-lg border border-dashed border-border bg-background px-2.5 py-1.5 text-xs font-medium text-muted-foreground hover:border-brand hover:text-foreground"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  {t('variant_custom')}
+                </button>
+              </div>
+            </div>
+
             {(category === 'sante' || posology) && (
               <Field label={t('posology')}>
                 <input
@@ -439,13 +556,6 @@ export function AddProductSheet({
           </div>
         )}
       </div>
-
-      {scanning && (
-        <BarcodeScanner
-          onDetected={handleScanDetected}
-          onClose={() => setScanning(false)}
-        />
-      )}
     </div>
   )
 }

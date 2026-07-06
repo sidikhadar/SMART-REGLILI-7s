@@ -366,6 +366,17 @@ const fr: Dict = {
   total_covered: 'Total couvert',
   to_pay: 'À payer',
   add_to_cart: 'Ajouter au panier',
+  added: 'Ajouté',
+  units_word: 'unités',
+  units_deducted: 'Unités décomptées du stock',
+  sale_units: 'Unités de vente',
+  sale_units_hint: 'Ajoutez des packs ou cartons. Le stock est toujours géré en unités.',
+  variant_name: 'Nom de l\'unité',
+  units_per: 'Unités/pack',
+  variant_pack: 'Pack',
+  variant_carton: 'Carton',
+  variant_palette: 'Palette',
+  variant_custom: 'Personnalisé',
   select_client_required: 'Veuillez choisir ou créer un client',
 
   // nav ajouts
@@ -956,6 +967,17 @@ const en: Dict = {
   total_covered: 'Total covered',
   to_pay: 'To pay',
   add_to_cart: 'Add to cart',
+  added: 'Added',
+  units_word: 'units',
+  units_deducted: 'Units deducted from stock',
+  sale_units: 'Sale units',
+  sale_units_hint: 'Add packs or cartons. Stock is always managed in units.',
+  variant_name: 'Unit name',
+  units_per: 'Units/pack',
+  variant_pack: 'Pack',
+  variant_carton: 'Carton',
+  variant_palette: 'Pallet',
+  variant_custom: 'Custom',
   select_client_required: 'Please choose or create a client',
 
   product_return: 'Product return',
@@ -1310,7 +1332,7 @@ const ar: Dict = {
   client_name: 'اسم الزبون',
   purchases_count: 'مشتريات',
   client_debts: 'ديون الزبائن',
-  supplier_debts: 'ديون الموردين',
+  supplier_debts: 'ديون ��لموردين',
   to_collect: 'إجمالي المستحقات',
   to_pay: 'إجمالي المدفوعات',
   mark_paid: 'تحديد كمدفوع',
@@ -1533,6 +1555,17 @@ const ar: Dict = {
   total_covered: 'المبلغ المغطى',
   to_pay: 'للدفع',
   add_to_cart: 'أضف إلى السلة',
+  added: 'تمت الإضافة',
+  units_word: 'وحدة',
+  units_deducted: 'وحدات مخصومة من المخزون',
+  sale_units: 'وحدات البيع',
+  sale_units_hint: 'أضف عبوات أو كراتين. يُدار المخزون دائمًا بالوحدات.',
+  variant_name: 'اسم الوحدة',
+  units_per: 'وحدات/عبوة',
+  variant_pack: 'عبوة',
+  variant_carton: 'كرتون',
+  variant_palette: 'منصة',
+  variant_custom: 'مخصص',
   select_client_required: 'يرجى اختيار أو إنشاء زبون',
 
   product_return: 'إرجاع منتج',
@@ -1687,7 +1720,7 @@ const ar: Dict = {
 
   // الحساب (الإعدادات)
   set_profile_photo: 'صورة الملف الشخصي',
-  set_change_photo: 'تغيير الصورة',
+  set_change_photo: 'تغيير الص��رة',
   set_full_name: 'الاسم الكامل',
   set_email: 'البريد الإلكتروني',
   set_change_password: 'تغيير كلمة المرور',
@@ -1735,7 +1768,7 @@ const ar: Dict = {
   legal_privacy_body:
     'يحترم SMART REGLILI خصوصيتك. نجمع فقط البيانات اللازمة لتشغيل التطبيق: معلومات متجرك ومنتجاتك ومبيعاتك وعملائك. هذه البيانات ملك لك ولا تُباع أبدًا لأطراف ثالثة. تُخزَّن بشكل آمن ومشفّر. يمكنك في أي وقت طلب تصدير بياناتك أو حذفها عبر التواصل مع الدعم.',
   legal_terms_body:
-    'باستخدامك SMART REGLILI، فإنك توافق على استخدام التطبيق وفقًا للقوانين المعمول بها في موريتانيا. الاشتراك شخصي ولا يمكن مشاركته. نحتفظ بالحق في تعليق أي حساب في حال الاستخدام الاحتيالي. يُقدَّم التطبيق «كما هو»؛ نحسّن الخدمة باستمرار لكننا لا نضمن توفرًا غير منقطع.',
+    'باستخدامك SMART REGLILI، فإنك توافق على استخدام التطبيق وفقًا للقوانين المعمول بها في موريتانيا. الاشتراك شخصي ولا يمكن مشاركته. نحتفظ بالحق في تعليق أي حساب في حال الاست��دام الاحتيالي. يُقدَّم التطبيق «كما هو»؛ نحسّن الخدمة باستمرار لكننا لا نضمن توفرًا غير منقطع.',
   legal_notices_body:
     'يُنشر SMART REGLILI من قبل سيدي محمد الخضر، نواكشوط، موريتانيا. للتواصل: sidimohamedkhadar@gmail.com. مدير النشر: سيدي محمد الخضر. الاستضافة: Vercel Inc. لأي سؤال قانوني تواصل معنا عبر البريد أو واتساب.',
 

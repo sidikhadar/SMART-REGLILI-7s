@@ -11,6 +11,7 @@ import {
   Package,
   CalendarClock,
   Layers,
+  Boxes,
 } from 'lucide-react'
 import type { Product } from '@/lib/types'
 import { productStock, formatMRU, formatDate } from '@/lib/format'
@@ -118,6 +119,12 @@ export function ProductCard({
             <span className="text-muted-foreground">
               {t('margin')} {margin}%
             </span>
+            {product.variants && product.variants.length > 1 && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-navy/10 px-1.5 py-0.5 font-medium text-navy">
+                <Boxes className="h-3 w-3" />
+                {product.variants.length - 1} {t('sale_units').toLowerCase()}
+              </span>
+            )}
           </div>
         </div>
 
