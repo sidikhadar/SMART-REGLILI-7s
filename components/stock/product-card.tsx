@@ -214,6 +214,34 @@ export function ProductCard({
               )
             })}
           </ul>
+
+          {/* Variantes de vente (packs, cartons...) */}
+          {product.variants && product.variants.length > 1 && (
+            <>
+              <div className="mb-1.5 mt-3 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                <Boxes className="h-3.5 w-3.5" />
+                {t('sale_units')}
+              </div>
+              <ul className="space-y-1.5">
+                {product.variants.map((v) => (
+                  <li
+                    key={v.id}
+                    className="flex items-center justify-between rounded-xl bg-card px-3 py-2 text-sm shadow-soft"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="font-medium text-foreground">{v.label}</span>
+                      <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                        ×{v.factor}
+                      </span>
+                    </span>
+                    <span className="font-heading font-bold tabular-nums text-foreground">
+                      {formatMRU(v.price)} {t('mru')}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
       )}
     </div>
