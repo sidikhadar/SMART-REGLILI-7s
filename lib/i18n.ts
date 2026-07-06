@@ -452,6 +452,8 @@ const fr: Dict = {
   inv_from: 'De',
   inv_to: 'À',
   inv_thanks: 'Merci de votre confiance',
+  inv_cashier: 'Caissier',
+  inv_method: 'Mode de paiement',
 
   // IA & rapports
   ai_subtitle: 'Analyses intelligentes de votre commerce',
@@ -1057,6 +1059,8 @@ const en: Dict = {
   inv_from: 'From',
   inv_to: 'To',
   inv_thanks: 'Thank you for your business',
+  inv_cashier: 'Cashier',
+  inv_method: 'Payment method',
 
   ai_subtitle: 'Smart analytics for your business',
   ai_insights: 'AI recommendations',
@@ -1649,12 +1653,14 @@ const ar: Dict = {
   inv_date: 'التاريخ',
   inv_items: 'المنتجات',
   inv_paid: 'المدفوع',
-  inv_search: 'ابحث برقم الفاتورة أو العميل',
+  inv_search: 'ابحث برقم الفاتو��ة أو العميل',
   inv_empty: 'لا توجد فاتورة',
   inv_receipt: 'الفاتورة',
   inv_from: 'من',
   inv_to: 'إلى',
   inv_thanks: 'شكرًا لتعاملكم معنا',
+  inv_cashier: 'أمين الصندوق',
+  inv_method: 'طريقة الدفع',
 
   ai_subtitle: 'تحليلات ذكية لتجارتك',
   ai_insights: 'توصيات الذكاء الاصطناعي',
@@ -1721,7 +1727,7 @@ const ar: Dict = {
   ret_refund_credit: 'رصيد للزبون',
   ret_confirm: 'تأكيد الإرجاع',
   ret_qty: 'الكمية المرتجعة',
-  ret_done: 'تم تسجيل الإرجاع',
+  ret_done: 'تم تسجيل الإرجا��',
   ret_recent: 'المرتجعات الأخيرة',
   ret_empty: 'لا توجد مرتجعات',
   ret_choose_product: 'اختر المنتج',

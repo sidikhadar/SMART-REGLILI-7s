@@ -359,3 +359,21 @@
 [dir='rtl'] .flip-rtl {
   transform: scaleX(-1);
 }
+
+/* Impression : n'imprime que le reçu de facture */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #invoice-print,
+  #invoice-print * {
+    visibility: visible;
+  }
+  #invoice-print {
+    position: absolute;
+    inset: 0;
+    overflow: visible !important;
+    max-height: none !important;
+    padding: 24px;
+  }
+}

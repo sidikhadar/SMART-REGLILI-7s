@@ -19,6 +19,45 @@ export function InvoiceDetail({
   lang: string
   onClose: () => void
 }) {
+  function buildText() {
+    const lines = [
+      `${shopName} — ${t('inv_receipt')} ${invoice.number}`,
+      `${t('inv_date')}: ${formatDate(invoice.date, lang)} ${formatTime(invoice.date, lang)}`,
+      `${t('inv_to')}: ${invoice.clientName || t('inv_walkin')}`,
+      '',
+      ...invoice.items.map(
+        (it) =>
+          `${it.qty}× ${it.name} — ${formatMRU(it.qty * it.unitPrice)} ${t('mru')}`,
+      ),
+      '',
+      `${t('total')}: ${formatMRU(invoice.total)} ${t('mru')}`,
+      `${t('inv_paid')}: ${formatMRU(invoice.paid)} ${t('mru')}`,
+      invoice.remaining > 0
+        ? `${t('remaining')}: ${formatMRU(invoice.remaining)} ${t('mru')}`
+        : '',
+      '',
+      t('inv_thanks'),
+    ]
+    return lines.filter(Boolean).join('\n')
+  }
+
+  async function handleShare() {
+    const text = buildText()
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ title: invoice.number, text })
+        return
+      } catch {
+        // annulé → repli WhatsApp
+      }
+    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
+  }
+
+  function handleDownload() {
+    window.print()
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
       {/* Overlay */}
@@ -50,7 +89,7 @@ export function InvoiceDetail({
         </div>
 
         {/* Corps défilant */}
-        <div className="flex-1 overflow-y-auto px-5 py-4">
+        <div id="invoice-print" className="flex-1 overflow-y-auto px-5 py-4">
           {/* En-tête magasin / client */}
           <div className="mb-4 flex items-start justify-between gap-3">
             <div>
@@ -72,6 +111,22 @@ export function InvoiceDetail({
               <p className="text-xs text-muted-foreground">{t('inv_date')}</p>
               <p className="text-sm font-medium text-foreground">
                 {formatDate(invoice.date, lang)} · {formatTime(invoice.date, lang)}
+              </p>
+            </div>
+          </div>
+
+          {/* Caissier + mode de paiement */}
+          <div className="mb-4 grid grid-cols-2 gap-3 rounded-2xl bg-muted/50 p-3">
+            <div className="min-w-0">
+              <p className="text-xs text-muted-foreground">{t('inv_cashier')}</p>
+              <p className="truncate text-sm font-medium text-foreground">
+                {invoice.cashier}
+              </p>
+            </div>
+            <div className="min-w-0 text-end">
+              <p className="text-xs text-muted-foreground">{t('inv_method')}</p>
+              <p className="truncate text-sm font-medium text-foreground">
+                {t(`pay_${invoice.method}`)}
               </p>
             </div>
           </div>
@@ -137,9 +192,10 @@ export function InvoiceDetail({
         </div>
 
         {/* Actions */}
-        <div className="grid grid-cols-2 gap-2 border-t border-border p-4">
+        <div className="grid grid-cols-2 gap-2 border-t border-border p-4 print:hidden">
           <button
             type="button"
+            onClick={handleShare}
             className="flex items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
           >
             <Share2 className="h-4 w-4" />
@@ -147,6 +203,7 @@ export function InvoiceDetail({
           </button>
           <button
             type="button"
+            onClick={handleDownload}
             className="flex items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-semibold text-brand-foreground transition-transform active:scale-95"
           >
             <Download className="h-4 w-4" />
