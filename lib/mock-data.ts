@@ -7,6 +7,8 @@ import type {
   Supplier,
   Employee,
   Alert,
+  Register,
+  Warehouse,
 } from './types'
 
 const today = new Date()
@@ -29,11 +31,16 @@ export const PRODUCTS: Product[] = [
     category: 'alimentation',
     buyPrice: 28,
     sellPrice: 35,
-    image: '/products/milk.jpg',
+    image: '/products/milk.png',
     lowStockThreshold: 12,
     lots: [
       { id: 'l1', quantity: 24, expiry: daysFromNow(40), number: 'LT-2401' },
       { id: 'l2', quantity: 6, expiry: daysFromNow(5), number: 'LT-2312' },
+    ],
+    variants: [
+      { id: 'v-p1-unit', label: 'Unité', barcode: '6111035000123', price: 35, factor: 1 },
+      { id: 'v-p1-pack', label: 'Pack', barcode: '6111035000124', price: 200, factor: 6 },
+      { id: 'v-p1-carton', label: 'Carton', barcode: '6111035000125', price: 380, factor: 12 },
     ],
   },
   {
@@ -43,7 +50,7 @@ export const PRODUCTS: Product[] = [
     category: 'alimentation',
     buyPrice: 320,
     sellPrice: 410,
-    image: '/products/rice.jpg',
+    image: '/products/rice.png',
     lowStockThreshold: 8,
     lots: [{ id: 'l3', quantity: 32, number: 'RZ-88' }],
   },
@@ -55,7 +62,7 @@ export const PRODUCTS: Product[] = [
     buyPrice: 95,
     sellPrice: 140,
     tva: 20,
-    image: '/products/cream.jpg',
+    image: '/products/cream.png',
     lowStockThreshold: 6,
     lots: [{ id: 'l4', quantity: 18, expiry: daysFromNow(220) }],
   },
@@ -66,7 +73,7 @@ export const PRODUCTS: Product[] = [
     category: 'sante',
     buyPrice: 12,
     sellPrice: 25,
-    image: '/products/paracetamol.jpg',
+    image: '/products/paracetamol.png',
     lowStockThreshold: 20,
     lots: [
       { id: 'l5', quantity: 40, expiry: daysFromNow(18), number: 'PH-LOT-A' },
@@ -80,9 +87,14 @@ export const PRODUCTS: Product[] = [
     category: 'alimentation',
     buyPrice: 18,
     sellPrice: 30,
-    image: '/products/cola.jpg',
+    image: '/products/cola.png',
     lowStockThreshold: 24,
-    lots: [{ id: 'l7', quantity: 9, expiry: daysFromNow(2) }],
+    lots: [{ id: 'l7', quantity: 96, expiry: daysFromNow(120) }],
+    variants: [
+      { id: 'v-p5-unit', label: 'Unité', barcode: '5449000000996', price: 30, factor: 1 },
+      { id: 'v-p5-pack', label: 'Pack', barcode: '5449000000997', price: 165, factor: 6 },
+      { id: 'v-p5-carton', label: 'Carton', barcode: '5449000000998', price: 620, factor: 24 },
+    ],
   },
   {
     id: 'p6',
@@ -92,7 +104,7 @@ export const PRODUCTS: Product[] = [
     buyPrice: 22,
     sellPrice: 40,
     tva: 20,
-    image: '/products/soap.jpg',
+    image: '/products/soap.png',
     lowStockThreshold: 10,
     lots: [{ id: 'l8', quantity: 3 }],
   },
@@ -103,7 +115,7 @@ export const PRODUCTS: Product[] = [
     category: 'alimentation',
     buyPrice: 45,
     sellPrice: 70,
-    image: '/products/tea.jpg',
+    image: '/products/tea.png',
     lowStockThreshold: 15,
     lots: [{ id: 'l9', quantity: 50 }],
   },
@@ -114,7 +126,7 @@ export const PRODUCTS: Product[] = [
     category: 'alimentation',
     buyPrice: 60,
     sellPrice: 85,
-    image: '/products/oil.jpg',
+    image: '/products/oil.png',
     lowStockThreshold: 12,
     lots: [{ id: 'l10', quantity: 28 }],
   },
@@ -228,10 +240,16 @@ export const SUPPLIERS: Supplier[] = [
   { id: 'sup3', name: 'Pharma Distrib', phone: '+222 36 78 90 12', balance: 4500 },
 ]
 
+export const WAREHOUSES: Warehouse[] = [
+  { id: 'wh1', name: 'Boutique principale', location: 'Nouakchott — Centre', productCount: 8, units: 262, value: 42600, fillPercent: 78, main: true },
+  { id: 'wh2', name: 'Dépôt Ksar', location: 'Nouakchott — Ksar', productCount: 5, units: 140, value: 21800, fillPercent: 54, main: false },
+  { id: 'wh3', name: 'Réserve Arafat', location: 'Nouakchott — Arafat', productCount: 3, units: 60, value: 8400, fillPercent: 31, main: false },
+]
+
 export const EMPLOYEES: Employee[] = [
-  { id: 'emp1', name: 'Sidi Mohamed', role: 'patron', active: true },
-  { id: 'emp2', name: 'Caissier 1', role: 'caissier', register: 'Caisse 1', active: true },
-  { id: 'emp3', name: 'Caissier 2', role: 'caissier', register: 'Caisse 2', active: true },
+  { id: 'emp1', name: 'Sidi Mohamed', role: 'patron', active: true, phone: '37 16 20 07', email: 'sidimohamedkhadar@gmail.com' },
+  { id: 'emp2', name: 'Caissier 1', role: 'caissier', register: 'Caisse 1', active: true, phone: '46 12 34 56', email: 'caissier1@reglili.mr', password: 'caisse123' },
+  { id: 'emp3', name: 'Caissier 2', role: 'caissier', register: 'Caisse 2', active: true, phone: '46 78 90 12', email: 'caissier2@reglili.mr', password: 'caisse456' },
 ]
 
 export const ALERTS: Alert[] = [
@@ -263,3 +281,47 @@ export const SALES_LAST_7_DAYS = [
   { day: 'Sam', ventes: 8900, benefice: 2240 },
   { day: 'Dim', ventes: 5600, benefice: 1330 },
 ]
+
+// --- Caisses (toutes partagent le même stock) ---
+export const REGISTERS: Register[] = [
+  { id: 'r1', name: 'Caisse 1', active: true },
+  { id: 'r2', name: 'Caisse 2', active: true },
+]
+
+// --- Historique de ventes sur 1 an (données fictives déterministes) ---
+export interface DailyPoint {
+  date: string // YYYY-MM-DD
+  total: number
+  profit: number
+  r1: number
+  r2: number
+}
+
+// pseudo-aléatoire déterministe pour des données stables entre les rendus
+function seeded(n: number): number {
+  const x = Math.sin(n * 9973.13) * 43758.5453
+  return x - Math.floor(x)
+}
+
+export const DAILY_SALES: DailyPoint[] = (() => {
+  const out: DailyPoint[] = []
+  const start = new Date()
+  start.setHours(0, 0, 0, 0)
+  // 0 = dimanche ... 6 = samedi (week-ends plus actifs en Mauritanie : jeu/ven/sam)
+  const weekdayFactor = [0.9, 0.85, 0.9, 0.95, 1.2, 1.4, 1.15]
+  for (let i = 364; i >= 0; i--) {
+    const d = new Date(start)
+    d.setDate(d.getDate() - i)
+    const dow = d.getDay()
+    const month = d.getMonth()
+    const seasonal = 1 + 0.14 * Math.sin((month / 12) * Math.PI * 2)
+    const growth = 1 + (364 - i) / 364 * 0.25 // légère croissance sur l'année
+    const noise = 0.78 + seeded(i + 1) * 0.5
+    const total = Math.round(6200 * weekdayFactor[dow] * seasonal * growth * noise)
+    const r1 = Math.round(total * (0.52 + seeded(i + 100) * 0.12))
+    const r2 = total - r1
+    const profit = Math.round(total * (0.21 + seeded(i + 200) * 0.07))
+    out.push({ date: d.toISOString().slice(0, 10), total, profit, r1, r2 })
+  }
+  return out
+})()

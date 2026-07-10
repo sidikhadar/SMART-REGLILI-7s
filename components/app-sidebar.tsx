@@ -37,9 +37,7 @@ export function AppSidebar() {
   return (
     <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-e border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
       <div className="flex items-center gap-3 border-b border-sidebar-border px-5 py-5">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-card shadow-soft ring-1 ring-sidebar-border">
-          <BrandEmblem size={42} />
-        </span>
+        <BrandEmblem size={40} className="rounded-full shadow-soft ring-1 ring-sidebar-border" />
         <div className="leading-tight">
           <p className="font-display text-lg font-black tracking-wide text-sidebar-accent-foreground">
             SMART <span className="text-brand">REGLILI</span>

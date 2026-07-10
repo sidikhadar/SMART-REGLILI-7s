@@ -82,9 +82,7 @@ export function AppTopbar({ title }: { title: string }) {
           <div className="absolute inset-y-0 start-0 flex w-[82%] max-w-xs flex-col bg-sidebar text-sidebar-foreground shadow-soft-lg animate-float-up">
             <div className="flex items-center justify-between gap-2 border-b border-sidebar-border px-4 py-4">
               <div className="flex min-w-0 items-center gap-2.5">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-card shadow-soft ring-1 ring-sidebar-border">
-                  <BrandEmblem size={34} />
-                </span>
+                <BrandEmblem size={40} className="rounded-full shadow-soft ring-1 ring-sidebar-border" />
                 <span className="truncate font-display text-base font-black tracking-wide text-sidebar-accent-foreground">
                   SMART <span className="text-brand">REGLILI</span>
                 </span>

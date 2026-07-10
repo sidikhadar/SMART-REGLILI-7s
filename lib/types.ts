@@ -10,8 +10,15 @@ export type PaymentMethod =
   | 'click'
   | 'masrivi'
   | 'bamis'
+  | 'amanety'
   | 'credit'
   | 'partiel'
+
+export interface Register {
+  id: string
+  name: string
+  active: boolean
+}
 
 export type ProductCategory =
   | 'alimentation'
@@ -26,6 +33,20 @@ export interface Lot {
   number?: string
 }
 
+/**
+ * Variante de vente d'un produit (Unité, Pack, Carton, Palette, personnalisée).
+ * Le stock réel est toujours stocké en unités : `factor` = nombre d'unités
+ * contenues dans cette variante (Unité = 1, Pack de 6 = 6, Carton de 24 = 24...).
+ * Chaque variante possède son propre code-barres et son propre prix de vente.
+ */
+export interface ProductVariant {
+  id: string
+  label: string
+  barcode?: string
+  price: number
+  factor: number
+}
+
 export interface Product {
   id: string
   name: string
@@ -37,6 +58,8 @@ export interface Product {
   image?: string
   lots: Lot[]
   lowStockThreshold: number
+  /** Variantes de vente. La 1ère est l'unité de base (factor 1). */
+  variants?: ProductVariant[]
 }
 
 export interface SaleItem {
@@ -44,6 +67,10 @@ export interface SaleItem {
   name: string
   qty: number
   unitPrice: number
+  /** Libellé de la variante vendue (ex: "Pack ×24"). */
+  variantLabel?: string
+  /** Nombre d'unités par variante (pour le décompte du stock en unités). */
+  factor?: number
 }
 
 export interface Sale {
@@ -90,12 +117,26 @@ export interface Supplier {
   balance: number
 }
 
+export interface Warehouse {
+  id: string
+  name: string
+  location: string
+  productCount: number
+  units: number
+  value: number
+  fillPercent: number
+  main: boolean
+}
+
 export interface Employee {
   id: string
   name: string
   role: Role
   register?: string
   active: boolean
+  phone?: string
+  email?: string
+  password?: string
 }
 
 export interface Alert {
