@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils'
 const PAYMENT_NUMBER = '37 16 20 07'
 const WHATSAPP = '+33 7 58 66 46 84'
 const WHATSAPP_LINK = 'https://wa.me/33758664684'
-const EMAIL = 'contact@reglili.mr'
+const EMAIL = 'contact@reglili.com'
 const PAYMENT_APPS = ['Bankily', 'Sedad', 'Masrivi', 'Click']
 
 interface Plan {

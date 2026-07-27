@@ -44,7 +44,7 @@ export default function SettingsPage() {
   const [fullName, setFullName] = useState(userName || 'Sidi Mohamed')
   const [shopName, setShopName] = useState('SMART REGLILI')
   const [shopPhone, setShopPhone] = useState('37 16 20 07')
-  const [email, setEmail] = useState('sidimohamedkhadar@gmail.com')
+  const [email, setEmail] = useState('contact@reglili.com')
   const [photo, setPhoto] = useState<string | null>(null)
   const [notif, setNotif] = useState({ stock: true, expiry: true, debt: false })
   const [saved, setSaved] = useState(false)
