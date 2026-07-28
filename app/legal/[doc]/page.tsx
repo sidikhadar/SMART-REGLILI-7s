@@ -51,9 +51,33 @@ export default function LegalPage({
             </div>
           </div>
 
-          <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
-            {t(entry.bodyKey)}
-          </p>
+          <div className="space-y-4">
+            {t(entry.bodyKey)
+              .split('\n\n')
+              .map((para, i) => {
+                const trimmed = para.trim()
+                // Un paragraphe qui se termine par « : » et court est traité comme un titre de section
+                const isHeading = trimmed.endsWith(':') && trimmed.length < 60
+                if (isHeading) {
+                  return (
+                    <h2
+                      key={i}
+                      className="font-heading text-sm font-bold text-foreground"
+                    >
+                      {trimmed.replace(/:$/, '')}
+                    </h2>
+                  )
+                }
+                return (
+                  <p
+                    key={i}
+                    className="text-pretty text-sm leading-relaxed text-muted-foreground"
+                  >
+                    {trimmed}
+                  </p>
+                )
+              })}
+          </div>
         </section>
 
         {/* Navigation entre documents */}
