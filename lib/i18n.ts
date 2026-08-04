@@ -602,11 +602,30 @@ const fr: Dict = {
   legal_notices: 'Mentions légales',
   legal_updated: 'Dernière mise à jour : janvier 2025',
   legal_privacy_body:
-    "SMART REGLILI respecte votre vie privée. Nous collectons uniquement les données nécessaires au fonctionnement de l'application : informations de votre commerce, produits, ventes et clients. Ces données vous appartiennent et ne sont jamais vendues à des tiers. Elles sont stockées de manière sécurisée et chiffrée. Vous pouvez à tout moment demander l'export ou la suppression de vos données en contactant le support.",
+    "Données collectées :\n\n" +
+    "SMART REGLILI respecte votre vie privée. Nous collectons uniquement les données nécessaires au fonctionnement de l'application : les informations de votre commerce, vos produits, vos ventes et vos clients.\n\n" +
+    "Utilisation des données :\n\n" +
+    "Ces données vous appartiennent et ne sont jamais vendues à des tiers. Elles sont utilisées exclusivement pour faire fonctionner votre espace et vous fournir vos rapports.\n\n" +
+    "Sécurité :\n\n" +
+    "Vos données sont stockées de manière sécurisée et chiffrée.\n\n" +
+    "Vos droits :\n\n" +
+    "Vous pouvez à tout moment demander l'export ou la suppression de vos données en contactant le support à contact@reglili.com.",
   legal_terms_body:
-    "En utilisant SMART REGLILI, vous acceptez d'utiliser l'application dans le respect des lois en vigueur en Mauritanie. L'abonnement est personnel et ne peut être partagé. Nous nous réservons le droit de suspendre un compte en cas d'usage frauduleux. L'application est fournie « telle quelle » ; nous améliorons continuellement le service mais ne garantissons pas une disponibilité ininterrompue.",
+    "Acceptation :\n\n" +
+    "En utilisant SMART REGLILI, vous acceptez d'utiliser l'application dans le respect des lois en vigueur en Mauritanie.\n\n" +
+    "Abonnement :\n\n" +
+    "L'abonnement est personnel et ne peut être partagé. Nous nous réservons le droit de suspendre un compte en cas d'usage frauduleux.\n\n" +
+    "Disponibilité du service :\n\n" +
+    "L'application est fournie « telle quelle ». Nous améliorons continuellement le service, mais nous ne garantissons pas une disponibilité ininterrompue.",
   legal_notices_body:
-    "SMART REGLILI est édité par Sidi Mohamed El Khader, Nouakchott, Mauritanie. Contact : sidimohamedkhadar@gmail.com. Directeur de la publication : Sidi Mohamed El Khader. Hébergement : Vercel Inc. Pour toute question légale, contactez-nous par email ou WhatsApp.",
+    "Éditeur :\n\n" +
+    "SMART REGLILI est édité par Sidi Mohamed El Khader, Nouakchott, Mauritanie.\n\n" +
+    "Directeur de la publication :\n\n" +
+    "Sidi Mohamed El Khader.\n\n" +
+    "Hébergement :\n\n" +
+    "Vercel Inc.\n\n" +
+    "Contact :\n\n" +
+    "Pour toute question légale, contactez-nous par email à contact@reglili.com ou via WhatsApp.",
 
   // aide et support
   help_center: "Centre d'aide",
@@ -1202,11 +1221,30 @@ const en: Dict = {
   legal_notices: 'Legal notices',
   legal_updated: 'Last updated: January 2025',
   legal_privacy_body:
-    'SMART REGLILI respects your privacy. We only collect the data needed to run the app: your business information, products, sales and customers. This data belongs to you and is never sold to third parties. It is stored securely and encrypted. You can request an export or deletion of your data at any time by contacting support.',
+    'Data we collect:\n\n' +
+    'SMART REGLILI respects your privacy. We only collect the data needed to run the app: your business information, your products, your sales and your customers.\n\n' +
+    'How we use your data:\n\n' +
+    'This data belongs to you and is never sold to third parties. It is used only to run your workspace and provide your reports.\n\n' +
+    'Security:\n\n' +
+    'Your data is stored securely and encrypted.\n\n' +
+    'Your rights:\n\n' +
+    'You can request an export or deletion of your data at any time by contacting support at contact@reglili.com.',
   legal_terms_body:
-    'By using SMART REGLILI, you agree to use the app in compliance with the laws in force in Mauritania. The subscription is personal and cannot be shared. We reserve the right to suspend an account in case of fraudulent use. The app is provided "as is"; we continuously improve the service but do not guarantee uninterrupted availability.',
+    'Acceptance:\n\n' +
+    'By using SMART REGLILI, you agree to use the app in compliance with the laws in force in Mauritania.\n\n' +
+    'Subscription:\n\n' +
+    'The subscription is personal and cannot be shared. We reserve the right to suspend an account in case of fraudulent use.\n\n' +
+    'Service availability:\n\n' +
+    'The app is provided "as is". We continuously improve the service but do not guarantee uninterrupted availability.',
   legal_notices_body:
-    'SMART REGLILI is published by Sidi Mohamed El Khader, Nouakchott, Mauritania. Contact: sidimohamedkhadar@gmail.com. Publication director: Sidi Mohamed El Khader. Hosting: Vercel Inc. For any legal question, contact us by email or WhatsApp.',
+    'Publisher:\n\n' +
+    'SMART REGLILI is published by Sidi Mohamed El Khader, Nouakchott, Mauritania.\n\n' +
+    'Publication director:\n\n' +
+    'Sidi Mohamed El Khader.\n\n' +
+    'Hosting:\n\n' +
+    'Vercel Inc.\n\n' +
+    'Contact:\n\n' +
+    'For any legal question, contact us by email at contact@reglili.com or via WhatsApp.',
 
   // help & support
   help_center: 'Help center',
@@ -1319,7 +1357,7 @@ const ar: Dict = {
   ai_reports: 'الذكاء والتقارير',
   finances: 'المالية',
   alerts: 'التنبيهات',
-  subscription: 'الاشتراك',
+  subscription: '��لاشتراك',
   settings: 'الإعدادات',
   admin: 'لوحة الإدارة',
   logout: 'تسجيل الخروج',
@@ -1764,7 +1802,7 @@ const ar: Dict = {
   set_new_password: 'كلمة المرور الجديدة',
   set_confirm_password: 'تأكيد كلمة المرور',
   set_password_changed: 'تم تغيير كلمة المرور',
-  set_password_mismatch: 'كلمتا المرور غير متطابقتين',
+  set_password_mismatch: 'كلمتا المرور غير متط��بقتين',
 
   // تبديل الدور المؤمّن
   set_security: 'الأمان',
@@ -1802,11 +1840,30 @@ const ar: Dict = {
   legal_notices: 'إشعارات قانونية',
   legal_updated: 'آخر تحديث: يناير 2025',
   legal_privacy_body:
-    'يحترم SMART REGLILI خصوصيتك. نجمع فقط البيانات اللازمة لتشغيل التطبيق: معلومات متجرك ومنتجاتك ومبيعاتك وعملائك. هذه البيانات ملك لك ولا تُباع أبدًا لأطراف ثالثة. تُخزَّن بشكل آمن ومشفّر. يمكنك في أي وقت طلب تصدير بياناتك أو حذفها عبر التواصل مع الدعم.',
+    'البيانات التي نجمعها:\n\n' +
+    'يحترم SMART REGLILI خصوصيتك. نجمع فقط البيانات اللازمة لتشغيل التطبيق: معلومات متجرك ومنتجاتك ومبيعاتك وعملائك.\n\n' +
+    'استخدام البيانات:\n\n' +
+    'هذه البيانات ملك لك ولا تُباع أبدًا لأطراف ثالثة. تُستخدم حصريًا لتشغيل مساحتك وتزويدك بتقاريرك.\n\n' +
+    'الأمان:\n\n' +
+    'تُخزَّن بياناتك بشكل آمن ومشفّر.\n\n' +
+    'حقوقك:\n\n' +
+    'يمكنك في أي وقت طلب تصدير بياناتك أو حذفها عبر التواصل مع الدعم على contact@reglili.com.',
   legal_terms_body:
-    'باستخدامك SMART REGLILI، فإنك توافق على استخدام التطبيق وفقًا للقوانين المعمول بها في موريتانيا. الاشتراك شخصي ولا يمكن مشاركته. نحتفظ بالحق في تعليق أي حساب في حال الاست��دام الاحتيالي. يُقدَّم التطبيق «كما هو»؛ نحسّن الخدمة باستمرار لكننا لا نضمن توفرًا غير منقطع.',
+    'القبول:\n\n' +
+    'باستخدامك SMART REGLILI، فإنك توافق على استخدام التطبيق وفقًا للقوانين المعمول بها في موريتانيا.\n\n' +
+    'الاشتراك:\n\n' +
+    'الاشتراك شخصي ولا يمكن مشاركته. نحتفظ بالحق في تعليق أي حساب في حال الاستخدام الاحتيالي.\n\n' +
+    'توفر الخدمة:\n\n' +
+    'يُقدَّم التطبيق «كما هو». نحسّن الخدمة باستمرار لكننا لا نضمن توفرًا غير منقطع.',
   legal_notices_body:
-    'يُنشر SMART REGLILI من قبل سيدي محمد الخضر، نواكشوط، موريتانيا. للتواصل: sidimohamedkhadar@gmail.com. مدير النشر: سيدي محمد الخضر. الاستضافة: Vercel Inc. لأي سؤال قانوني تواصل معنا عبر البريد أو واتساب.',
+    'الناشر:\n\n' +
+    'يُنشر SMART REGLILI من قبل سيدي محمد الخضر، نواكشوط، موريتانيا.\n\n' +
+    'مدير النشر:\n\n' +
+    'سيدي محمد الخضر.\n\n' +
+    'الاستضافة:\n\n' +
+    'Vercel Inc.\n\n' +
+    'للتواصل:\n\n' +
+    'لأي سؤال قانوني تواصل معنا عبر البريد على contact@reglili.com أو عبر واتساب.',
 
   // المساعدة والدعم
   help_center: 'مركز المساعدة',
