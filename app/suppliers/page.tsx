@@ -7,6 +7,7 @@ import { formatMRU } from '@/lib/format'
 import { SUPPLIERS } from '@/lib/mock-data'
 import type { Supplier } from '@/lib/types'
 import { Plus, Truck, X, Check, Phone, HandCoins } from 'lucide-react'
+import { PhoneNumber } from '@/components/phone-number'
 
 export default function SuppliersPage() {
   const { t, dir } = useApp()
@@ -109,7 +110,9 @@ export default function SuppliersPage() {
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-foreground">{s.name}</p>
                     {s.phone && (
-                      <p className="truncate text-sm text-muted-foreground">{s.phone}</p>
+                      <p className="truncate text-sm text-muted-foreground">
+                        <PhoneNumber value={s.phone} />
+                      </p>
                     )}
                   </div>
                 </div>

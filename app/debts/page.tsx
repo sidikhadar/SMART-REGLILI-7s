@@ -174,7 +174,9 @@ export default function DebtsPage() {
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-foreground">{s.name}</p>
                     {s.phone && (
-                      <p className="truncate text-xs text-muted-foreground">{s.phone}</p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        <PhoneNumber value={s.phone} />
+                      </p>
                     )}
                   </div>
                 </div>

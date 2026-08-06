@@ -4,6 +4,7 @@ import { X, Phone, ShoppingBag, Wallet, MessageCircle, Receipt } from 'lucide-re
 import type { Client, Sale } from '@/lib/types'
 import { formatMRU, formatDate, formatTime } from '@/lib/format'
 import { clientSales, clientTotalPurchased, whatsappReminderUrl } from '@/lib/clients-utils'
+import { PhoneNumber } from '@/components/phone-number'
 
 export function ClientDetailSheet({
   client,
@@ -42,8 +43,8 @@ export function ClientDetailSheet({
               </h2>
               {client.phone && (
                 <p className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Phone className="h-3.5 w-3.5" />
-                  {client.phone}
+                  <Phone className="h-3.5 w-3.5 shrink-0" />
+                  <PhoneNumber value={client.phone} />
                 </p>
               )}
             </div>

@@ -166,7 +166,7 @@ export default function EmployeesPage() {
                     {e.phone && (
                       <p className="flex items-center gap-2 text-sm text-foreground">
                         <Phone className="h-4 w-4 shrink-0 text-muted-foreground" />
-                        {e.phone}
+                        <PhoneNumber value={e.phone} />
                       </p>
                     )}
                     {e.email && (
