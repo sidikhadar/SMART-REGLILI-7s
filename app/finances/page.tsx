@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import {
   TrendingUp,
   TrendingDown,
@@ -12,17 +12,41 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   Wallet,
+  ChevronLeft,
+  ChevronRight,
+  CalendarDays,
 } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
 import { AppShell } from '@/components/app-shell'
-import { computeFinances } from '@/lib/finances-utils'
+import {
+  computeFinances,
+  availableMonths,
+  monthLabel,
+  latestMonth,
+} from '@/lib/finances-utils'
 import { formatMRU } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 export default function FinancesPage() {
-  const { t } = useApp()
-  const f = useMemo(() => computeFinances(), [])
+  const { t, lang, dir } = useApp()
+
+  // Mois sélectionné (initialisé sur le mois le plus récent)
+  const months = useMemo(() => availableMonths(lang), [lang])
+  const [month, setMonth] = useState<string>(() => latestMonth())
+
+  const f = useMemo(() => computeFinances(month), [month])
   const positive = f.netProfit >= 0
+
+  // Navigation mois précédent / suivant
+  const monthIndex = months.findIndex((m) => m.value === month)
+  const hasOlder = monthIndex >= 0 && monthIndex < months.length - 1
+  const hasNewer = monthIndex > 0
+  function goOlder() {
+    if (hasOlder) setMonth(months[monthIndex + 1].value)
+  }
+  function goNewer() {
+    if (hasNewer) setMonth(months[monthIndex - 1].value)
+  }
 
   const income = [
     { key: 'sales_revenue', icon: ShoppingBag, value: f.salesRevenue },
@@ -36,6 +60,53 @@ export default function FinancesPage() {
 
   return (
     <AppShell title={t('finances')}>
+      {/* Sélecteur de mois */}
+      <div className="mb-4 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={goOlder}
+          disabled={!hasOlder}
+          aria-label={t('prev_month')}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-soft transition-transform active:scale-95 disabled:opacity-40"
+        >
+          {dir === 'rtl' ? (
+            <ChevronRight className="h-5 w-5" />
+          ) : (
+            <ChevronLeft className="h-5 w-5" />
+          )}
+        </button>
+
+        <div className="flex min-w-0 flex-1 items-center justify-center gap-2">
+          <CalendarDays className="h-4 w-4 shrink-0 text-brand" />
+          <select
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+            aria-label={t('select_month')}
+            className="min-w-0 flex-1 truncate rounded-xl border border-border bg-card px-3 py-2.5 text-center font-heading text-base font-bold text-foreground shadow-soft outline-none focus:border-brand"
+          >
+            {months.map((m) => (
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <button
+          type="button"
+          onClick={goNewer}
+          disabled={!hasNewer}
+          aria-label={t('next_month')}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-soft transition-transform active:scale-95 disabled:opacity-40"
+        >
+          {dir === 'rtl' ? (
+            <ChevronLeft className="h-5 w-5" />
+          ) : (
+            <ChevronRight className="h-5 w-5" />
+          )}
+        </button>
+      </div>
+
       {/* Hero : bénéfice net réel */}
       <div
         className={cn(
@@ -77,7 +148,9 @@ export default function FinancesPage() {
             {positive ? t('profit_positive') : t('profit_negative')}
           </span>
         </p>
-        <p className="mt-1 text-xs text-muted-foreground">{t('period_month')}</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {monthLabel(month, lang)}
+        </p>
       </div>
 
       {/* Résumé entrées / déductions */}
