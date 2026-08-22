@@ -7,6 +7,8 @@ import { AppSidebar } from '@/components/app-sidebar'
 import { AppTopbar } from '@/components/app-topbar'
 import { BottomNav } from '@/components/bottom-nav'
 import { PageTransition } from '@/components/page-transition'
+import { SubscriptionGate } from '@/components/subscription-gate'
+import { useSubscription } from '@/lib/subscription'
 
 export function AppShell({
   title,
@@ -17,6 +19,7 @@ export function AppShell({
 }) {
   const { role } = useApp()
   const router = useRouter()
+  const { blocked } = useSubscription()
 
   useEffect(() => {
     if (role === null) {
@@ -37,6 +40,9 @@ export function AppShell({
         </main>
         <BottomNav />
       </div>
+
+      {/* Blocage total de l'application si l'abonnement a expiré */}
+      {blocked && <SubscriptionGate />}
     </div>
   )
 }
