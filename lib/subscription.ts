@@ -33,6 +33,22 @@ export interface SubscriptionState {
   blocked: boolean
   trialStart: string | null
   expiry: string | null
+  /**
+   * false pendant le rendu serveur et le premier rendu client.
+   * Le localStorage n'existe pas côté serveur : lire l'état trop tôt
+   * provoquerait une erreur d'hydratation React.
+   */
+  ready: boolean
+}
+
+/** État neutre identique côté serveur et au premier rendu client. */
+const INITIAL_STATE: SubscriptionState = {
+  status: 'trial',
+  daysLeft: TRIAL_DAYS,
+  blocked: false,
+  trialStart: null,
+  expiry: null,
+  ready: false,
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000
