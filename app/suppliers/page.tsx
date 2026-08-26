@@ -208,12 +208,12 @@ export default function SuppliersPage() {
                 key={s.id}
                 className="rounded-2xl border border-border bg-card p-4 shadow-soft"
               >
-                <div className="flex items-start gap-2">
+                <div className="flex items-center gap-2">
                   {/* Zone cliquable → historique */}
                   <button
                     type="button"
                     onClick={() => setDetailId(s.id)}
-                    className="flex min-w-0 flex-1 items-start gap-3 rounded-xl text-start transition-opacity active:opacity-70"
+                    className="flex min-w-0 flex-1 items-center gap-3 rounded-xl text-start transition-opacity active:opacity-70"
                   >
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-navy/10 text-navy">
                       <Truck className="h-5 w-5" />
@@ -228,22 +228,7 @@ export default function SuppliersPage() {
                         </p>
                       )}
                     </div>
-                    <div className="shrink-0 text-end">
-                      <p className="text-xs text-muted-foreground">
-                        {t('sup_balance')}
-                      </p>
-                      <p
-                        className={cn(
-                          'font-heading text-lg font-bold tabular-nums',
-                          settled ? 'text-brand' : 'text-destructive',
-                        )}
-                      >
-                        {settled
-                          ? t('sup_settled')
-                          : `${formatMRU(s.balance)} ${t('mru')}`}
-                      </p>
-                    </div>
-                    <ChevronRight className="mt-4 h-4 w-4 shrink-0 text-muted-foreground rtl:rotate-180" />
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground rtl:rotate-180" />
                   </button>
 
                   {/* Menu contextuel */}
@@ -258,6 +243,23 @@ export default function SuppliersPage() {
                     }}
                     t={t}
                   />
+                </div>
+
+                {/* Solde sur sa propre ligne : le nom garde toute la largeur */}
+                <div className="mt-3 flex items-baseline justify-between gap-2 border-t border-border pt-3">
+                  <p className="text-xs text-muted-foreground">
+                    {t('sup_balance')}
+                  </p>
+                  <p
+                    className={cn(
+                      'font-heading text-lg font-bold tabular-nums',
+                      settled ? 'text-brand' : 'text-destructive',
+                    )}
+                  >
+                    {settled
+                      ? t('sup_settled')
+                      : `${formatMRU(s.balance)} ${t('mru')}`}
+                  </p>
                 </div>
 
                 <div className="mt-3 flex gap-2">
