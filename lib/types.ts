@@ -143,6 +143,23 @@ export interface Warehouse {
   main: boolean
 }
 
+/**
+ * Mouvement de stock dans un entrepôt.
+ * - `add`          : entrée de marchandise (réception, ajout manuel, inventaire +).
+ * - `remove`       : sortie (casse, perte, retrait manuel, inventaire −).
+ * - `transfer_in`  : reçu depuis un autre entrepôt.
+ * - `transfer_out` : envoyé vers un autre entrepôt.
+ */
+export interface StockMovement {
+  id: string
+  warehouseId: string
+  productId: string
+  type: 'add' | 'remove' | 'transfer_in' | 'transfer_out'
+  quantity: number
+  date: string // ISO datetime
+  note?: string
+}
+
 export interface Employee {
   id: string
   name: string

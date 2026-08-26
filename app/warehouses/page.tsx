@@ -1,35 +1,28 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AppShell } from '@/components/app-shell'
 import { useApp } from '@/lib/app-context'
-import { formatMRU } from '@/lib/format'
-import { WAREHOUSES, PRODUCTS } from '@/lib/mock-data'
-import type { Warehouse } from '@/lib/types'
+import { formatMRU, productStock } from '@/lib/format'
+import { WAREHOUSES, PRODUCTS, STOCK_MOVEMENTS } from '@/lib/mock-data'
+import type { Product, StockMovement, Warehouse } from '@/lib/types'
+import { WarehouseSheet } from '@/components/warehouses/warehouse-sheet'
+import { WarehouseStockView } from '@/components/warehouses/warehouse-stock-view'
 import {
   Plus,
   Warehouse as WarehouseIcon,
-  X,
-  Check,
   MapPin,
   Package,
   Boxes,
-  ArrowRightLeft,
+  MoreHorizontal,
+  Pencil,
   Trash2,
-  Minus,
+  AlertTriangle,
+  X,
 } from 'lucide-react'
 
 /** Stock par entrepôt : { [warehouseId]: { [productId]: unités } } */
 type StockMap = Record<string, Record<string, number>>
-
-/** Prix unitaire d'achat (base de la valeur de stock). */
-function unitBuyPrice(productId: string): number {
-  const p = PRODUCTS.find((x) => x.id === productId)
-  return p?.buyPrice ?? 0
-}
-function productName(productId: string): string {
-  return PRODUCTS.find((x) => x.id === productId)?.name ?? productId
-}
 
 /** Répartition initiale de démonstration du stock catalogue dans les entrepôts. */
 function initialStock(): StockMap {
@@ -41,18 +34,26 @@ function initialStock(): StockMap {
 }
 
 export default function WarehousesPage() {
-  const { t, dir } = useApp()
+  const { t, lang, dir } = useApp()
 
   const [items, setItems] = useState<Warehouse[]>(WAREHOUSES)
+  const [catalog, setCatalog] = useState<Product[]>(PRODUCTS)
   const [stock, setStock] = useState<StockMap>(initialStock)
+  const [movements, setMovements] = useState<StockMovement[]>(STOCK_MOVEMENTS)
 
-  // modal "ajouter un entrepôt"
-  const [open, setOpen] = useState(false)
-  const [name, setName] = useState('')
-  const [location, setLocation] = useState('')
-
-  // modal "gérer les produits d'un entrepôt"
+  // sheets & menus
+  const [addOpen, setAddOpen] = useState(false)
+  const [editTarget, setEditTarget] = useState<Warehouse | null>(null)
+  const [menuId, setMenuId] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Warehouse | null>(null)
   const [manageId, setManageId] = useState<string | null>(null)
+
+  function unitBuyPrice(productId: string): number {
+    return catalog.find((x) => x.id === productId)?.buyPrice ?? 0
+  }
+  function productName(productId: string): string {
+    return catalog.find((x) => x.id === productId)?.name ?? productId
+  }
 
   /** Agrégats calculés en direct depuis le stock (pas de valeurs figées). */
   function stats(warehouseId: string) {
@@ -74,32 +75,85 @@ export default function WarehousesPage() {
     }
     return { units, value }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, stock])
+  }, [items, stock, catalog])
 
-  function addWarehouse() {
-    const n = name.trim()
-    if (!n) return
+  /** Journalise un mouvement de stock. */
+  function logMovement(
+    warehouseId: string,
+    productId: string,
+    type: StockMovement['type'],
+    quantity: number,
+    note?: string,
+  ) {
+    if (quantity <= 0) return
+    setMovements((prev) => [
+      {
+        id: `mv-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        warehouseId,
+        productId,
+        type,
+        quantity,
+        date: new Date().toISOString(),
+        note,
+      },
+      ...prev,
+    ])
+  }
+
+  function saveWarehouse(values: {
+    name: string
+    location: string
+    main: boolean
+  }) {
+    const location = values.location || '—'
+
+    if (editTarget) {
+      setItems((prev) =>
+        prev.map((w) =>
+          w.id === editTarget.id
+            ? { ...w, name: values.name, location, main: values.main }
+            : // un seul entrepôt principal à la fois
+              values.main
+              ? { ...w, main: false }
+              : w,
+        ),
+      )
+      setEditTarget(null)
+      return
+    }
+
     const id = `wh-${Date.now()}`
     setItems((prev) => [
-      ...prev,
+      ...prev.map((w) => (values.main ? { ...w, main: false } : w)),
       {
         id,
-        name: n,
-        location: location.trim() || '—',
+        name: values.name,
+        location,
         productCount: 0,
         units: 0,
         value: 0,
         fillPercent: 0,
-        main: false,
+        main: values.main,
       },
     ])
     setStock((prev) => ({ ...prev, [id]: {} }))
-    setName('')
-    setLocation('')
-    setOpen(false)
+    setAddOpen(false)
   }
 
-  /** Ajoute/retire des unités d'un produit dans un entrepôt (jamais négatif). */
+  function deleteWarehouse(w: Warehouse) {
+    // Bloqué si l'entrepôt contient encore des lots
+    if (stats(w.id).productCount > 0) return
+    setItems((prev) => prev.filter((x) => x.id !== w.id))
+    setStock((prev) => {
+      const next = { ...prev }
+      delete next[w.id]
+      return next
+    })
+    setMovements((prev) => prev.filter((m) => m.warehouseId !== w.id))
+    setDeleteTarget(null)
+  }
+
+  /** Définit les unités d'un produit dans un entrepôt (jamais négatif). */
   function setUnits(warehouseId: string, productId: string, units: number) {
     setStock((prev) => {
       const wh = { ...(prev[warehouseId] ?? {}) }
@@ -112,24 +166,105 @@ export default function WarehousesPage() {
   /** Transfère toutes les unités d'un produit vers un autre entrepôt. */
   function transfer(fromId: string, productId: string, toId: string) {
     if (fromId === toId) return
+    const qty = stock[fromId]?.[productId] ?? 0
+    if (qty <= 0) return
+
     setStock((prev) => {
       const from = { ...(prev[fromId] ?? {}) }
       const to = { ...(prev[toId] ?? {}) }
-      const qty = from[productId] ?? 0
-      if (qty <= 0) return prev
       to[productId] = (to[productId] ?? 0) + qty
       delete from[productId]
       return { ...prev, [fromId]: from, [toId]: to }
     })
+
+    const fromName = items.find((w) => w.id === fromId)?.name ?? ''
+    const toName = items.find((w) => w.id === toId)?.name ?? ''
+    logMovement(fromId, productId, 'transfer_out', qty, `→ ${toName}`)
+    logMovement(toId, productId, 'transfer_in', qty, `← ${fromName}`)
   }
 
-  function fillColor(pct: number) {
-    if (pct >= 70) return 'bg-brand'
-    if (pct >= 40) return 'bg-warning'
-    return 'bg-destructive'
+  /** Ajoute un produit du catalogue (ou nouveau) dans un entrepôt. */
+  function addProductToWarehouse(warehouseId: string, p: Product) {
+    const qty = productStock(p.lots)
+    const existing = catalog.find(
+      (x) => x.id === p.id || (p.barcode && x.barcode === p.barcode),
+    )
+
+    if (existing) {
+      setUnits(warehouseId, existing.id, (stock[warehouseId]?.[existing.id] ?? 0) + qty)
+      logMovement(warehouseId, existing.id, 'add', qty)
+      return
+    }
+
+    setCatalog((prev) => [p, ...prev])
+    setUnits(warehouseId, p.id, qty)
+    logMovement(warehouseId, p.id, 'add', qty)
+  }
+
+  /** Applique les quantités comptées en inventaire pour un entrepôt. */
+  function applyInventory(
+    warehouseId: string,
+    adjusted: Record<string, number>,
+  ) {
+    Object.entries(adjusted).forEach(([pid, counted]) => {
+      const current = stock[warehouseId]?.[pid] ?? 0
+      const diff = counted - current
+      setUnits(warehouseId, pid, counted)
+      if (diff > 0) logMovement(warehouseId, pid, 'add', diff, t('wh_inventory'))
+      else if (diff < 0)
+        logMovement(warehouseId, pid, 'remove', -diff, t('wh_inventory'))
+    })
+  }
+
+  /** Retire totalement un produit d'un entrepôt. */
+  function removeProduct(warehouseId: string, productId: string) {
+    const qty = stock[warehouseId]?.[productId] ?? 0
+    if (qty <= 0) return
+    setUnits(warehouseId, productId, 0)
+    logMovement(warehouseId, productId, 'remove', qty)
+  }
+
+  /**
+   * Produits d'un entrepôt : on repart du catalogue et on remplace les lots
+   * par la quantité réellement stockée ici, pour réutiliser ProductCard,
+   * InventoryMode et le reste des composants de /stock tels quels.
+   */
+  function warehouseProducts(warehouseId: string): Product[] {
+    const wh = stock[warehouseId] ?? {}
+    return Object.entries(wh)
+      .filter(([, u]) => u > 0)
+      .map(([pid, units]) => {
+        const base = catalog.find((p) => p.id === pid)
+        if (!base) return null
+        return {
+          ...base,
+          lots: [{ id: `${warehouseId}-${pid}`, quantity: units }],
+        }
+      })
+      .filter((p): p is Product => p !== null)
   }
 
   const manageWarehouse = items.find((w) => w.id === manageId) ?? null
+
+  if (manageWarehouse) {
+    return (
+      <WarehouseStockView
+        warehouse={manageWarehouse}
+        warehouses={items}
+        products={warehouseProducts(manageWarehouse.id)}
+        movements={movements.filter((m) => m.warehouseId === manageWarehouse.id)}
+        productName={productName}
+        t={t}
+        lang={lang}
+        dir={dir}
+        onBack={() => setManageId(null)}
+        onAddProduct={(p) => addProductToWarehouse(manageWarehouse.id, p)}
+        onAdjust={(adj) => applyInventory(manageWarehouse.id, adj)}
+        onTransfer={(pid, toId) => transfer(manageWarehouse.id, pid, toId)}
+        onRemove={(pid) => removeProduct(manageWarehouse.id, pid)}
+      />
+    )
+  }
 
   return (
     <AppShell title={t('warehouses')}>
@@ -161,7 +296,8 @@ export default function WarehousesPage() {
           </div>
           <button
             type="button"
-            onClick={() => setOpen(true)}
+            onClick={() => setAddOpen(true)}
+            aria-label={t('wh_add')}
             className="flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-brand px-4 font-semibold text-brand-foreground shadow-soft transition-transform active:scale-95"
           >
             <Plus className="h-5 w-5" />
@@ -183,26 +319,41 @@ export default function WarehousesPage() {
               key={w.id}
               className="rounded-2xl border border-border bg-card p-4 shadow-soft"
             >
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-navy/10 text-navy">
-                    <WarehouseIcon className="h-5 w-5" />
-                  </span>
-                  <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-navy/10 text-navy">
+                  <WarehouseIcon className="h-5 w-5" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
                     <p className="truncate font-semibold text-foreground">
                       {w.name}
                     </p>
-                    <p className="flex items-center gap-1 truncate text-sm text-muted-foreground">
-                      <MapPin className="h-3.5 w-3.5 shrink-0" />
-                      {w.location}
-                    </p>
+                    {w.main && (
+                      <span className="shrink-0 rounded-full bg-brand/15 px-2 py-0.5 text-[11px] font-semibold text-brand">
+                        {t('wh_main')}
+                      </span>
+                    )}
                   </div>
+                  <p className="flex items-center gap-1 truncate text-sm text-muted-foreground">
+                    <MapPin className="h-3.5 w-3.5 shrink-0" />
+                    {w.location}
+                  </p>
                 </div>
-                {w.main && (
-                  <span className="shrink-0 rounded-full bg-brand/15 px-2.5 py-1 text-xs font-semibold text-brand">
-                    {t('wh_main')}
-                  </span>
-                )}
+
+                <WarehouseMenu
+                  open={menuId === w.id}
+                  onToggle={() => setMenuId(menuId === w.id ? null : w.id)}
+                  onClose={() => setMenuId(null)}
+                  onEdit={() => {
+                    setMenuId(null)
+                    setEditTarget(w)
+                  }}
+                  onDelete={() => {
+                    setMenuId(null)
+                    setDeleteTarget(w)
+                  }}
+                  t={t}
+                />
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-3">
@@ -245,79 +396,29 @@ export default function WarehousesPage() {
         })}
       </div>
 
-      {/* Modal ajout d'entrepôt */}
-      {open && (
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-foreground/40 p-4 backdrop-blur-sm"
-          onClick={() => setOpen(false)}
-        >
-          <div
-            dir={dir}
-            className="mt-6 w-full max-w-md animate-slide-in-up rounded-3xl bg-card p-5 shadow-soft-lg"
-            onClick={(ev) => ev.stopPropagation()}
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-heading text-lg font-extrabold text-foreground">
-                {t('wh_add')}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                aria-label={t('close')}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">
-                  {t('wh_add')}
-                </label>
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
-                  autoFocus
-                />
-              </div>
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">
-                  {t('wh_location')}
-                </label>
-                <input
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
-                />
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={addWarehouse}
-              disabled={!name.trim()}
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-brand py-3.5 text-base font-semibold text-brand-foreground shadow-soft transition-all hover:brightness-110 active:scale-[0.99] disabled:opacity-50"
-            >
-              <Check className="h-5 w-5" />
-              {t('save')}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Modal gestion des produits d'un entrepôt */}
-      {manageWarehouse && (
-        <ManageProductsModal
-          warehouse={manageWarehouse}
-          warehouses={items}
-          stock={stock[manageWarehouse.id] ?? {}}
-          onClose={() => setManageId(null)}
-          onSetUnits={(pid, u) => setUnits(manageWarehouse.id, pid, u)}
-          onTransfer={(pid, toId) => transfer(manageWarehouse.id, pid, toId)}
+      {/* Ajout / modification d'entrepôt */}
+      {(addOpen || editTarget) && (
+        <WarehouseSheet
+          warehouse={editTarget}
           t={t}
           dir={dir}
+          onClose={() => {
+            setAddOpen(false)
+            setEditTarget(null)
+          }}
+          onSave={saveWarehouse}
+        />
+      )}
+
+      {/* Confirmation de suppression */}
+      {deleteTarget && (
+        <DeleteWarehouseDialog
+          warehouse={deleteTarget}
+          productCount={stats(deleteTarget.id).productCount}
+          t={t}
+          dir={dir}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={() => deleteWarehouse(deleteTarget)}
         />
       )}
     </AppShell>
@@ -325,67 +426,127 @@ export default function WarehousesPage() {
 }
 
 /* --------------------------------------------------------------------- */
-/* Modal : gérer les produits d'un entrepôt                              */
+/* Menu contextuel d'un entrepôt                                          */
 /* --------------------------------------------------------------------- */
 
-function ManageProductsModal({
-  warehouse,
-  warehouses,
-  stock,
+function WarehouseMenu({
+  open,
+  onToggle,
   onClose,
-  onSetUnits,
-  onTransfer,
+  onEdit,
+  onDelete,
+  t,
+}: {
+  open: boolean
+  onToggle: () => void
+  onClose: () => void
+  onEdit: () => void
+  onDelete: () => void
+  t: (k: string) => string
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function onDocPointer(e: PointerEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose()
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('pointerdown', onDocPointer)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('pointerdown', onDocPointer)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open, onClose])
+
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-label={t('sup_actions')}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+      >
+        <MoreHorizontal className="h-5 w-5" />
+      </button>
+
+      {open && (
+        <div
+          role="menu"
+          className="absolute end-0 top-12 z-20 w-48 animate-float-up overflow-hidden rounded-2xl border border-border bg-card shadow-soft-lg"
+        >
+          <button
+            type="button"
+            role="menuitem"
+            onClick={onEdit}
+            className="flex min-h-11 w-full items-center gap-2.5 px-4 text-start text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          >
+            <Pencil className="h-4 w-4 text-muted-foreground" />
+            {t('edit')}
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={onDelete}
+            className="flex min-h-11 w-full items-center gap-2.5 border-t border-border px-4 text-start text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+          >
+            <Trash2 className="h-4 w-4" />
+            {t('delete')}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* --------------------------------------------------------------------- */
+/* Confirmation de suppression                                            */
+/* --------------------------------------------------------------------- */
+
+function DeleteWarehouseDialog({
+  warehouse,
+  productCount,
   t,
   dir,
+  onClose,
+  onConfirm,
 }: {
   warehouse: Warehouse
-  warehouses: Warehouse[]
-  stock: Record<string, number>
-  onClose: () => void
-  onSetUnits: (productId: string, units: number) => void
-  onTransfer: (productId: string, toId: string) => void
+  productCount: number
   t: (k: string) => string
   dir: 'rtl' | 'ltr'
+  onClose: () => void
+  onConfirm: () => void
 }) {
-  const present = Object.entries(stock).filter(([, u]) => u > 0)
-  const presentIds = new Set(present.map(([pid]) => pid))
-  const available = PRODUCTS.filter((p) => !presentIds.has(p.id))
-
-  const [adding, setAdding] = useState(false)
-  const [selectedProduct, setSelectedProduct] = useState('')
-  const [addQty, setAddQty] = useState('')
-  const [transferFor, setTransferFor] = useState<string | null>(null)
-
-  const otherWarehouses = warehouses.filter((w) => w.id !== warehouse.id)
-
-  function confirmAdd() {
-    const qty = Number.parseInt(addQty, 10)
-    if (!selectedProduct || !Number.isFinite(qty) || qty <= 0) return
-    onSetUnits(selectedProduct, (stock[selectedProduct] ?? 0) + qty)
-    setAdding(false)
-    setSelectedProduct('')
-    setAddQty('')
-  }
+  const blocked = productCount > 0
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-foreground/40 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
         dir={dir}
-        className="mt-6 w-full max-w-md animate-slide-in-up rounded-3xl bg-card p-5 shadow-soft-lg"
+        role="alertdialog"
+        aria-modal="true"
+        className="w-full max-w-sm animate-slide-in-up rounded-3xl bg-card p-5 shadow-soft-lg"
         onClick={(ev) => ev.stopPropagation()}
       >
-        <div className="mb-4 flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className="truncate font-heading text-lg font-extrabold text-foreground">
-              {t('wh_manage_title')} {warehouse.name}
-            </h3>
-            <p className="text-xs text-muted-foreground">
-              {present.length} {t('wh_products')}
-            </p>
-          </div>
+        <div className="mb-3 flex items-start justify-between gap-2">
+          <span
+            className={
+              blocked
+                ? 'flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-warning/15 text-warning'
+                : 'flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive'
+            }
+          >
+            <AlertTriangle className="h-5 w-5" />
+          </span>
           <button
             type="button"
             onClick={onClose}
@@ -396,164 +557,35 @@ function ManageProductsModal({
           </button>
         </div>
 
-        {/* Liste des produits présents */}
-        {present.length === 0 ? (
-          <p className="rounded-xl bg-muted/50 px-4 py-6 text-center text-sm text-muted-foreground">
-            {t('wh_no_products')}
-          </p>
-        ) : (
-          <ul className="space-y-2">
-            {present.map(([pid, units]) => (
-              <li
-                key={pid}
-                className="rounded-xl border border-border bg-background p-3"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-foreground">
-                      {productName(pid)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {units} {t('wh_units')} · {t('wh_in_stock')}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => onSetUnits(pid, units - 1)}
-                      aria-label={t('wh_remove')}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-foreground active:scale-95"
-                    >
-                      <Minus className="h-4 w-4" />
-                    </button>
-                    <span className="w-8 text-center text-sm font-bold tabular-nums text-foreground">
-                      {units}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => onSetUnits(pid, units + 1)}
-                      aria-label={t('wh_add_product')}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-brand-foreground active:scale-95"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
+        <h3 className="font-heading text-lg font-extrabold text-foreground">
+          {t('wh_delete')}
+        </h3>
+        <p className="mt-1 truncate text-sm font-medium text-foreground">
+          {warehouse.name}
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {blocked ? t('wh_delete_blocked') : t('wh_delete_confirm')}
+        </p>
 
-                {/* Actions transfert / retirer */}
-                <div className="mt-2 flex items-center gap-2">
-                  {otherWarehouses.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setTransferFor(transferFor === pid ? null : pid)
-                      }
-                      className="flex items-center gap-1 rounded-lg bg-navy/10 px-2.5 py-1.5 text-xs font-semibold text-navy active:scale-95"
-                    >
-                      <ArrowRightLeft className="h-3.5 w-3.5" />
-                      {t('wh_transfer')}
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => onSetUnits(pid, 0)}
-                    className="flex items-center gap-1 rounded-lg bg-destructive/10 px-2.5 py-1.5 text-xs font-semibold text-destructive active:scale-95"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    {t('wh_remove')}
-                  </button>
-                </div>
-
-                {/* Sélecteur d'entrepôt cible pour le transfert */}
-                {transferFor === pid && otherWarehouses.length > 0 && (
-                  <div className="mt-2 rounded-lg bg-muted/60 p-2">
-                    <p className="mb-1.5 text-xs font-medium text-muted-foreground">
-                      {t('wh_transfer_to')}
-                    </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {otherWarehouses.map((w) => (
-                        <button
-                          key={w.id}
-                          type="button"
-                          onClick={() => {
-                            onTransfer(pid, w.id)
-                            setTransferFor(null)
-                          }}
-                          className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:border-brand hover:text-brand active:scale-95"
-                        >
-                          {w.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {/* Ajout d'un produit du catalogue */}
-        {adding ? (
-          <div className="mt-4 rounded-xl border border-brand/30 bg-brand/5 p-3">
-            <label className="mb-1.5 block text-sm font-medium text-foreground">
-              {t('wh_choose_product')}
-            </label>
-            <select
-              value={selectedProduct}
-              onChange={(e) => setSelectedProduct(e.target.value)}
-              className="mb-3 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-base text-foreground outline-none focus:border-brand"
-            >
-              <option value="">—</option>
-              {available.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-            <label className="mb-1.5 block text-sm font-medium text-foreground">
-              {t('wh_quantity')}
-            </label>
-            <input
-              value={addQty}
-              onChange={(e) => setAddQty(e.target.value.replace(/[^0-9]/g, ''))}
-              inputMode="numeric"
-              placeholder="0"
-              className="mb-3 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-base text-foreground outline-none focus:border-brand"
-            />
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setAdding(false)
-                  setSelectedProduct('')
-                  setAddQty('')
-                }}
-                className="flex-1 rounded-xl bg-muted py-2.5 text-sm font-semibold text-foreground active:scale-[0.99]"
-              >
-                {t('wh_cancel')}
-              </button>
-              <button
-                type="button"
-                onClick={confirmAdd}
-                disabled={!selectedProduct || !addQty}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-brand py-2.5 text-sm font-semibold text-brand-foreground active:scale-[0.99] disabled:opacity-50"
-              >
-                <Check className="h-4 w-4" />
-                {t('wh_save')}
-              </button>
-            </div>
-          </div>
-        ) : (
+        <div className="mt-5 flex gap-2">
           <button
             type="button"
-            onClick={() => setAdding(true)}
-            disabled={available.length === 0}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-brand/40 py-3 text-sm font-semibold text-brand transition-colors hover:bg-brand/5 active:scale-[0.99] disabled:opacity-40"
+            onClick={onClose}
+            className="min-h-11 flex-1 rounded-xl border border-border bg-card text-sm font-semibold text-foreground hover:bg-muted active:scale-[0.99]"
           >
-            <Plus className="h-5 w-5" />
-            {t('wh_add_product')}
+            {t('wh_cancel')}
           </button>
-        )}
+          {!blocked && (
+            <button
+              type="button"
+              onClick={onConfirm}
+              className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-destructive text-sm font-semibold text-destructive-foreground shadow-soft hover:brightness-110 active:scale-[0.99]"
+            >
+              <Trash2 className="h-4 w-4" />
+              {t('delete')}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

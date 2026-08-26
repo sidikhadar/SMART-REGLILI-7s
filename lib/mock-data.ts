@@ -10,6 +10,7 @@ import type {
   Alert,
   Register,
   Warehouse,
+  StockMovement,
 } from './types'
 
 const today = new Date()
@@ -269,6 +270,44 @@ export const SUPPLIERS: Supplier[] = [
   { id: 'wh1', name: 'Boutique principale', location: 'Nouakchott — Centre', productCount: 8, units: 262, value: 42600, fillPercent: 78, main: true },
   { id: 'wh2', name: 'Dépôt Ksar', location: 'Nouakchott — Ksar', productCount: 5, units: 140, value: 21800, fillPercent: 54, main: false },
   { id: 'wh3', name: 'Réserve Arafat', location: 'Nouakchott — Arafat', productCount: 3, units: 60, value: 8400, fillPercent: 31, main: false },
+]
+
+/**
+ * Mouvements de stock par entrepôt, cohérents avec la répartition initiale
+ * des lots : les entrées `add` correspondent aux réceptions de marchandise,
+ * les `transfer_out`/`transfer_in` s'appairent entre deux entrepôts.
+ */
+export const STOCK_MOVEMENTS: StockMovement[] = [
+  // --- Boutique principale (wh1) : réceptions initiales ---
+  { id: 'mv1', warehouseId: 'wh1', productId: 'p1', type: 'add', quantity: 30, date: hoursAgo(196), note: 'Réception LT-2401' },
+  { id: 'mv2', warehouseId: 'wh1', productId: 'p2', type: 'add', quantity: 32, date: hoursAgo(192), note: 'Réception RZ-88' },
+  { id: 'mv3', warehouseId: 'wh1', productId: 'p5', type: 'add', quantity: 48, date: hoursAgo(188) },
+  { id: 'mv4', warehouseId: 'wh1', productId: 'p7', type: 'add', quantity: 60, date: hoursAgo(180) },
+  { id: 'mv5', warehouseId: 'wh1', productId: 'p3', type: 'add', quantity: 18, date: hoursAgo(172) },
+  { id: 'mv6', warehouseId: 'wh1', productId: 'p8', type: 'add', quantity: 28, date: hoursAgo(168) },
+  { id: 'mv7', warehouseId: 'wh1', productId: 'p4', type: 'add', quantity: 14, date: hoursAgo(160), note: 'Réception PH-LOT-A' },
+  { id: 'mv8', warehouseId: 'wh1', productId: 'p6', type: 'add', quantity: 40, date: hoursAgo(150) },
+
+  // --- Dépôt Ksar (wh2) : reçoit une partie depuis la boutique ---
+  { id: 'mv9', warehouseId: 'wh2', productId: 'p2', type: 'add', quantity: 20, date: hoursAgo(144), note: 'Réception directe' },
+  { id: 'mv10', warehouseId: 'wh2', productId: 'p5', type: 'add', quantity: 30, date: hoursAgo(140) },
+  { id: 'mv11', warehouseId: 'wh1', productId: 'p7', type: 'transfer_out', quantity: 40, date: hoursAgo(120), note: 'Vers Dépôt Ksar' },
+  { id: 'mv12', warehouseId: 'wh2', productId: 'p7', type: 'transfer_in', quantity: 40, date: hoursAgo(120), note: 'Depuis Boutique principale' },
+  { id: 'mv13', warehouseId: 'wh1', productId: 'p8', type: 'transfer_out', quantity: 30, date: hoursAgo(96), note: 'Vers Dépôt Ksar' },
+  { id: 'mv14', warehouseId: 'wh2', productId: 'p8', type: 'transfer_in', quantity: 30, date: hoursAgo(96), note: 'Depuis Boutique principale' },
+  { id: 'mv15', warehouseId: 'wh2', productId: 'p1', type: 'add', quantity: 20, date: hoursAgo(72), note: 'Réception LT-2312' },
+
+  // --- Réserve Arafat (wh3) ---
+  { id: 'mv16', warehouseId: 'wh3', productId: 'p4', type: 'add', quantity: 30, date: hoursAgo(90), note: 'Réception PH-LOT-B' },
+  { id: 'mv17', warehouseId: 'wh1', productId: 'p6', type: 'transfer_out', quantity: 20, date: hoursAgo(60), note: 'Vers Réserve Arafat' },
+  { id: 'mv18', warehouseId: 'wh3', productId: 'p6', type: 'transfer_in', quantity: 20, date: hoursAgo(60), note: 'Depuis Boutique principale' },
+  { id: 'mv19', warehouseId: 'wh3', productId: 'p3', type: 'add', quantity: 12, date: hoursAgo(48) },
+  { id: 'mv20', warehouseId: 'wh3', productId: 'p3', type: 'remove', quantity: 2, date: hoursAgo(30), note: 'Casse' },
+
+  // --- Ajustements récents ---
+  { id: 'mv21', warehouseId: 'wh1', productId: 'p6', type: 'remove', quantity: 3, date: hoursAgo(20), note: 'Inventaire — écart' },
+  { id: 'mv22', warehouseId: 'wh2', productId: 'p5', type: 'remove', quantity: 4, date: hoursAgo(12), note: 'Bouteilles cassées' },
+  { id: 'mv23', warehouseId: 'wh1', productId: 'p1', type: 'add', quantity: 6, date: hoursAgo(5), note: 'Complément livraison' },
 ]
 
 export const EMPLOYEES: Employee[] = [
