@@ -73,9 +73,7 @@ function daysUntil(iso: string): number {
 
 /** Lit l'état brut depuis localStorage (safe SSR). */
 function read(): SubscriptionState {
-  if (typeof window === 'undefined') {
-    return { status: 'trial', daysLeft: TRIAL_DAYS, blocked: false, trialStart: null, expiry: null }
-  }
+  if (typeof window === 'undefined') return INITIAL_STATE
 
   // Initialise le début d'essai au premier accès.
   let trialStart = localStorage.getItem(K_TRIAL_START)
@@ -91,24 +89,26 @@ function read(): SubscriptionState {
   if (active && expiry) {
     const left = daysUntil(expiry)
     if (left >= 0) {
-      return { status: 'active', daysLeft: left, blocked: false, trialStart, expiry }
+      return { status: 'active', daysLeft: left, blocked: false, trialStart, expiry, ready: true }
     }
     // Abonnement expiré
-    return { status: 'expired', daysLeft: 0, blocked: true, trialStart, expiry }
+    return { status: 'expired', daysLeft: 0, blocked: true, trialStart, expiry, ready: true }
   }
 
   // Sinon, période d'essai
   const used = diffDays(trialStart)
   const left = TRIAL_DAYS - used
   if (left > 0) {
-    return { status: 'trial', daysLeft: left, blocked: false, trialStart, expiry: null }
+    return { status: 'trial', daysLeft: left, blocked: false, trialStart, expiry: null, ready: true }
   }
-  return { status: 'expired', daysLeft: 0, blocked: true, trialStart, expiry: null }
+  return { status: 'expired', daysLeft: 0, blocked: true, trialStart, expiry: null, ready: true }
 }
 
 /** Hook réactif d'abonnement, se resynchronise au focus et sur événement custom. */
 export function useSubscription() {
-  const [state, setState] = useState<SubscriptionState>(() => read())
+  // On part d'un état neutre identique au serveur, puis on lit le
+  // localStorage après le montage pour éviter toute erreur d'hydratation.
+  const [state, setState] = useState<SubscriptionState>(INITIAL_STATE)
 
   const refresh = useCallback(() => setState(read()), [])
 

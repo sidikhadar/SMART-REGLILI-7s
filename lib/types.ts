@@ -117,6 +117,21 @@ export interface Supplier {
   balance: number
 }
 
+/**
+ * Mouvement sur le compte d'un fournisseur.
+ * - `purchase` : achat de marchandise → augmente le solde dû.
+ * - `payment`  : règlement au fournisseur → diminue le solde dû.
+ * `balanceAfter` est le solde restant dû après l'opération.
+ */
+export interface SupplierTransaction {
+  id: string
+  supplierId: string
+  amount: number
+  date: string // ISO datetime
+  type: 'payment' | 'purchase'
+  balanceAfter: number
+}
+
 export interface Warehouse {
   id: string
   name: string

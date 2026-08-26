@@ -5,6 +5,7 @@ import type {
   Debt,
   Expense,
   Supplier,
+  SupplierTransaction,
   Employee,
   Alert,
   Register,
@@ -240,7 +241,31 @@ export const SUPPLIERS: Supplier[] = [
   { id: 'sup3', name: 'Pharma Distrib', phone: '+222 36 78 90 12', balance: 4500 },
 ]
 
-export const WAREHOUSES: Warehouse[] = [
+  /**
+   * Historique des mouvements par fournisseur.
+   * Les `balanceAfter` sont chaînés dans l'ordre chronologique et le dernier
+   * mouvement de chaque fournisseur correspond à son `balance` actuel.
+   */
+  export const SUPPLIER_TRANSACTIONS: SupplierTransaction[] = [
+  // Grossiste Nouakchott — solde final 12 000
+  { id: 'stx1', supplierId: 'sup1', type: 'purchase', amount: 18000, date: hoursAgo(24 * 26), balanceAfter: 18000 },
+  { id: 'stx2', supplierId: 'sup1', type: 'payment', amount: 10000, date: hoursAgo(24 * 19), balanceAfter: 8000 },
+  { id: 'stx3', supplierId: 'sup1', type: 'purchase', amount: 9500, date: hoursAgo(24 * 8), balanceAfter: 17500 },
+  { id: 'stx4', supplierId: 'sup1', type: 'payment', amount: 5500, date: hoursAgo(24 * 3), balanceAfter: 12000 },
+
+  // Import Maghreb — soldé
+  { id: 'stx5', supplierId: 'sup2', type: 'purchase', amount: 7400, date: hoursAgo(24 * 21), balanceAfter: 7400 },
+  { id: 'stx6', supplierId: 'sup2', type: 'payment', amount: 4000, date: hoursAgo(24 * 14), balanceAfter: 3400 },
+  { id: 'stx7', supplierId: 'sup2', type: 'payment', amount: 3400, date: hoursAgo(24 * 5), balanceAfter: 0 },
+
+  // Pharma Distrib — solde final 4 500
+  { id: 'stx8', supplierId: 'sup3', type: 'purchase', amount: 6200, date: hoursAgo(24 * 17), balanceAfter: 6200 },
+  { id: 'stx9', supplierId: 'sup3', type: 'payment', amount: 3200, date: hoursAgo(24 * 11), balanceAfter: 3000 },
+  { id: 'stx10', supplierId: 'sup3', type: 'purchase', amount: 4300, date: hoursAgo(24 * 6), balanceAfter: 7300 },
+  { id: 'stx11', supplierId: 'sup3', type: 'payment', amount: 2800, date: hoursAgo(24 * 2), balanceAfter: 4500 },
+  ]
+
+  export const WAREHOUSES: Warehouse[] = [
   { id: 'wh1', name: 'Boutique principale', location: 'Nouakchott — Centre', productCount: 8, units: 262, value: 42600, fillPercent: 78, main: true },
   { id: 'wh2', name: 'Dépôt Ksar', location: 'Nouakchott — Ksar', productCount: 5, units: 140, value: 21800, fillPercent: 54, main: false },
   { id: 'wh3', name: 'Réserve Arafat', location: 'Nouakchott — Arafat', productCount: 3, units: 60, value: 8400, fillPercent: 31, main: false },

@@ -19,7 +19,7 @@ export function AppShell({
 }) {
   const { role } = useApp()
   const router = useRouter()
-  const { blocked } = useSubscription()
+  const { blocked, ready } = useSubscription()
 
   useEffect(() => {
     if (role === null) {
@@ -42,7 +42,7 @@ export function AppShell({
       </div>
 
       {/* Blocage total de l'application si l'abonnement a expiré */}
-      {blocked && <SubscriptionGate />}
+      {ready && blocked && <SubscriptionGate />}
     </div>
   )
 }
