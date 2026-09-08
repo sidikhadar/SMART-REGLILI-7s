@@ -18,6 +18,7 @@ import {
   ShieldCheck,
   RotateCcw,
   Store,
+  ReceiptText,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -43,6 +44,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: '/alerts', key: 'alerts', icon: Bell, roles: ALL, group: 'main', bottom: true },
 
   // --- Gestion ---
+  { href: '/sales', key: 'sales_all', icon: ReceiptText, roles: ALL, group: 'manage' },
   { href: '/clients', key: 'clients', icon: Users, roles: ALL, group: 'manage' },
   { href: '/debts', key: 'debts', icon: HandCoins, roles: ALL, group: 'manage' },
   { href: '/returns', key: 'product_return', icon: RotateCcw, roles: ALL, group: 'manage' },
