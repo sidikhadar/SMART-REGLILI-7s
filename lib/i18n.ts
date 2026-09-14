@@ -153,6 +153,9 @@ const fr: Dict = {
   expired_losses: 'Pertes (produits expirés)',
   supplier_debts_deducted: 'Dettes fournisseurs',
   period_month: 'Ce mois-ci',
+  select_month: 'Choisir le mois',
+  prev_month: 'Mois précédent',
+  next_month: 'Mois suivant',
   gross_income: 'Entrées totales',
   total_deductions: 'Total des déductions',
   profit_positive: 'Votre commerce est bénéficiaire',
@@ -190,6 +193,12 @@ const fr: Dict = {
   finalize_step2: 'Envoyez la confirmation par WhatsApp pour activer votre compte.',
   send_whatsapp_confirm: 'Confirmer par WhatsApp',
   wa_sub_message: "Bonjour, je souhaite m'abonner à SMART REGLILI.",
+  check_payment: "J'ai payé, vérifier",
+  payment_not_confirmed: "Paiement pas encore confirmé. Contactez le support si besoin.",
+  trial_left: 'Essai gratuit',
+  days_left_suffix: 'jours restants',
+  sub_active_badge: 'Abonnement actif',
+  gate_locked_note: "L'accès est bloqué jusqu'au renouvellement de votre abonnement.",
 
   // dashboard
   todays_sales: "Ventes du jour",
@@ -200,6 +209,18 @@ const fr: Dict = {
   by_payment: 'Par mode de paiement',
   top_products: 'Top produits',
   recent_sales: 'Ventes récentes',
+  sales_all: 'Toutes les ventes',
+  sales_filter_register: 'Caisse',
+  sales_all_registers: 'Toutes les caisses',
+  sales_filter_period: 'Période',
+  sales_all_periods: 'Toutes les dates',
+  sales_year: 'Année',
+  sales_month: 'Mois',
+  sales_day_optional: 'Jour (optionnel)',
+  sales_day_all: 'Tout le mois',
+  sales_empty: 'Aucune vente pour ces filtres',
+  sales_count: 'ventes',
+  sales_clear: 'Réinitialiser',
   quick_actions: 'Actions rapides',
   new_sale: 'Nouvelle vente',
   add_product: 'Ajouter un produit',
@@ -407,6 +428,20 @@ const fr: Dict = {
   sup_count: 'fournisseurs',
   sup_name: 'Nom du fournisseur',
   sup_phone: 'Téléphone',
+  sup_search: 'Rechercher un fournisseur…',
+  sup_empty: 'Aucun fournisseur trouvé',
+  sup_edit: 'Modifier le fournisseur',
+  sup_delete: 'Supprimer le fournisseur',
+  sup_delete_msg: 'Ce fournisseur et son historique seront supprimés définitivement.',
+  sup_history: 'Historique des transactions',
+  sup_no_transactions: 'Aucune transaction enregistrée',
+  sup_tx_payment: 'Paiement',
+  sup_tx_purchase: 'Achat',
+  sup_balance_before: 'Solde avant',
+  sup_balance_after: 'Solde après',
+  sup_total_paid: 'Total payé',
+  sup_total_purchased: 'Total acheté',
+  sup_actions: 'Actions',
 
   // entrepôts
   wh_add: 'Ajouter un entrepôt',
@@ -418,6 +453,37 @@ const fr: Dict = {
   wh_total_value: 'Valeur totale du stock',
   wh_count: 'entrepôts',
   wh_fill: 'Remplissage',
+  wh_manage: 'Gérer les produits',
+  wh_manage_title: 'Produits de',
+  wh_add_product: 'Ajouter un produit',
+  wh_choose_product: 'Choisir un produit',
+  wh_quantity: 'Quantité',
+  wh_in_stock: 'en stock',
+  wh_no_products: 'Aucun produit dans cet entrepôt',
+  wh_transfer: 'Transférer',
+  wh_transfer_to: 'Transférer vers',
+  wh_remove: 'Retirer',
+  wh_save: 'Enregistrer',
+  wh_cancel: 'Annuler',
+  wh_units_short: 'u',
+  wh_total_units: 'Unités totales',
+  wh_transfer_done: 'Transfert effectué',
+  wh_edit: 'Modifier l’entrepôt',
+  wh_delete: 'Supprimer l’entrepôt',
+  wh_delete_confirm: 'Supprimer définitivement cet entrepôt ?',
+  wh_delete_blocked: 'Impossible de supprimer : cet entrepôt contient encore des lots. Videz-le ou transférez son stock d’abord.',
+  wh_is_main: 'Entrepôt principal',
+  wh_is_main_hint: 'La boutique où se font les ventes',
+  wh_name: 'Nom de l’entrepôt',
+  wh_history: 'Historique des mouvements',
+  wh_history_empty: 'Aucun mouvement pour cet entrepôt',
+  wh_mv_add: 'Ajout',
+  wh_mv_remove: 'Retrait',
+  wh_mv_transfer_in: 'Entrée transfert',
+  wh_mv_transfer_out: 'Sortie transfert',
+  wh_search_placeholder: 'Nom, code-barres ou emplacement',
+  wh_inventory: 'Inventaire rapide',
+  wh_back: 'Retour aux entrepôts',
 
   // employés
   emp_add: 'Ajouter un employé',
@@ -602,11 +668,30 @@ const fr: Dict = {
   legal_notices: 'Mentions légales',
   legal_updated: 'Dernière mise à jour : janvier 2025',
   legal_privacy_body:
-    "SMART REGLILI respecte votre vie privée. Nous collectons uniquement les données nécessaires au fonctionnement de l'application : informations de votre commerce, produits, ventes et clients. Ces données vous appartiennent et ne sont jamais vendues à des tiers. Elles sont stockées de manière sécurisée et chiffrée. Vous pouvez à tout moment demander l'export ou la suppression de vos données en contactant le support.",
+    "Données collectées :\n\n" +
+    "SMART REGLILI respecte votre vie privée. Nous collectons uniquement les données nécessaires au fonctionnement de l'application : les informations de votre commerce, vos produits, vos ventes et vos clients.\n\n" +
+    "Utilisation des données :\n\n" +
+    "Ces données vous appartiennent et ne sont jamais vendues à des tiers. Elles sont utilisées exclusivement pour faire fonctionner votre espace et vous fournir vos rapports.\n\n" +
+    "Sécurité :\n\n" +
+    "Vos données sont stockées de manière sécurisée et chiffrée.\n\n" +
+    "Vos droits :\n\n" +
+    "Vous pouvez à tout moment demander l'export ou la suppression de vos données en contactant le support à contact@reglili.com.",
   legal_terms_body:
-    "En utilisant SMART REGLILI, vous acceptez d'utiliser l'application dans le respect des lois en vigueur en Mauritanie. L'abonnement est personnel et ne peut être partagé. Nous nous réservons le droit de suspendre un compte en cas d'usage frauduleux. L'application est fournie « telle quelle » ; nous améliorons continuellement le service mais ne garantissons pas une disponibilité ininterrompue.",
+    "Acceptation :\n\n" +
+    "En utilisant SMART REGLILI, vous acceptez d'utiliser l'application dans le respect des lois en vigueur en Mauritanie.\n\n" +
+    "Abonnement :\n\n" +
+    "L'abonnement est personnel et ne peut être partagé. Nous nous réservons le droit de suspendre un compte en cas d'usage frauduleux.\n\n" +
+    "Disponibilité du service :\n\n" +
+    "L'application est fournie « telle quelle ». Nous améliorons continuellement le service, mais nous ne garantissons pas une disponibilité ininterrompue.",
   legal_notices_body:
-    "SMART REGLILI est édité par Sidi Mohamed El Khader, Nouakchott, Mauritanie. Contact : sidimohamedkhadar@gmail.com. Directeur de la publication : Sidi Mohamed El Khader. Hébergement : Vercel Inc. Pour toute question légale, contactez-nous par email ou WhatsApp.",
+    "Éditeur :\n\n" +
+    "SMART REGLILI est édité par Sidi Mohamed El Khader, Nouakchott, Mauritanie.\n\n" +
+    "Directeur de la publication :\n\n" +
+    "Sidi Mohamed El Khader.\n\n" +
+    "Hébergement :\n\n" +
+    "Vercel Inc.\n\n" +
+    "Contact :\n\n" +
+    "Pour toute question légale, contactez-nous par email à contact@reglili.com ou via WhatsApp.",
 
   // aide et support
   help_center: "Centre d'aide",
@@ -780,6 +865,9 @@ const en: Dict = {
   expired_losses: 'Losses (expired products)',
   supplier_debts_deducted: 'Supplier debts',
   period_month: 'This month',
+  select_month: 'Select month',
+  prev_month: 'Previous month',
+  next_month: 'Next month',
   gross_income: 'Total income',
   total_deductions: 'Total deductions',
   profit_positive: 'Your business is profitable',
@@ -816,6 +904,12 @@ const en: Dict = {
   finalize_step2: 'Send the confirmation via WhatsApp to activate your account.',
   send_whatsapp_confirm: 'Confirm via WhatsApp',
   wa_sub_message: 'Hello, I would like to subscribe to SMART REGLILI.',
+  check_payment: "I've paid, verify",
+  payment_not_confirmed: 'Payment not confirmed yet. Contact support if needed.',
+  trial_left: 'Free trial',
+  days_left_suffix: 'days left',
+  sub_active_badge: 'Subscription active',
+  gate_locked_note: 'Access is locked until you renew your subscription.',
 
   todays_sales: "Today's sales",
   profit: 'Profit',
@@ -825,6 +919,18 @@ const en: Dict = {
   by_payment: 'By payment method',
   top_products: 'Top products',
   recent_sales: 'Recent sales',
+  sales_all: 'All sales',
+  sales_filter_register: 'Register',
+  sales_all_registers: 'All registers',
+  sales_filter_period: 'Period',
+  sales_all_periods: 'All dates',
+  sales_year: 'Year',
+  sales_month: 'Month',
+  sales_day_optional: 'Day (optional)',
+  sales_day_all: 'Whole month',
+  sales_empty: 'No sales for these filters',
+  sales_count: 'sales',
+  sales_clear: 'Reset',
   quick_actions: 'Quick actions',
   new_sale: 'New sale',
   add_product: 'Add product',
@@ -1017,6 +1123,20 @@ const en: Dict = {
   sup_count: 'suppliers',
   sup_name: 'Supplier name',
   sup_phone: 'Phone',
+  sup_search: 'Search a supplier…',
+  sup_empty: 'No supplier found',
+  sup_edit: 'Edit supplier',
+  sup_delete: 'Delete supplier',
+  sup_delete_msg: 'This supplier and its history will be permanently deleted.',
+  sup_history: 'Transaction history',
+  sup_no_transactions: 'No transaction recorded',
+  sup_tx_payment: 'Payment',
+  sup_tx_purchase: 'Purchase',
+  sup_balance_before: 'Balance before',
+  sup_balance_after: 'Balance after',
+  sup_total_paid: 'Total paid',
+  sup_total_purchased: 'Total purchased',
+  sup_actions: 'Actions',
 
   wh_add: 'Add warehouse',
   wh_products: 'products',
@@ -1027,6 +1147,37 @@ const en: Dict = {
   wh_total_value: 'Total stock value',
   wh_count: 'warehouses',
   wh_fill: 'Fill level',
+  wh_manage: 'Manage products',
+  wh_manage_title: 'Products in',
+  wh_add_product: 'Add a product',
+  wh_choose_product: 'Choose a product',
+  wh_quantity: 'Quantity',
+  wh_in_stock: 'in stock',
+  wh_no_products: 'No products in this warehouse',
+  wh_transfer: 'Transfer',
+  wh_transfer_to: 'Transfer to',
+  wh_remove: 'Remove',
+  wh_save: 'Save',
+  wh_cancel: 'Cancel',
+  wh_units_short: 'u',
+  wh_total_units: 'Total units',
+  wh_transfer_done: 'Transfer completed',
+  wh_edit: 'Edit warehouse',
+  wh_delete: 'Delete warehouse',
+  wh_delete_confirm: 'Permanently delete this warehouse?',
+  wh_delete_blocked: 'Cannot delete: this warehouse still contains lots. Empty it or transfer its stock first.',
+  wh_is_main: 'Main warehouse',
+  wh_is_main_hint: 'The shop where sales happen',
+  wh_name: 'Warehouse name',
+  wh_history: 'Movement history',
+  wh_history_empty: 'No movements for this warehouse',
+  wh_mv_add: 'Added',
+  wh_mv_remove: 'Removed',
+  wh_mv_transfer_in: 'Transfer in',
+  wh_mv_transfer_out: 'Transfer out',
+  wh_search_placeholder: 'Name, barcode or location',
+  wh_inventory: 'Quick inventory',
+  wh_back: 'Back to warehouses',
 
   emp_add: 'Add employee',
   emp_active: 'Active',
@@ -1202,11 +1353,30 @@ const en: Dict = {
   legal_notices: 'Legal notices',
   legal_updated: 'Last updated: January 2025',
   legal_privacy_body:
-    'SMART REGLILI respects your privacy. We only collect the data needed to run the app: your business information, products, sales and customers. This data belongs to you and is never sold to third parties. It is stored securely and encrypted. You can request an export or deletion of your data at any time by contacting support.',
+    'Data we collect:\n\n' +
+    'SMART REGLILI respects your privacy. We only collect the data needed to run the app: your business information, your products, your sales and your customers.\n\n' +
+    'How we use your data:\n\n' +
+    'This data belongs to you and is never sold to third parties. It is used only to run your workspace and provide your reports.\n\n' +
+    'Security:\n\n' +
+    'Your data is stored securely and encrypted.\n\n' +
+    'Your rights:\n\n' +
+    'You can request an export or deletion of your data at any time by contacting support at contact@reglili.com.',
   legal_terms_body:
-    'By using SMART REGLILI, you agree to use the app in compliance with the laws in force in Mauritania. The subscription is personal and cannot be shared. We reserve the right to suspend an account in case of fraudulent use. The app is provided "as is"; we continuously improve the service but do not guarantee uninterrupted availability.',
+    'Acceptance:\n\n' +
+    'By using SMART REGLILI, you agree to use the app in compliance with the laws in force in Mauritania.\n\n' +
+    'Subscription:\n\n' +
+    'The subscription is personal and cannot be shared. We reserve the right to suspend an account in case of fraudulent use.\n\n' +
+    'Service availability:\n\n' +
+    'The app is provided "as is". We continuously improve the service but do not guarantee uninterrupted availability.',
   legal_notices_body:
-    'SMART REGLILI is published by Sidi Mohamed El Khader, Nouakchott, Mauritania. Contact: sidimohamedkhadar@gmail.com. Publication director: Sidi Mohamed El Khader. Hosting: Vercel Inc. For any legal question, contact us by email or WhatsApp.',
+    'Publisher:\n\n' +
+    'SMART REGLILI is published by Sidi Mohamed El Khader, Nouakchott, Mauritania.\n\n' +
+    'Publication director:\n\n' +
+    'Sidi Mohamed El Khader.\n\n' +
+    'Hosting:\n\n' +
+    'Vercel Inc.\n\n' +
+    'Contact:\n\n' +
+    'For any legal question, contact us by email at contact@reglili.com or via WhatsApp.',
 
   // help & support
   help_center: 'Help center',
@@ -1254,15 +1424,15 @@ const ar: Dict = {
   signup: 'إنشاء حساب',
   email: 'البريد أو الهاتف',
   password: 'كلمة المرور',
-  pin: 'الرمز السري',
+  pin: 'الرمز السر��',
   role_patron: 'المالك',
   role_caissier: 'الصراف',
   enter: 'دخول',
-  continue: 'متابعة',
+  continue: 'مت��بعة',
   welcome: 'مرحباً',
   choose_role: 'اختر ملفك',
   patron_desc: 'وصول كامل: المالية، الذكاء الاصطناعي والتقارير',
-  caissier_desc: 'صندوق البيع، الماسح واستعراض المخزون',
+  caissier_desc: 'صند��ق البيع، الماسح واستعراض المخزون',
   tab_signin: 'تسجيل الدخول',
   tab_signup: 'إنشاء حساب',
   signin_hint: 'اختر ملفك ثم سجّل الدخول',
@@ -1275,7 +1445,7 @@ const ar: Dict = {
   have_account: 'لديك حساب بالفعل؟',
   help: 'مساعدة',
   help_title: 'تحتاج مساعدة؟',
-  help_text: 'اختر صاحب المتجر للإدارة الكاملة أو الصندوق للبيع. تواصل مع الدعم إذا نسيت بياناتك.',
+  help_text: 'اختر صاحب المتجر للإد��رة الكاملة أو الصندوق للبيع. تواصل مع الدعم إذا نسيت بي��ناتك.',
   remember_me: 'تذكرني',
   forgot: 'نسيت كلمة المرور؟',
   lang_label: 'Langue / اللغة / Language',
@@ -1319,7 +1489,7 @@ const ar: Dict = {
   ai_reports: 'الذكاء والتقارير',
   finances: 'المالية',
   alerts: 'التنبيهات',
-  subscription: 'الاشتراك',
+  subscription: '��لاشتراك',
   settings: 'الإعدادات',
   admin: 'لوحة الإدارة',
   logout: 'تسجيل الخروج',
@@ -1331,7 +1501,7 @@ const ar: Dict = {
   wrong_password: 'كلمة المرور غير صحيحة',
   cancel: 'إلغاء',
   close: 'إغلاق',
-  read_only: 'للقراءة فقط',
+  read_only: 'للقراءة فق��',
   logout_confirm_msg: 'هل تريد فعلاً تسجيل الخروج؟',
   forgot_title: 'نسيت كلمة المرور',
   forgot_msg: 'لإعادة تعيين كلمة المرور، يرجى التواصل مع الدعم.',
@@ -1372,7 +1542,7 @@ const ar: Dict = {
   supplier_name: 'اسم المورد',
   confirm_payment: 'تأكيد الدفع',
 
-  net_profit_real: 'صافي الربح الفعلي',
+  net_profit_real: 'صافي الربح ��لفعلي',
   net_profit_formula: 'حساب تلقائي للربح',
   sales_revenue: 'إيرادات المبيعات',
   debts_collected: 'الديون المحصّلة',
@@ -1380,6 +1550,9 @@ const ar: Dict = {
   expired_losses: 'الخسائر (منتجات منتهية)',
   supplier_debts_deducted: 'ديون الموردين',
   period_month: 'هذا الشهر',
+  select_month: 'اختر الشهر',
+  prev_month: 'الشهر السابق',
+  next_month: 'الشهر التالي',
   gross_income: 'إجمالي المداخيل',
   total_deductions: 'إجمالي الخصومات',
   profit_positive: 'تجارتك رابحة',
@@ -1400,7 +1573,7 @@ const ar: Dict = {
   payment_apps: 'تطبيقات الدفع',
   payment_number: 'رقم الدفع',
   after_payment_title: 'بعد الدفع',
-  after_payment_note: 'تواصل مع الدعم لتفعيل اشتراكك بعد إتمام الدفع.',
+  after_payment_note: 'تواصل مع الدع�� لتفعيل اشتراكك بعد إتمام الدفع.',
   whatsapp_support: 'دعم واتساب',
   email_label: 'البريد الإلكتروني',
   contact_support: 'تواصل مع الدعم',
@@ -1416,6 +1589,12 @@ const ar: Dict = {
   finalize_step2: 'أرسل التأكيد عبر واتساب لتفعيل حسابك.',
   send_whatsapp_confirm: 'التأكيد عبر واتساب',
   wa_sub_message: 'مرحباً، أرغب في الاشتراك في SMART REGLILI.',
+  check_payment: 'لقد دفعت، تحقق',
+  payment_not_confirmed: 'لم يتم تأكيد الدفع بعد. تواصل مع الدعم إذا لزم الأمر.',
+  trial_left: 'الفترة التجريبية',
+  days_left_suffix: 'يوم متبقٍ',
+  sub_active_badge: 'الاشتراك نشط',
+  gate_locked_note: 'الوصول مقفل حتى تجديد اشتراكك.',
 
   todays_sales: 'مبيعات اليوم',
   profit: 'الربح',
@@ -1424,7 +1603,19 @@ const ar: Dict = {
   sales_7d: 'مبيعات آخر ٧ أيام',
   by_payment: 'حسب طريقة الدفع',
   top_products: 'أفضل المنتجات',
-  recent_sales: 'مبيعات حديثة',
+  recent_sales: 'مبيعات حد��ثة',
+  sales_all: 'كل المبيعات',
+  sales_filter_register: 'الصندوق',
+  sales_all_registers: 'كل الصناديق',
+  sales_filter_period: 'الفترة',
+  sales_all_periods: 'كل التواريخ',
+  sales_year: 'السنة',
+  sales_month: 'الشهر',
+  sales_day_optional: 'اليوم (اختياري)',
+  sales_day_all: 'الشهر كامل',
+  sales_empty: 'لا توجد مبيعات لهذه الفلاتر',
+  sales_count: 'مبيعات',
+  sales_clear: 'إعادة تعيين',
   quick_actions: 'إجراءات سريعة',
   new_sale: 'بيع جديد',
   add_product: 'إضافة منتج',
@@ -1551,7 +1742,7 @@ const ar: Dict = {
   plus: 'زائد',
   clear: 'إفراغ',
   remaining: 'المتبقي',
-  add_register: 'إضافة صندوق',
+  add_register: 'إضافة ص��دوق',
   register_name: 'اسم الصندوق',
   manage_registers: 'إدارة الصناديق',
   delete: 'حذف',
@@ -1561,7 +1752,7 @@ const ar: Dict = {
   no_products_found: 'لا يوجد منتج',
   qty_short: 'الكمية',
   registers_caisses: 'الصناديق',
-  registers_hint: 'أنشئ وأدر صناديق متجرك. كل الصناديق تشترك في نفس المخزون.',
+  registers_hint: 'أنشئ وأدر صناد��ق متجرك. كل الصناديق تشترك في نفس المخزون.',
   at_least_one_register: 'مطلوب صندوق واحد على الأقل',
   pay_mode_especes: 'نقداً',
   pay_mode_transfert: 'تحويل',
@@ -1617,6 +1808,20 @@ const ar: Dict = {
   sup_count: 'موردون',
   sup_name: 'اسم المورّد',
   sup_phone: 'الهاتف',
+  sup_search: 'ابحث عن مورّد…',
+  sup_empty: 'لا يوجد مورّد',
+  sup_edit: 'تعديل المورّد',
+  sup_delete: 'حذف المورّد',
+  sup_delete_msg: 'سيتم حذف هذا المورّد وسجل معاملاته نهائيًا.',
+  sup_history: 'سجل المعاملات',
+  sup_no_transactions: 'لا توجد معاملات مسجّلة',
+  sup_tx_payment: 'دفعة',
+  sup_tx_purchase: 'شراء',
+  sup_balance_before: 'الرصيد قبل',
+  sup_balance_after: 'الرصيد بعد',
+  sup_total_paid: 'إجمالي المدفوع',
+  sup_total_purchased: 'إجمالي المشتريات',
+  sup_actions: 'إجراءات',
 
   wh_add: 'إضافة مستودع',
   wh_products: 'منتجات',
@@ -1627,6 +1832,37 @@ const ar: Dict = {
   wh_total_value: 'إجمالي قيمة المخزون',
   wh_count: 'مستودعات',
   wh_fill: 'نسبة الامتلاء',
+  wh_manage: 'إدارة المنتجات',
+  wh_manage_title: 'منتجات',
+  wh_add_product: 'إضافة منتج',
+  wh_choose_product: 'اختر منتجًا',
+  wh_quantity: 'الكمية',
+  wh_in_stock: 'في المخزون',
+  wh_no_products: 'لا توجد منتجات في هذا المستودع',
+  wh_transfer: 'تحويل',
+  wh_transfer_to: 'تحويل إلى',
+  wh_remove: 'إ��الة',
+  wh_save: 'حفظ',
+  wh_cancel: 'إلغاء',
+  wh_units_short: 'و',
+  wh_total_units: 'إجمالي الوحدات',
+  wh_transfer_done: 'تم التحويل',
+  wh_edit: 'تعديل المستودع',
+  wh_delete: 'حذف المستودع',
+  wh_delete_confirm: 'هل تريد حذف هذا المستودع نهائيًا؟',
+  wh_delete_blocked: 'لا يمكن الحذف: لا يزال هذا المستودع يحتوي على دفعات. أفرغه أو حوّل مخزونه أولًا.',
+  wh_is_main: 'المستودع الرئيسي',
+  wh_is_main_hint: 'المتجر الذي تتم فيه المبيعات',
+  wh_name: 'اسم المستودع',
+  wh_history: 'سجل الحركات',
+  wh_history_empty: 'لا توجد حركات لهذا المستودع',
+  wh_mv_add: 'إضافة',
+  wh_mv_remove: 'إزالة',
+  wh_mv_transfer_in: 'تحويل داخل',
+  wh_mv_transfer_out: 'تحويل خارج',
+  wh_search_placeholder: 'الاسم أو الباركود أو الموقع',
+  wh_inventory: 'جرد سريع',
+  wh_back: 'رجوع إلى المستودعات',
 
   emp_add: 'إضافة موظف',
   emp_active: 'نشط',
@@ -1648,12 +1884,12 @@ const ar: Dict = {
   inv_total: 'إجمالي الفواتير',
   inv_count: 'فواتير',
   inv_walkin: 'زبون نقدي',
-  inv_all: 'الكل',
+  inv_all: 'ال��ل',
   inv_subtitle: 'كل الفواتير والإيصالات',
   inv_date: 'التاريخ',
   inv_items: 'المنتجات',
   inv_paid: 'المدفوع',
-  inv_search: 'ابحث برقم الفاتو��ة أو العميل',
+  inv_search: 'ابحث برقم الف��تو��ة أو العميل',
   inv_empty: 'لا توجد فاتورة',
   inv_receipt: 'الفاتورة',
   inv_from: 'من',
@@ -1764,7 +2000,7 @@ const ar: Dict = {
   set_new_password: 'كلمة المرور الجديدة',
   set_confirm_password: 'تأكيد كلمة المرور',
   set_password_changed: 'تم تغيير كلمة المرور',
-  set_password_mismatch: 'كلمتا المرور غير متطابقتين',
+  set_password_mismatch: 'كلمتا المرور غير متط��بقتين',
 
   // تبديل الدور المؤمّن
   set_security: 'الأمان',
@@ -1802,11 +2038,30 @@ const ar: Dict = {
   legal_notices: 'إشعارات قانونية',
   legal_updated: 'آخر تحديث: يناير 2025',
   legal_privacy_body:
-    'يحترم SMART REGLILI خصوصيتك. نجمع فقط البيانات اللازمة لتشغيل التطبيق: معلومات متجرك ومنتجاتك ومبيعاتك وعملائك. هذه البيانات ملك لك ولا تُباع أبدًا لأطراف ثالثة. تُخزَّن بشكل آمن ومشفّر. يمكنك في أي وقت طلب تصدير بياناتك أو حذفها عبر التواصل مع الدعم.',
+    'البيانات التي نجمعها:\n\n' +
+    'يحترم SMART REGLILI خصوصيتك. نجمع فقط البيانات اللازمة لتشغيل التطبيق: معلومات متجرك ومنتجاتك ومبيعاتك وعملائك.\n\n' +
+    'استخدام البيانات:\n\n' +
+    'هذه البيانات ملك لك ولا تُباع أبدًا لأطراف ثالثة. تُستخدم حصريًا لتشغيل مساحتك وتزويدك بتقاريرك.\n\n' +
+    'الأمان:\n\n' +
+    'تُخزَّن بياناتك بشكل آمن ومشفّر.\n\n' +
+    'حقوقك:\n\n' +
+    'يمكنك في أي وقت طلب تصدير بياناتك أو حذفها عبر التواصل مع الدعم على contact@reglili.com.',
   legal_terms_body:
-    'باستخدامك SMART REGLILI، فإنك توافق على استخدام التطبيق وفقًا للقوانين المعمول بها في موريتانيا. الاشتراك شخصي ولا يمكن مشاركته. نحتفظ بالحق في تعليق أي حساب في حال الاست��دام الاحتيالي. يُقدَّم التطبيق «كما هو»؛ نحسّن الخدمة باستمرار لكننا لا نضمن توفرًا غير منقطع.',
+    'القبول:\n\n' +
+    'باستخدامك SMART REGLILI، فإنك توافق على استخدام التطبيق وفقًا للقوانين المعمول بها في موريتانيا.\n\n' +
+    'الاشتراك:\n\n' +
+    'الاشتراك شخصي ولا يمكن مشاركته. نحتفظ بالحق في تعليق أي حساب في حال الاستخدام الاحتيالي.\n\n' +
+    'توفر الخدمة:\n\n' +
+    'يُقدَّم التطبيق «كما هو». نحسّن الخدمة باستمرار لكننا لا نضمن توفرًا غير منقطع.',
   legal_notices_body:
-    'يُنشر SMART REGLILI من قبل سيدي محمد الخضر، نواكشوط، موريتانيا. للتواصل: sidimohamedkhadar@gmail.com. مدير النشر: سيدي محمد الخضر. الاستضافة: Vercel Inc. لأي سؤال قانوني تواصل معنا عبر البريد أو واتساب.',
+    'الناشر:\n\n' +
+    'يُنشر SMART REGLILI من قبل سيدي محمد الخضر، نواكشوط، موريتانيا.\n\n' +
+    'مدير النشر:\n\n' +
+    'سيدي محمد الخضر.\n\n' +
+    'الاستضافة:\n\n' +
+    'Vercel Inc.\n\n' +
+    'للتواصل:\n\n' +
+    'لأي سؤال قانوني تواصل معنا عبر البريد على contact@reglili.com أو عبر واتساب.',
 
   // المساعدة والدعم
   help_center: 'مركز المساعدة',
@@ -1844,7 +2099,7 @@ const ar: Dict = {
   emp_new_password: 'كلمة مرور جديدة',
   emp_password_reset_done: 'تمت إعادة تعيين كلمة المرور',
 
-  mru: 'أوقية',
+  mru: '��وقية',
 }
 
 const DICTS: Record<Lang, Dict> = { ar, fr, en }

@@ -206,7 +206,7 @@ export function AuthFooter() {
         </span>
         <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
           <Globe className="h-3.5 w-3.5 shrink-0 text-brand sm:h-4 sm:w-4" aria-hidden />
-          {t('contact_label')} : contact@reglili.mr
+          {t('contact_label')} : contact@reglili.com
         </span>
       </div>
 
@@ -353,7 +353,7 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
             <Headphones className="h-4 w-4 text-brand" aria-hidden /> +33 7 58 66 46 84
           </p>
           <p className="mt-1 flex items-center gap-2">
-            <Globe className="h-4 w-4 text-brand" aria-hidden /> contact@reglili.mr
+            <Globe className="h-4 w-4 text-brand" aria-hidden /> contact@reglili.com
           </p>
         </div>
       </div>

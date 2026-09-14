@@ -12,16 +12,19 @@ import {
   Mail,
   AlertTriangle,
   X,
+  Clock,
+  ShieldCheck,
 } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
 import { AppShell } from '@/components/app-shell'
 import { formatMRU } from '@/lib/format'
 import { cn } from '@/lib/utils'
+import { useSubscription } from '@/lib/subscription'
 
 const PAYMENT_NUMBER = '37 16 20 07'
 const WHATSAPP = '+33 7 58 66 46 84'
 const WHATSAPP_LINK = 'https://wa.me/33758664684'
-const EMAIL = 'contact@reglili.mr'
+const EMAIL = 'contact@reglili.com'
 const PAYMENT_APPS = ['Bankily', 'Sedad', 'Masrivi', 'Click']
 
 interface Plan {
@@ -45,6 +48,7 @@ function SubscriptionContent() {
   const [selected, setSelected] = useState('plan_6months')
   const [copied, setCopied] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+  const sub = useSubscription()
 
   const selectedPlan = PLANS.find((p) => p.key === selected) ?? PLANS[0]
 
@@ -70,6 +74,41 @@ function SubscriptionContent() {
           <div className="min-w-0">
             <p className="font-semibold text-destructive">{t('sub_expired_title')}</p>
             <p className="mt-0.5 text-sm text-muted-foreground">{t('sub_expired_note')}</p>
+          </div>
+        </div>
+      )}
+
+      {/* État actuel de l'abonnement */}
+      {sub.status !== 'expired' && (
+        <div
+          className={cn(
+            'mb-4 flex items-center gap-3 rounded-2xl border p-4',
+            sub.status === 'active'
+              ? 'border-brand/30 bg-brand/5'
+              : 'border-warning/30 bg-warning/5',
+          )}
+        >
+          <div
+            className={cn(
+              'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
+              sub.status === 'active'
+                ? 'bg-brand/15 text-brand'
+                : 'bg-warning/15 text-warning',
+            )}
+          >
+            {sub.status === 'active' ? (
+              <ShieldCheck className="h-5 w-5" />
+            ) : (
+              <Clock className="h-5 w-5" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-foreground">
+              {sub.status === 'active' ? t('sub_active_badge') : t('trial_left')}
+            </p>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              {sub.daysLeft} {t('days_left_suffix')}
+            </p>
           </div>
         </div>
       )}

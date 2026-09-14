@@ -10,6 +10,7 @@ import { CLIENTS, SALES } from '@/lib/mock-data'
 import { formatMRU } from '@/lib/format'
 import { whatsappReminderUrl } from '@/lib/clients-utils'
 import type { Client } from '@/lib/types'
+import { PhoneNumber } from '@/components/phone-number'
 
 export default function ClientsPage() {
   const { t, lang } = useApp()
@@ -75,8 +76,8 @@ export default function ClientsPage() {
                 <p className="truncate font-semibold text-foreground">{c.name}</p>
                 {c.phone && (
                   <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">
-                    <Phone className="h-3 w-3" />
-                    {c.phone}
+                    <Phone className="h-3 w-3 shrink-0" />
+                    <PhoneNumber value={c.phone} className="truncate" />
                   </p>
                 )}
               </div>

@@ -117,6 +117,21 @@ export interface Supplier {
   balance: number
 }
 
+/**
+ * Mouvement sur le compte d'un fournisseur.
+ * - `purchase` : achat de marchandise → augmente le solde dû.
+ * - `payment`  : règlement au fournisseur → diminue le solde dû.
+ * `balanceAfter` est le solde restant dû après l'opération.
+ */
+export interface SupplierTransaction {
+  id: string
+  supplierId: string
+  amount: number
+  date: string // ISO datetime
+  type: 'payment' | 'purchase'
+  balanceAfter: number
+}
+
 export interface Warehouse {
   id: string
   name: string
@@ -126,6 +141,23 @@ export interface Warehouse {
   value: number
   fillPercent: number
   main: boolean
+}
+
+/**
+ * Mouvement de stock dans un entrepôt.
+ * - `add`          : entrée de marchandise (réception, ajout manuel, inventaire +).
+ * - `remove`       : sortie (casse, perte, retrait manuel, inventaire −).
+ * - `transfer_in`  : reçu depuis un autre entrepôt.
+ * - `transfer_out` : envoyé vers un autre entrepôt.
+ */
+export interface StockMovement {
+  id: string
+  warehouseId: string
+  productId: string
+  type: 'add' | 'remove' | 'transfer_in' | 'transfer_out'
+  quantity: number
+  date: string // ISO datetime
+  note?: string
 }
 
 export interface Employee {
