@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useMemo, useState } from 'react'
 import {
   TrendingUp,
   Wallet,
@@ -26,7 +27,11 @@ import {
   ALERTS,
 } from '@/lib/mock-data'
 import { formatMRU, formatTime, productStock } from '@/lib/format'
+import { InvoiceDetail } from '@/components/invoices/invoice-detail'
+import { buildInvoices } from '@/lib/invoice-utils'
 import { cn } from '@/lib/utils'
+
+const SHOP_NAME = 'SMART REGLILI'
 
 export default function DashboardPage() {
   const { t, lang, userName, role, addToCart } = useApp()
@@ -74,6 +79,11 @@ export default function DashboardPage() {
   const paymentMax = Math.max(...payments.map(([, v]) => v), 1)
 
   const recentSales = [...SALES].slice(0, 4)
+
+  // Tickets : on retrouve la facture par son id (identique à sale.id)
+  const invoices = useMemo(() => buildInvoices(), [])
+  const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null)
+  const selectedInvoice = invoices.find((i) => i.id === selectedSaleId) ?? null
 
   return (
     <AppShell title={t('dashboard')}>
@@ -228,7 +238,7 @@ export default function DashboardPage() {
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-heading text-base font-bold text-foreground">{t('recent_sales')}</h2>
             <Link
-              href="/caisse"
+              href="/sales"
               className="flex items-center gap-1 text-xs font-medium text-brand hover:underline"
             >
               {t('view_all')} <ArrowRight className="h-3.5 w-3.5 flip-rtl" />
@@ -236,24 +246,33 @@ export default function DashboardPage() {
           </div>
           <ul className="divide-y divide-border">
             {recentSales.map((s) => (
-              <li key={s.id} className="flex items-center justify-between gap-3 py-2.5">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-brand">
-                    <ShoppingCart className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      {s.items.length} {t('products_count').toLowerCase()} · {s.cashier}
-                    </p>
-                    <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" /> {formatTime(s.date, lang)} ·{' '}
-                      {t(`pay_${s.method}`)}
-                    </p>
+              <li key={s.id}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedSaleId(s.id)}
+                  className="flex w-full items-center justify-between gap-3 rounded-xl py-2.5 text-start transition-colors hover:bg-muted"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-brand">
+                      <ShoppingCart className="h-4 w-4" />
+                    </span>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">
+                        {s.items.length} {t('products_count').toLowerCase()} · {s.cashier}
+                      </p>
+                      <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Clock className="h-3 w-3" /> {formatTime(s.date, lang)} ·{' '}
+                        {t(`pay_${s.method}`)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <span className="shrink-0 font-heading text-sm font-bold tabular-nums text-foreground">
-                  {formatMRU(s.total)} {t('currency')}
-                </span>
+                  <span className="flex shrink-0 items-center gap-1">
+                    <span className="font-heading text-sm font-bold tabular-nums text-foreground">
+                      {formatMRU(s.total)} {t('currency')}
+                    </span>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground flip-rtl" />
+                  </span>
+                </button>
               </li>
             ))}
           </ul>
@@ -319,6 +338,17 @@ export default function DashboardPage() {
           </div>
         </section>
       </div>
+
+      {/* Ticket de la vente sélectionnée (lecture seule) */}
+      {selectedInvoice && (
+        <InvoiceDetail
+          invoice={selectedInvoice}
+          shopName={SHOP_NAME}
+          t={t}
+          lang={lang}
+          onClose={() => setSelectedSaleId(null)}
+        />
+      )}
     </AppShell>
   )
 }
