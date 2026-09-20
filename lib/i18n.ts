@@ -207,6 +207,9 @@ const fr: Dict = {
   open_debts: 'Dettes en cours',
   sales_7d: 'Ventes 7 derniers jours',
   by_payment: 'Par mode de paiement',
+  treasury: 'Trésorerie',
+  treasury_total: 'Trésorerie totale',
+  treasury_hint: 'Solde détenu par compte : ventes encaissées − dépenses réglées.',
   top_products: 'Top produits',
   top_products_all: 'Tous les produits par ventes',
   tp_revenue: 'Chiffre d’affaires',
@@ -932,6 +935,9 @@ const en: Dict = {
   open_debts: 'Open debts',
   sales_7d: 'Sales last 7 days',
   by_payment: 'By payment method',
+  treasury: 'Treasury',
+  treasury_total: 'Total treasury',
+  treasury_hint: 'Balance held per account: collected sales − settled expenses.',
   top_products: 'Top products',
   top_products_all: 'All products by sales',
   tp_revenue: 'Revenue',
@@ -1457,7 +1463,7 @@ const ar: Dict = {
   pin: 'الرمز السر��',
   role_patron: 'المالك',
   role_caissier: 'الصراف',
-  enter: 'دخول',
+  enter: 'د��ول',
   continue: 'مت��بعة',
   welcome: 'مرحباً',
   choose_role: 'اختر ملفك',
@@ -1632,6 +1638,9 @@ const ar: Dict = {
   open_debts: 'ديون قائمة',
   sales_7d: 'مبيعات آخر ٧ أيام',
   by_payment: 'حسب طريقة الدفع',
+  treasury: 'الخزينة',
+  treasury_total: 'إجمالي الخزينة',
+  treasury_hint: 'الرصيد المتوفر لكل حساب: المبيعات المحصلة − المصاريف المدفوعة.',
   top_products: 'أفضل المنتجات',
   top_products_all: 'كل المنتجات حسب المبيعات',
   tp_revenue: 'رقم المعاملات',
@@ -2088,7 +2097,7 @@ const ar: Dict = {
     'استخدام البيانات:\n\n' +
     'هذه البيانات ملك لك ولا تُباع أبدًا لأطراف ثالثة. تُستخدم حصريًا لتشغيل مساحتك وتزويدك بتقاريرك.\n\n' +
     'الأمان:\n\n' +
-    'تُخزَّن بياناتك بشكل آمن ومشفّر.\n\n' +
+    'تُخزَّ�� بياناتك بشكل آمن ومشفّر.\n\n' +
     'حقوقك:\n\n' +
     'يمكنك في أي وقت طلب تصدير بياناتك أو حذفها عبر التواصل مع الدعم على contact@reglili.com.',
   legal_terms_body:

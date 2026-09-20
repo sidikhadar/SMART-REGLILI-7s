@@ -1,5 +1,6 @@
-import { DAILY_SALES, EXPENSES, SUPPLIERS, PRODUCTS } from './mock-data'
+import { DAILY_SALES, EXPENSES, SUPPLIERS, PRODUCTS, PAYMENT_TOTALS } from './mock-data'
 import { daysUntil } from './format'
+import type { PaymentMethod } from './types'
 
 export interface FinanceBreakdown {
   salesRevenue: number
@@ -49,6 +50,54 @@ export function availableMonths(lang = 'fr'): MonthOption[] {
 export function latestMonth(): string {
   const months = [...new Set(DAILY_SALES.map((d) => d.date.slice(0, 7)))].sort()
   return months[months.length - 1] ?? new Date().toISOString().slice(0, 7)
+}
+
+/** Modes de paiement correspondant à un compte de trésorerie réel. */
+export type TreasuryMethod = Extract<
+  PaymentMethod,
+  'especes' | 'bankily' | 'sedad' | 'bik' | 'click' | 'masrivi' | 'amanety'
+>
+
+export const TREASURY_METHODS: TreasuryMethod[] = [
+  'especes',
+  'bankily',
+  'sedad',
+  'bik',
+  'click',
+  'masrivi',
+  'amanety',
+]
+
+export interface TreasuryAccount {
+  method: TreasuryMethod
+  /** Ventes encaissées sur ce compte. */
+  salesIn: number
+  /** Dépenses réglées depuis ce compte. */
+  expensesOut: number
+  /** Solde détenu = ventes encaissées − dépenses réglées. */
+  balance: number
+}
+
+export interface TreasurySummary {
+  accounts: TreasuryAccount[]
+  total: number
+}
+
+/**
+ * Solde de trésorerie détenu par compte de paiement :
+ * somme des ventes encaissées avec ce mode (PAYMENT_TOTALS déjà agrégé)
+ * moins les dépenses réglées depuis ce compte (EXPENSES.method, défaut espèces).
+ */
+export function computeTreasury(): TreasurySummary {
+  const accounts: TreasuryAccount[] = TREASURY_METHODS.map((method) => {
+    const salesIn = PAYMENT_TOTALS[method] ?? 0
+    const expensesOut = EXPENSES.filter(
+      (e) => (e.method ?? 'especes') === method,
+    ).reduce((sum, e) => sum + e.amount, 0)
+    return { method, salesIn, expensesOut, balance: salesIn - expensesOut }
+  })
+  const total = accounts.reduce((sum, a) => sum + a.balance, 0)
+  return { accounts, total }
 }
 
 /**

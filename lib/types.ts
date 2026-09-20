@@ -9,7 +9,6 @@ export type PaymentMethod =
   | 'bik'
   | 'click'
   | 'masrivi'
-  | 'bamis'
   | 'amanety'
   | 'credit'
   | 'partiel'
@@ -117,6 +116,8 @@ export interface Expense {
   amount: number
   category: string
   date: string
+  /** Compte de paiement utilisé pour régler la dépense. Défaut : espèces. */
+  method?: PaymentMethod
 }
 
 export interface Supplier {

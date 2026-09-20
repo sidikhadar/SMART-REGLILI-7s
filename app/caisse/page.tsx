@@ -48,7 +48,7 @@ const TRANSFER_APPS = [
   { id: 'bik', label: 'BIK', color: '#059669' },
   { id: 'click', label: 'Click', color: '#0d9488' },
   { id: 'masrivi', label: 'Masrivi', color: '#7c3aed' },
-  { id: 'bamis', label: 'Bamis', color: '#15803d' },
+  { id: 'amanety', label: 'Amanety', color: '#db2777' },
 ] as const
 
 // Le paiement partiel = combinaison de 2 méthodes.

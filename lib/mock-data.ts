@@ -230,10 +230,10 @@ export const DEBTS: Debt[] = [
 ]
 
 export const EXPENSES: Expense[] = [
-  { id: 'e1', label: 'Loyer boutique', amount: 8000, category: 'Loyer', date: daysFromNow(-2) },
-  { id: 'e2', label: 'Électricité', amount: 2400, category: 'Charges', date: daysFromNow(-4) },
-  { id: 'e3', label: 'Transport marchandise', amount: 1200, category: 'Logistique', date: daysFromNow(-1) },
-  { id: 'e4', label: 'Salaire caissier', amount: 15000, category: 'Salaires', date: daysFromNow(-6) },
+  { id: 'e1', label: 'Loyer boutique', amount: 8000, category: 'Loyer', date: daysFromNow(-2), method: 'especes' },
+  { id: 'e2', label: 'Électricité', amount: 2400, category: 'Charges', date: daysFromNow(-4), method: 'bankily' },
+  { id: 'e3', label: 'Transport marchandise', amount: 1200, category: 'Logistique', date: daysFromNow(-1), method: 'especes' },
+  { id: 'e4', label: 'Salaire caissier', amount: 15000, category: 'Salaires', date: daysFromNow(-6), method: 'especes' },
 ]
 
 export const SUPPLIERS: Supplier[] = [
@@ -325,13 +325,13 @@ export const ALERTS: Alert[] = [
 ]
 
 export const PAYMENT_TOTALS: Record<string, number> = {
-  especes: 9450,
-  bankily: 6200,
-  sedad: 2100,
-  bik: 1750,
-  click: 980,
-  masrivi: 540,
-  bamis: 0,
+  especes: 152000,
+  bankily: 68000,
+  sedad: 24500,
+  bik: 17800,
+  click: 9200,
+  masrivi: 4300,
+  amanety: 6100,
   credit: 2665,
   partiel: 1000,
 }
