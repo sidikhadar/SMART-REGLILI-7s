@@ -304,6 +304,11 @@ const fr: Dict = {
   stock_value: 'Valeur du stock',
   // ajout produit
   add_product_title: 'Ajouter un produit',
+  edit_product_title: 'Modifier le produit',
+  alert_thresholds: 'Seuils d’alerte',
+  low_stock_threshold: 'Seuil de stock bas',
+  expiry_alert_threshold: 'Seuil d’alerte péremption',
+  expiry_alert_hint: 'Vous serez alerté seulement si le stock restant dépasse ce seuil.',
   scan_barcode: 'Scanner le code-barres',
   enter_barcode: 'Saisir le code-barres',
   camera_denied: "Accès à la caméra refusé. Autorisez la caméra dans votre navigateur.",
@@ -1019,6 +1024,11 @@ const en: Dict = {
   signal_cold: 'Low demand',
   stock_value: 'Stock value',
   add_product_title: 'Add a product',
+  edit_product_title: 'Edit product',
+  alert_thresholds: 'Alert thresholds',
+  low_stock_threshold: 'Low stock threshold',
+  expiry_alert_threshold: 'Expiry alert threshold',
+  expiry_alert_hint: 'You will only be alerted if the remaining stock exceeds this threshold.',
   scan_barcode: 'Scan barcode',
   enter_barcode: 'Enter barcode',
   camera_denied: 'Camera access denied. Allow the camera in your browser.',
@@ -1714,11 +1724,16 @@ const ar: Dict = {
   signal_cold: 'طلب منخفض',
   stock_value: 'قيمة المخزون',
   add_product_title: 'إضافة منتج',
+  edit_product_title: 'تعديل المنتج',
+  alert_thresholds: 'حدود التنبيه',
+  low_stock_threshold: 'حد المخزون المنخفض',
+  expiry_alert_threshold: 'حد تنبيه انتهاء الصلاحية',
+  expiry_alert_hint: 'لن يتم تنبيهك إلا إذا تجاوز المخزون المتبقي هذا الحد.',
   scan_barcode: 'مسح الباركود',
   enter_barcode: 'إدخال الباركود',
   camera_denied: 'تم رفض الوصول إلى الكاميرا. اسمح بالكاميرا في المتصفح.',
   align_barcode: 'حاذِ الباركود داخل الإطار',
-  starting_camera: 'جارٍ تشغيل الكاميرا…',
+  starting_camera: 'جارٍ تش��يل الكاميرا…',
   use_camera: 'استخدام الكاميرا',
   source_off: 'Open Food Facts',
   source_obf: 'Open Beauty Facts',
@@ -1924,7 +1939,7 @@ const ar: Dict = {
   inv_receipt: 'الفاتورة',
   inv_from: 'من',
   inv_to: 'إلى',
-  inv_thanks: 'شكرًا لتعاملكم معنا',
+  inv_thanks: 'شكرًا لتعام��كم معنا',
   inv_cashier: 'أمين الصندوق',
   inv_method: 'طريقة الدفع',
 
@@ -2085,13 +2100,13 @@ const ar: Dict = {
     'يُقدَّم التطبيق «كما هو». نحسّن الخدمة باستمرار لكننا لا نضمن توفرًا غير منقطع.',
   legal_notices_body:
     'الناشر:\n\n' +
-    'يُنشر SMART REGLILI من قبل سيدي محمد الخضر، نواكشوط، موريتانيا.\n\n' +
+    'يُ��شر SMART REGLILI من قبل سيدي محمد الخضر، نواكشوط، موريتانيا.\n\n' +
     'مدير النشر:\n\n' +
     'سيدي محمد الخضر.\n\n' +
     'الاستضافة:\n\n' +
     'Vercel Inc.\n\n' +
     'للتواصل:\n\n' +
-    'لأي سؤال قانوني تواصل معنا عبر البريد على contact@reglili.com أو عبر واتساب.',
+    'لأي سؤال ��انوني تواصل معنا عبر البريد على contact@reglili.com أو عبر واتساب.',
 
   // المساعدة والدعم
   help_center: 'مركز المساعدة',

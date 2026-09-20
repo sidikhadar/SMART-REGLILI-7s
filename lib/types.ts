@@ -58,6 +58,13 @@ export interface Product {
   image?: string
   lots: Lot[]
   lowStockThreshold: number
+  /**
+   * Seuil d'alerte péremption : quantité restante en dessous de laquelle on
+   * n'alerte PAS sur une date d'expiration proche (ex: inutile d'alerter pour
+   * 2 unités, mais oui pour un carton entier). Défaut 0 = alerter quelle que
+   * soit la quantité si non renseigné.
+   */
+  expiryAlertThreshold?: number
   /** Emplacement physique en boutique (ex: "Rayon 3 - Case B2"). */
   location?: string
   /** Variantes de vente. La 1ère est l'unité de base (factor 1). */

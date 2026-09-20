@@ -17,6 +17,7 @@ import {
   Trash2,
   Boxes,
   MapPin,
+  AlertTriangle,
 } from 'lucide-react'
 import type { Product, ProductCategory, ProductVariant } from '@/lib/types'
 import { lookupBarcode, productMargin, type LookupSource } from '@/lib/stock-utils'
@@ -54,37 +55,60 @@ export function AddProductSheet({
   t,
   onClose,
   onSave,
+  initial,
 }: {
   t: (k: string) => string
   onClose: () => void
   onSave: (p: Product) => void
+  /** Produit existant à modifier. Absent = création. */
+  initial?: Product
 }) {
+  const editing = !!initial
   const [method, setMethod] = useState<Method | null>(null)
-  const [barcode, setBarcode] = useState('')
+  const [barcode, setBarcode] = useState(initial?.barcode ?? '')
   const [searching, setSearching] = useState(false)
   const [lookupMsg, setLookupMsg] = useState<'found' | 'notfound' | null>(null)
   const [scanning, setScanning] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  // champs du formulaire
-  const [name, setName] = useState('')
-  const [category, setCategory] = useState<ProductCategory>('alimentation')
-  const [buyPrice, setBuyPrice] = useState('')
-  const [sellPrice, setSellPrice] = useState('')
-  const [tva, setTva] = useState('')
+  // champs du formulaire (préremplis en modification)
+  const [name, setName] = useState(initial?.name ?? '')
+  const [category, setCategory] = useState<ProductCategory>(initial?.category ?? 'alimentation')
+  const [buyPrice, setBuyPrice] = useState(initial ? String(initial.buyPrice) : '')
+  const [sellPrice, setSellPrice] = useState(initial ? String(initial.sellPrice) : '')
+  const [tva, setTva] = useState(initial?.tva != null ? String(initial.tva) : '')
   const [quantity, setQuantity] = useState('')
   const [expiry, setExpiry] = useState('')
   const [lotNumber, setLotNumber] = useState('')
   const [posology, setPosology] = useState('')
-  const [location, setLocation] = useState('')
-  const [image, setImage] = useState<string | undefined>()
+  const [location, setLocation] = useState(initial?.location ?? '')
+  const [image, setImage] = useState<string | undefined>(initial?.image)
+  // Seuils d'alerte (stock bas + péremption). Défaut : 5 / 0.
+  const [lowStockThreshold, setLowStockThreshold] = useState(
+    initial ? String(initial.lowStockThreshold) : '5',
+  )
+  const [expiryAlertThreshold, setExpiryAlertThreshold] = useState(
+    initial?.expiryAlertThreshold != null ? String(initial.expiryAlertThreshold) : '0',
+  )
   // Variantes de vente supplémentaires (pack, carton, palette...). L'unité de
   // base est implicite (prix de vente / code-barres ci-dessus, facteur 1).
-  const [variants, setVariants] = useState<EditVariant[]>([])
+  const [variants, setVariants] = useState<EditVariant[]>(
+    initial?.variants
+      ? initial.variants
+          .filter((v) => v.factor !== 1)
+          .map((v, i) => ({
+            id: v.id || `ev-${i}`,
+            label: v.label,
+            barcode: v.barcode ?? '',
+            price: String(v.price),
+            factor: String(v.factor),
+          }))
+      : [],
+  )
 
   const margin =
     buyPrice && sellPrice ? productMargin(Number(buyPrice), Number(sellPrice)) : null
-  const showForm = method === 'manual' || lookupMsg === 'found'
+  const showForm = editing || method === 'manual' || lookupMsg === 'found'
   const canSave = name.trim() && Number(sellPrice) > 0
 
   async function runLookup(code?: string) {
@@ -172,7 +196,7 @@ export function AddProductSheet({
       : undefined
 
     const product: Product = {
-      id: `p-${Date.now()}`,
+      id: initial ? initial.id : `p-${Date.now()}`,
       name: name.trim(),
       barcode: barcode.trim() || undefined,
       category,
@@ -181,15 +205,20 @@ export function AddProductSheet({
       tva: tva ? Number(tva) : undefined,
       image,
       location: location.trim() || undefined,
-      lowStockThreshold: 5,
-      lots: [
-        {
-          id: `lot-${Date.now()}`,
-          quantity: qty,
-          expiry: expiry || undefined,
-          number: lotNumber || undefined,
-        },
-      ],
+      lowStockThreshold: Number(lowStockThreshold) || 5,
+      expiryAlertThreshold: Number(expiryAlertThreshold) || 0,
+      // En modification, on préserve les lots existants (le stock/FIFO se gère
+      // via le mode inventaire). En création, on crée le lot initial.
+      lots: initial
+        ? initial.lots
+        : [
+            {
+              id: `lot-${Date.now()}`,
+              quantity: qty,
+              expiry: expiry || undefined,
+              number: lotNumber || undefined,
+            },
+          ],
       variants: productVariants,
     }
     onSave(product)
@@ -200,7 +229,7 @@ export function AddProductSheet({
       <div className="max-h-[100dvh] w-full max-w-lg overflow-y-auto rounded-b-3xl bg-card p-5 shadow-soft-lg sm:max-h-[92dvh] sm:rounded-3xl">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-heading text-lg font-bold text-foreground">
-            {t('add_product_title')}
+            {editing ? t('edit_product_title') : t('add_product_title')}
           </h2>
           <button
             type="button"
@@ -211,7 +240,8 @@ export function AddProductSheet({
           </button>
         </div>
 
-        {/* Choix de la méthode */}
+        {/* Choix de la méthode (masqué en modification) */}
+        {!editing && (
         <div className="mb-4 grid grid-cols-2 gap-2">
           {METHODS.map((m) => {
             const Icon = m.icon
@@ -236,6 +266,7 @@ export function AddProductSheet({
             )
           })}
         </div>
+        )}
 
         {/* Recherche par code-barres */}
         {method && method !== 'manual' && (
@@ -335,9 +366,9 @@ export function AddProductSheet({
               />
             </div>
 
-            {/* Code-barres en création manuelle : scan caméra OU saisie directe.
-                Le code (scanné ou tapé) permettra de retrouver le produit en caisse. */}
-            {method === 'manual' && (
+            {/* Code-barres en création manuelle ou en modification : scan caméra
+                OU saisie directe. Le code permet de retrouver le produit en caisse. */}
+            {(method === 'manual' || editing) && (
               <Field label={t('barcode')}>
                 <div className="flex gap-2">
                   <input
@@ -443,14 +474,18 @@ export function AddProductSheet({
             )}
 
             <div className="grid grid-cols-2 gap-3">
-              <Field label={t('quantity')}>
-                <input
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  inputMode="numeric"
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base tabular-nums text-foreground outline-none focus:border-brand"
-                />
-              </Field>
+              {/* La quantité initiale ne se saisit qu'à la création : en
+                  modification, le stock se gère via le mode inventaire. */}
+              {!editing && (
+                <Field label={t('quantity')}>
+                  <input
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    inputMode="numeric"
+                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base tabular-nums text-foreground outline-none focus:border-brand"
+                  />
+                </Field>
+              )}
               <Field label={t('vat')}>
                 <input
                   value={tva}
@@ -462,30 +497,61 @@ export function AddProductSheet({
               </Field>
             </div>
 
-            {/* Section dédiée au lot : n° de lot + date d'expiration regroupés */}
+            {/* Section dédiée au lot : n° de lot + date d'expiration (création seule) */}
+            {!editing && (
+              <div className="rounded-2xl border border-border bg-muted/40 p-3">
+                <div className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                  <Layers className="h-4 w-4 text-brand" />
+                  {t('lot')}
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label={t('lot_number')}>
+                    <input
+                      value={lotNumber}
+                      onChange={(e) => setLotNumber(e.target.value)}
+                      placeholder="LOT-2026"
+                      className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
+                    />
+                  </Field>
+                  <Field label={t('expiry_optional')}>
+                    <input
+                      type="date"
+                      value={expiry}
+                      onChange={(e) => setExpiry(e.target.value)}
+                      className="w-full rounded-xl border border-border bg-background px-3 py-3 text-base text-foreground outline-none focus:border-brand"
+                    />
+                  </Field>
+                </div>
+              </div>
+            )}
+
+            {/* Seuils d'alerte : stock bas + péremption (même bloc) */}
             <div className="rounded-2xl border border-border bg-muted/40 p-3">
               <div className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-foreground">
-                <Layers className="h-4 w-4 text-brand" />
-                {t('lot')}
+                <AlertTriangle className="h-4 w-4 text-brand" />
+                {t('alert_thresholds')}
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <Field label={t('lot_number')}>
+                <Field label={t('low_stock_threshold')}>
                   <input
-                    value={lotNumber}
-                    onChange={(e) => setLotNumber(e.target.value)}
-                    placeholder="LOT-2026"
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
+                    value={lowStockThreshold}
+                    onChange={(e) => setLowStockThreshold(e.target.value)}
+                    inputMode="numeric"
+                    placeholder="5"
+                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base tabular-nums text-foreground outline-none focus:border-brand"
                   />
                 </Field>
-                <Field label={t('expiry_optional')}>
+                <Field label={t('expiry_alert_threshold')}>
                   <input
-                    type="date"
-                    value={expiry}
-                    onChange={(e) => setExpiry(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-background px-3 py-3 text-base text-foreground outline-none focus:border-brand"
+                    value={expiryAlertThreshold}
+                    onChange={(e) => setExpiryAlertThreshold(e.target.value)}
+                    inputMode="numeric"
+                    placeholder="0"
+                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base tabular-nums text-foreground outline-none focus:border-brand"
                   />
                 </Field>
               </div>
+              <p className="mt-2 text-xs text-muted-foreground">{t('expiry_alert_hint')}</p>
             </div>
 
             {/* Variantes de vente : packs, cartons, palettes (stock géré en unités) */}

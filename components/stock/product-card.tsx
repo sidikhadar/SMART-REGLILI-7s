@@ -12,6 +12,7 @@ import {
   CalendarClock,
   Layers,
   Boxes,
+  Pencil,
 } from 'lucide-react'
 import type { Product } from '@/lib/types'
 import { productStock, formatMRU, formatDate } from '@/lib/format'
@@ -58,10 +59,12 @@ export function ProductCard({
   product,
   t,
   lang,
+  onEdit,
 }: {
   product: Product
   t: (k: string) => string
   lang: string
+  onEdit?: () => void
 }) {
   const [open, setOpen] = useState(false)
   const stock = productStock(product.lots)
@@ -128,7 +131,7 @@ export function ProductCard({
           </div>
         </div>
 
-        {/* Stock + chevron */}
+        {/* Stock + actions */}
         <div className="flex flex-col items-end gap-1">
           <span
             className={cn(
@@ -138,16 +141,28 @@ export function ProductCard({
           >
             {stock}
           </span>
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-label={open ? t('hide_lots') : t('view_lots')}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted"
-          >
-            <ChevronDown
-              className={cn('h-4 w-4 transition-transform', open && 'rotate-180')}
-            />
-          </button>
+          <div className="flex items-center gap-0.5">
+            {onEdit && (
+              <button
+                type="button"
+                onClick={onEdit}
+                aria-label={t('edit_product_title')}
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-brand"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              aria-label={open ? t('hide_lots') : t('view_lots')}
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted"
+            >
+              <ChevronDown
+                className={cn('h-4 w-4 transition-transform', open && 'rotate-180')}
+              />
+            </button>
+          </div>
         </div>
       </div>
 
