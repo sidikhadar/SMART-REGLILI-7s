@@ -1,6 +1,7 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import {
   X,
@@ -72,7 +73,21 @@ export function TopProductsSheet({
   const maxQty = Math.max(...ranking.map((r) => r.qty), 1)
   const hasSales = ranking.some((r) => r.qty > 0)
 
-  return (
+  // Rendu via portal sur <body> : indispensable pour échapper au conteneur
+  // transformé de PageTransition (un `transform` ancêtre piège `position:fixed`).
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    setMounted(true)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [])
+
+  if (!mounted) return null
+
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/40 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onClose}
@@ -213,6 +228,7 @@ export function TopProductsSheet({
         )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
