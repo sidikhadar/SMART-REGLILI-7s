@@ -58,6 +58,8 @@ export interface Product {
   image?: string
   lots: Lot[]
   lowStockThreshold: number
+  /** Emplacement physique en boutique (ex: "Rayon 3 - Case B2"). */
+  location?: string
   /** Variantes de vente. La 1ère est l'unité de base (factor 1). */
   variants?: ProductVariant[]
 }

@@ -16,6 +16,7 @@ import {
   Plus,
   Trash2,
   Boxes,
+  MapPin,
 } from 'lucide-react'
 import type { Product, ProductCategory, ProductVariant } from '@/lib/types'
 import { lookupBarcode, productMargin, type LookupSource } from '@/lib/stock-utils'
@@ -75,6 +76,7 @@ export function AddProductSheet({
   const [expiry, setExpiry] = useState('')
   const [lotNumber, setLotNumber] = useState('')
   const [posology, setPosology] = useState('')
+  const [location, setLocation] = useState('')
   const [image, setImage] = useState<string | undefined>()
   // Variantes de vente supplémentaires (pack, carton, palette...). L'unité de
   // base est implicite (prix de vente / code-barres ci-dessus, facteur 1).
@@ -106,11 +108,13 @@ export function AddProductSheet({
     }
   }
 
-  // code détecté par la caméra → on remplit, on ferme le scanner puis on recherche
+  // code détecté par la caméra → on remplit et on ferme le scanner.
+  // En mode manuel (produit absent des 3 bases), on ne lance PAS de recherche :
+  // le code sert uniquement à identifier le produit pour les ventes futures.
   function handleScanDetected(code: string) {
     setBarcode(code)
     setScanning(false)
-    void runLookup(code)
+    if (method !== 'manual') void runLookup(code)
   }
 
   function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
@@ -176,6 +180,7 @@ export function AddProductSheet({
       sellPrice: Number(sellPrice) || 0,
       tva: tva ? Number(tva) : undefined,
       image,
+      location: location.trim() || undefined,
       lowStockThreshold: 5,
       lots: [
         {
@@ -330,6 +335,47 @@ export function AddProductSheet({
               />
             </div>
 
+            {/* Code-barres en création manuelle : scan caméra OU saisie directe.
+                Le code (scanné ou tapé) permettra de retrouver le produit en caisse. */}
+            {method === 'manual' && (
+              <Field label={t('barcode')}>
+                <div className="flex gap-2">
+                  <input
+                    value={barcode}
+                    onChange={(e) => setBarcode(e.target.value)}
+                    inputMode="numeric"
+                    placeholder={t('enter_barcode')}
+                    className="min-w-0 flex-1 rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground outline-none focus:border-brand"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setScanning((v) => !v)}
+                    aria-pressed={scanning}
+                    className={cn(
+                      'flex shrink-0 items-center justify-center gap-1.5 rounded-xl px-4 text-sm font-semibold',
+                      scanning
+                        ? 'bg-navy text-navy-foreground'
+                        : 'bg-brand text-brand-foreground',
+                    )}
+                  >
+                    <Camera className="h-4 w-4" />
+                    {t('scan')}
+                  </button>
+                </div>
+                {scanning && (
+                  <div className="mt-2">
+                    <InlineScanner t={t} onDetected={handleScanDetected} autoStart />
+                  </div>
+                )}
+                {barcode.trim() && !scanning && (
+                  <p className="mt-2 flex items-center gap-1 text-xs font-medium text-brand">
+                    <Check className="h-3.5 w-3.5" /> {t('barcode')}:{' '}
+                    <span className="font-mono tabular-nums">{barcode}</span>
+                  </p>
+                )}
+              </Field>
+            )}
+
             <Field label={t('product_name')}>
               <input
                 value={name}
@@ -355,6 +401,18 @@ export function AddProductSheet({
                     {t(`cat_${c}`)}
                   </button>
                 ))}
+              </div>
+            </Field>
+
+            <Field label={t('location')}>
+              <div className="relative">
+                <MapPin className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder={t('location_hint')}
+                  className="w-full rounded-xl border border-border bg-background py-3 ps-10 pe-4 text-base text-foreground outline-none focus:border-brand"
+                />
               </div>
             </Field>
 

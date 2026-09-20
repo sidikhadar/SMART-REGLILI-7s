@@ -34,7 +34,10 @@ export default function StockPage() {
     return products.filter((p) => {
       const matchCat = cat === 'all' || p.category === cat
       const matchQuery =
-        !q || p.name.toLowerCase().includes(q) || p.barcode?.includes(q)
+        !q ||
+        p.name.toLowerCase().includes(q) ||
+        p.barcode?.includes(q) ||
+        !!p.location?.toLowerCase().includes(q)
       return matchCat && matchQuery
     })
   }, [products, query, cat])
@@ -118,7 +121,7 @@ export default function StockPage() {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={t('search_product')}
+          placeholder={t('search_product_or_location')}
           className="w-full rounded-xl border border-border bg-card py-3 ps-11 pe-4 text-base text-foreground shadow-soft outline-none focus:border-brand"
         />
       </div>
