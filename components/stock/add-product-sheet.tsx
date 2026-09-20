@@ -685,10 +685,12 @@ export function AddProductSheet({
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  // h-full + mt-auto : sur une grille, si un label passe sur 2 lignes, l'input
+  // reste aligné en bas avec celui de la colonne voisine (pas de décalage).
   return (
-    <div>
+    <div className="flex h-full flex-col">
       <label className="mb-1 block text-sm font-medium text-foreground">{label}</label>
-      {children}
+      <div className="mt-auto">{children}</div>
     </div>
   )
 }
