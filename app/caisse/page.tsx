@@ -16,18 +16,31 @@ import {
   UserPlus,
   Wallet,
   ChevronLeft,
+  Printer,
+  Share2,
 } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
 import { AppShell } from '@/components/app-shell'
 import { InlineScanner } from '@/components/inline-scanner'
 import { PRODUCTS, CLIENTS, SALES } from '@/lib/mock-data'
-import { formatMRU, productStock } from '@/lib/format'
+import { formatMRU, productStock, formatDate, formatTime } from '@/lib/format'
 import { findByBarcode, productVariants } from '@/lib/stock-utils'
 import type { Product, ProductVariant } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
+const SHOP_NAME = 'SMART REGLILI'
+
 // Les 4 modes de paiement demandés
 type PayMode = 'especes' | 'transfert' | 'dette' | 'partiel'
+
+// Instantané figé d'une vente confirmée (pour l'impression et le partage)
+type Receipt = {
+  items: { name: string; variantLabel: string; factor: number; qty: number; unitPrice: number }[]
+  total: number
+  payLabel: string
+  date: string
+  register: string
+}
 
 const TRANSFER_APPS = [
   { id: 'bankily', label: 'Bankily', color: '#f59e0b' },
@@ -52,6 +65,7 @@ export default function CaissePage() {
   const {
     t,
     dir,
+    lang,
     cart,
     addToCart,
     updateQty,
@@ -83,6 +97,7 @@ export default function CaissePage() {
   const [newClientName, setNewClientName] = useState('')
   const [newClientPhone, setNewClientPhone] = useState('')
   const [done, setDone] = useState(false)
+  const [receipt, setReceipt] = useState<Receipt | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
 
   const PAY_MODES: { id: PayMode; label: string; icon: typeof Banknote }[] = [
@@ -192,14 +207,77 @@ export default function CaissePage() {
     setPayOpen(true)
   }
 
+  // Libellé du mode de paiement retenu (transfert avec appli, ou combinaison partielle)
+  function payLabelText() {
+    if (mode === 'partiel' && comboCfg) {
+      return `${methodLabel(comboCfg.m1)} + ${methodLabel(comboCfg.m2)}`
+    }
+    if (mode === 'transfert') {
+      const app = TRANSFER_APPS.find((a) => a.id === transferApp)
+      return app ? `${t('pay_mode_transfert')} · ${app.label}` : t('pay_mode_transfert')
+    }
+    return mode ? t(`pay_mode_${mode}`) : ''
+  }
+
   function validateSale() {
     if (!canConfirm) return
+    // On fige un instantané de la vente AVANT de vider le panier,
+    // pour l'écran de confirmation (impression + partage).
+    setReceipt({
+      items: cart.map((i) => ({
+        name: i.name,
+        variantLabel: i.variantLabel,
+        factor: i.factor,
+        qty: i.qty,
+        unitPrice: i.unitPrice,
+      })),
+      total: cartTotal,
+      payLabel: payLabelText(),
+      date: new Date().toISOString(),
+      register: activeName ?? '',
+    })
     setDone(true)
-    setTimeout(() => {
-      setDone(false)
-      setPayOpen(false)
-      clearCart()
-    }, 1400)
+    clearCart()
+  }
+
+  // Termine la vente : referme la modale et réinitialise pour une nouvelle vente
+  function finishSale() {
+    setDone(false)
+    setPayOpen(false)
+    setReceipt(null)
+    setMode(null)
+  }
+
+  function handlePrint() {
+    window.print()
+  }
+
+  // Partage identique au bouton "Partager" de /invoices (Web Share API + repli WhatsApp)
+  async function handleShareReceipt() {
+    if (!receipt) return
+    const lines = [
+      `${SHOP_NAME} — ${t('inv_receipt')}`,
+      `${t('inv_date')}: ${formatDate(receipt.date, lang)} ${formatTime(receipt.date, lang)}`,
+      '',
+      ...receipt.items.map(
+        (it) => `${it.qty}× ${it.name} — ${formatMRU(it.qty * it.unitPrice)} ${t('mru')}`,
+      ),
+      '',
+      `${t('total')}: ${formatMRU(receipt.total)} ${t('mru')}`,
+      `${t('inv_method')}: ${receipt.payLabel}`,
+      '',
+      t('inv_thanks'),
+    ]
+    const text = lines.filter(Boolean).join('\n')
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ title: SHOP_NAME, text })
+        return
+      } catch {
+        // annulé → repli WhatsApp
+      }
+    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
   }
 
   function methodLabel(m: 'especes' | 'transfert' | 'dette') {
@@ -696,17 +774,47 @@ export default function CaissePage() {
       {payOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4">
           <div className="w-full max-w-md rounded-t-3xl bg-card p-5 shadow-2xl sm:rounded-3xl">
-            {done ? (
-              <div className="flex flex-col items-center py-8 text-center">
-                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand text-brand-foreground animate-success-pop">
-                  <Check className="h-8 w-8" />
-                </span>
-                <p className="mt-4 font-heading text-lg font-bold text-foreground">
-                  {t('sale_completed')}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {formatMRU(cartTotal)} {t('mru')} · {activeName}
-                </p>
+            {done && receipt ? (
+              <div className="py-2">
+                <div className="flex flex-col items-center py-4 text-center">
+                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand text-brand-foreground animate-success-pop">
+                    <Check className="h-8 w-8" />
+                  </span>
+                  <p className="mt-4 font-heading text-lg font-bold text-foreground">
+                    {t('sale_completed')}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {formatMRU(receipt.total)} {t('mru')} · {receipt.register}
+                  </p>
+                </div>
+
+                {/* Deux actions disponibles uniquement après confirmation du paiement */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={handleShareReceipt}
+                    className="flex items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+                  >
+                    <Share2 className="h-4 w-4" />
+                    {t('inv_share')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handlePrint}
+                    className="flex items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-semibold text-brand-foreground transition-transform active:scale-95"
+                  >
+                    <Printer className="h-4 w-4" />
+                    {t('print_receipt')}
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={finishSale}
+                  className="mt-2 w-full rounded-xl py-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted"
+                >
+                  {t('new_sale')}
+                </button>
               </div>
             ) : (
               <>
@@ -884,6 +992,42 @@ export default function CaissePage() {
                 )}
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Ticket imprimable (format reçu imprimante) — visible uniquement à l'impression */}
+      {receipt && (
+        <div id="invoice-print" className="hidden print:block">
+          <div className="mx-auto max-w-[280px] font-mono text-[12px] leading-relaxed text-black">
+            <p className="text-center text-base font-bold">{SHOP_NAME}</p>
+            <p className="text-center">{t('inv_receipt')}</p>
+            <p className="text-center">
+              {formatDate(receipt.date, lang)} · {formatTime(receipt.date, lang)}
+            </p>
+            <p className="text-center">{receipt.register}</p>
+            <div className="my-2 border-t border-dashed border-black" />
+            {receipt.items.map((it, i) => (
+              <div key={i} className="flex justify-between gap-3">
+                <span>
+                  {it.qty}× {it.name}
+                  {it.factor > 1 ? ` (${it.variantLabel})` : ''}
+                </span>
+                <span className="tabular-nums">{formatMRU(it.qty * it.unitPrice)}</span>
+              </div>
+            ))}
+            <div className="my-2 border-t border-dashed border-black" />
+            <div className="flex justify-between text-sm font-bold">
+              <span>{t('total')}</span>
+              <span className="tabular-nums">
+                {formatMRU(receipt.total)} {t('mru')}
+              </span>
+            </div>
+            <div className="mt-1 flex justify-between">
+              <span>{t('inv_method')}</span>
+              <span>{receipt.payLabel}</span>
+            </div>
+            <p className="mt-3 text-center">{t('inv_thanks')}</p>
           </div>
         </div>
       )}
