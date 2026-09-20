@@ -43,12 +43,12 @@ type Receipt = {
 }
 
 const TRANSFER_APPS = [
-  { id: 'bankily', label: 'Bankily', color: '#f59e0b' },
-  { id: 'sedad', label: 'Sedad', color: '#2563eb' },
-  { id: 'bik', label: 'BIK', color: '#059669' },
-  { id: 'click', label: 'Click', color: '#0d9488' },
-  { id: 'masrivi', label: 'Masrivi', color: '#7c3aed' },
-  { id: 'amanety', label: 'Amanety', color: '#db2777' },
+  { id: 'bankily', label: 'Bankily', logo: '/payment-logos/bankily.jpg' },
+  { id: 'sedad', label: 'Sedad', logo: '/payment-logos/sedad.jpg' },
+  { id: 'bik', label: 'BIK', logo: '/payment-logos/bik.jpg' },
+  { id: 'click', label: 'Click', logo: '/payment-logos/click.jpg' },
+  { id: 'masrivi', label: 'Masrivi', logo: '/payment-logos/masrivi.jpg' },
+  { id: 'amanety', label: 'Amanety', logo: '/payment-logos/amanety.jpg' },
 ] as const
 
 // Le paiement partiel = combinaison de 2 méthodes.
@@ -302,11 +302,12 @@ export default function CaissePage() {
                   : 'border-border hover:bg-muted',
               )}
             >
-              <span
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-sm font-extrabold text-white"
-                style={{ backgroundColor: app.color }}
-              >
-                {app.label.charAt(0)}
+              <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-border bg-card">
+                <img
+                  src={app.logo || "/placeholder.svg"}
+                  alt={app.label}
+                  className="h-full w-full object-contain"
+                />
               </span>
               <span className="text-xs font-semibold text-foreground">{app.label}</span>
             </button>
