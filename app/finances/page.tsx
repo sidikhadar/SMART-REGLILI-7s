@@ -21,6 +21,8 @@ import {
 } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
 import { AppShell } from '@/components/app-shell'
+import { ExportMenu } from '@/components/export-menu'
+import { buildInvoices } from '@/lib/invoice-utils'
 import {
   computeFinances,
   availableMonths,
@@ -30,6 +32,8 @@ import {
   type TreasuryMethod,
 } from '@/lib/finances-utils'
 import { formatMRU } from '@/lib/format'
+
+const SHOP_NAME = 'SMART REGLILI'
 import { cn } from '@/lib/utils'
 
 export default function FinancesPage() {
@@ -41,6 +45,12 @@ export default function FinancesPage() {
 
   const f = useMemo(() => computeFinances(month), [month])
   const positive = f.netProfit >= 0
+
+  // Ventes du mois sélectionné (pour l'export : respecte le filtre en place).
+  const monthInvoices = useMemo(
+    () => buildInvoices().filter((inv) => inv.date.slice(0, 7) === month),
+    [month],
+  )
 
   // Navigation mois précédent / suivant
   const monthIndex = months.findIndex((m) => m.value === month)
@@ -65,6 +75,18 @@ export default function FinancesPage() {
 
   return (
     <AppShell title={t('finances')}>
+      {/* Exporter les ventes du mois sélectionné (Excel / PDF) */}
+      <div className="mb-4 flex items-center justify-end">
+        <ExportMenu
+          invoices={monthInvoices}
+          filename={`finances-${month}`}
+          title={`${t('exp_title_finances')} — ${monthLabel(month, lang)}`}
+          shopName={SHOP_NAME}
+          t={t}
+          lang={lang}
+        />
+      </div>
+
       {/* Trésorerie : solde détenu par compte de paiement (indépendant du mois) */}
       <TreasurySection t={t} />
 

@@ -6,6 +6,7 @@ import { useApp } from '@/lib/app-context'
 import { AppShell } from '@/components/app-shell'
 import { StatusBadge } from '@/components/invoices/status-badge'
 import { InvoiceDetail } from '@/components/invoices/invoice-detail'
+import { ExportMenu } from '@/components/export-menu'
 import { buildInvoices, summarize, type InvoiceStatus } from '@/lib/invoice-utils'
 import { formatMRU, formatDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -73,6 +74,15 @@ export default function InvoicesPage() {
 
   const hasDateFilter = year !== 'all'
 
+  // Nom de fichier d'export reflétant la période filtrée (sinon « tout »)
+  const exportFilename = useMemo(() => {
+    const parts = ['factures']
+    if (year !== 'all') parts.push(year)
+    if (month !== 'all') parts.push(String(Number(month) + 1).padStart(2, '0'))
+    if (day !== 'all') parts.push(String(day).padStart(2, '0'))
+    return parts.join('-')
+  }, [year, month, day])
+
   function resetDateFilter() {
     setYear('all')
     setMonth('all')
@@ -90,7 +100,17 @@ export default function InvoicesPage() {
 
   return (
     <AppShell title={t('invoices')}>
-      <p className="mb-4 text-sm text-muted-foreground">{t('inv_subtitle')}</p>
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <p className="text-sm text-muted-foreground">{t('inv_subtitle')}</p>
+        <ExportMenu
+          invoices={filtered}
+          filename={exportFilename}
+          title={t('exp_title_invoices')}
+          shopName={SHOP_NAME}
+          t={t}
+          lang={lang}
+        />
+      </div>
 
       {/* Résumé */}
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
