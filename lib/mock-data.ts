@@ -317,7 +317,7 @@ export const EMPLOYEES: Employee[] = [
 ]
 
 export const ALERTS: Alert[] = [
-  { id: 'a1', type: 'stock', level: 'danger', message: 'Savon Dove 100g — stock critique (3 restants)', date: hoursAgo(2) },
+  { id: 'a1', type: 'stock', level: 'danger', message: 'Savon Dove 100g — stock critique (3 restants)', date: hoursAgo(2), productId: 'p6' },
   { id: 'a2', type: 'expiry', level: 'danger', message: 'Coca-Cola 1.5L — expire dans 2 jours', date: hoursAgo(4) },
   { id: 'a3', type: 'expiry', level: 'warning', message: 'Lait Candia 1L (LT-2312) — expire dans 5 jours', date: hoursAgo(6) },
   { id: 'a4', type: 'debt', level: 'info', message: 'Nouvelle dette de 1 605 MRU — Ahmed Ould Salem', date: hoursAgo(7) },

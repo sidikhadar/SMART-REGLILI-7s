@@ -187,4 +187,19 @@ export interface Alert {
   level: 'info' | 'warning' | 'danger'
   message: string
   date: string
+  /** Produit concerné (permet de générer un bon de commande depuis l'alerte). */
+  productId?: string
+}
+
+/**
+ * Bon de commande fournisseur, généré depuis une alerte de stock bas.
+ * Bloc indépendant : ne modifie pas la gestion des lots ni du stock.
+ */
+export interface PurchaseOrder {
+  id: string
+  productId: string
+  supplierId: string
+  quantity: number
+  date: string // ISO datetime
+  status: 'draft' | 'sent'
 }

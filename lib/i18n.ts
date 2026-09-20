@@ -565,6 +565,21 @@ const fr: Dict = {
   al_mark_read: 'Tout marquer comme lu',
   al_count: 'alertes',
 
+  // bon de commande fournisseur
+  po_create: 'Créer un bon de commande',
+  po_title: 'Bon de commande',
+  po_subtitle: 'Commande fournisseur',
+  po_product: 'Produit',
+  po_qty: 'Quantité recommandée',
+  po_qty_hint: 'Basée sur le seuil de stock bas. Ajustez si besoin.',
+  po_supplier: 'Fournisseur',
+  po_supplier_pick: 'Choisir un fournisseur',
+  po_send_whatsapp: 'Envoyer par WhatsApp',
+  po_current_stock: 'Stock actuel',
+  po_units: 'unités',
+  po_summary_hello: 'Bonjour, je souhaite passer commande :',
+  po_summary_from: 'De la part de',
+
   // paramètres
   set_general: 'Général',
   set_theme: 'Thème',
@@ -1271,6 +1286,19 @@ const en: Dict = {
   al_return: 'Returns',
   al_empty: 'No alerts',
   al_mark_read: 'Mark all as read',
+  po_create: 'Create purchase order',
+  po_title: 'Purchase order',
+  po_subtitle: 'Supplier order',
+  po_product: 'Product',
+  po_qty: 'Recommended quantity',
+  po_qty_hint: 'Based on the low-stock threshold. Adjust if needed.',
+  po_supplier: 'Supplier',
+  po_supplier_pick: 'Choose a supplier',
+  po_send_whatsapp: 'Send via WhatsApp',
+  po_current_stock: 'Current stock',
+  po_units: 'units',
+  po_summary_hello: 'Hello, I would like to place an order:',
+  po_summary_from: 'From',
   al_count: 'alerts',
 
   set_general: 'General',
@@ -1531,7 +1559,7 @@ const ar: Dict = {
   logout: 'تسجيل الخروج',
   switch_role: 'تغيير الدور',
   switch_role_title: 'تغيير الدور',
-  switch_to_caissier: 'التحويل إلى حساب الصراف',
+  switch_to_caissier: 'التحويل إلى حساب الصر��ف',
   switch_to_patron: 'التحويل إلى حساب المالك',
   switch_password_hint: 'أدخل كلمة المرور لتأكيد التغيير',
   wrong_password: 'كلمة المرور غير صحيحة',
@@ -1711,7 +1739,7 @@ const ar: Dict = {
   barcode: 'الباركود',
   location: 'الموقع',
   location_hint: 'الرف 3 - الخانة B2',
-  search_product_or_location: 'بحث (الاسم أو الموقع)…',
+  search_product_or_location: '��حث (الاسم أو الموقع)…',
   lots: 'الدفعات',
   lot: 'دفعة',
   lot_number: 'رقم الدفعة',
@@ -1720,7 +1748,7 @@ const ar: Dict = {
   expired: 'منتهية',
   expires_today: 'تنتهي اليوم',
   days_short: 'ي',
-  view_lots: 'عرض الدفعات',
+  view_lots: 'عر�� الدفعات',
   hide_lots: 'إخفاء الدفعات',
   fifo_first: 'تُباع أولاً',
   cat_alimentation: 'مواد غذائية',
@@ -1974,6 +2002,19 @@ const ar: Dict = {
   al_return: 'المرتجعات',
   al_empty: 'لا توجد تنبيهات',
   al_mark_read: 'تعليم الكل كمقروء',
+  po_create: 'إنشاء طلب شراء',
+  po_title: 'طلب شراء',
+  po_subtitle: 'طلب من المورّد',
+  po_product: 'المنتج',
+  po_qty: 'الكمية الموصى بها',
+  po_qty_hint: 'بناءً على حد المخزون المنخفض. عدّلها عند الحاجة.',
+  po_supplier: 'المورّد',
+  po_supplier_pick: 'اختر مورّدًا',
+  po_send_whatsapp: 'إرسال عبر واتساب',
+  po_current_stock: 'المخزون الحالي',
+  po_units: 'وحدة',
+  po_summary_hello: 'مرحباً، أود تقديم طلب شراء:',
+  po_summary_from: 'من',
   al_count: 'تنبيهات',
 
   set_general: 'عام',
@@ -2095,7 +2136,7 @@ const ar: Dict = {
     'البيانات التي نجمعها:\n\n' +
     'يحترم SMART REGLILI خصوصيتك. نجمع فقط البيانات اللازمة لتشغيل التطبيق: معلومات متجرك ومنتجاتك ومبيعاتك وعملائك.\n\n' +
     'استخدام البيانات:\n\n' +
-    'هذه البيانات ملك لك ولا تُباع أبدًا لأطراف ثالثة. تُستخدم حصريًا لتشغيل مساحتك وتزويدك بتقاريرك.\n\n' +
+    'هذه ا��بيانات ملك لك ولا تُباع أبدًا لأطراف ثالثة. تُستخدم حصريًا لتشغيل مساحتك وتزويدك بتقاريرك.\n\n' +
     'الأمان:\n\n' +
     'تُخزَّ�� بياناتك بشكل آمن ومشفّر.\n\n' +
     'حقوقك:\n\n' +
