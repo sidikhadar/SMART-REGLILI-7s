@@ -27,6 +27,7 @@ export default function StockPage() {
   const [query, setQuery] = useState('')
   const [cat, setCat] = useState<ProductCategory | 'all'>('all')
   const [addOpen, setAddOpen] = useState(false)
+  const [editProduct, setEditProduct] = useState<Product | null>(null)
   const [inventoryOpen, setInventoryOpen] = useState(false)
 
   const filtered = useMemo(() => {
@@ -34,7 +35,10 @@ export default function StockPage() {
     return products.filter((p) => {
       const matchCat = cat === 'all' || p.category === cat
       const matchQuery =
-        !q || p.name.toLowerCase().includes(q) || p.barcode?.includes(q)
+        !q ||
+        p.name.toLowerCase().includes(q) ||
+        p.barcode?.includes(q) ||
+        !!p.location?.toLowerCase().includes(q)
       return matchCat && matchQuery
     })
   }, [products, query, cat])
@@ -47,6 +51,11 @@ export default function StockPage() {
   function handleAddProduct(p: Product) {
     setProducts((prev) => [p, ...prev])
     setAddOpen(false)
+  }
+
+  function handleUpdateProduct(p: Product) {
+    setProducts((prev) => prev.map((x) => (x.id === p.id ? p : x)))
+    setEditProduct(null)
   }
 
   function handleInventoryAdjust(adjusted: Record<string, number>) {
@@ -118,7 +127,7 @@ export default function StockPage() {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={t('search_product')}
+          placeholder={t('search_product_or_location')}
           className="w-full rounded-xl border border-border bg-card py-3 ps-11 pe-4 text-base text-foreground shadow-soft outline-none focus:border-brand"
         />
       </div>
@@ -145,7 +154,13 @@ export default function StockPage() {
       {/* Liste produits */}
       <div className="space-y-2.5">
         {filtered.map((p) => (
-          <ProductCard key={p.id} product={p} t={t} lang={lang} />
+          <ProductCard
+            key={p.id}
+            product={p}
+            t={t}
+            lang={lang}
+            onEdit={() => setEditProduct(p)}
+          />
         ))}
         {filtered.length === 0 && (
           <p className="py-10 text-center text-sm text-muted-foreground">
@@ -159,6 +174,14 @@ export default function StockPage() {
           t={t}
           onClose={() => setAddOpen(false)}
           onSave={handleAddProduct}
+        />
+      )}
+      {editProduct && (
+        <AddProductSheet
+          t={t}
+          initial={editProduct}
+          onClose={() => setEditProduct(null)}
+          onSave={handleUpdateProduct}
         />
       )}
       {inventoryOpen && (

@@ -15,16 +15,25 @@ import {
   ChevronLeft,
   ChevronRight,
   CalendarDays,
+  Landmark,
+  Coins,
+  type LucideIcon,
 } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
 import { AppShell } from '@/components/app-shell'
+import { ExportMenu } from '@/components/export-menu'
+import { buildInvoices } from '@/lib/invoice-utils'
 import {
   computeFinances,
   availableMonths,
   monthLabel,
   latestMonth,
+  computeTreasury,
+  type TreasuryMethod,
 } from '@/lib/finances-utils'
 import { formatMRU } from '@/lib/format'
+
+const SHOP_NAME = 'SMART REGLILI'
 import { cn } from '@/lib/utils'
 
 export default function FinancesPage() {
@@ -36,6 +45,12 @@ export default function FinancesPage() {
 
   const f = useMemo(() => computeFinances(month), [month])
   const positive = f.netProfit >= 0
+
+  // Ventes du mois sélectionné (pour l'export : respecte le filtre en place).
+  const monthInvoices = useMemo(
+    () => buildInvoices().filter((inv) => inv.date.slice(0, 7) === month),
+    [month],
+  )
 
   // Navigation mois précédent / suivant
   const monthIndex = months.findIndex((m) => m.value === month)
@@ -60,6 +75,21 @@ export default function FinancesPage() {
 
   return (
     <AppShell title={t('finances')}>
+      {/* Exporter les ventes du mois sélectionné (Excel / PDF) */}
+      <div className="mb-4 flex items-center justify-end">
+        <ExportMenu
+          invoices={monthInvoices}
+          filename={`finances-${month}`}
+          title={`${t('exp_title_finances')} — ${monthLabel(month, lang)}`}
+          shopName={SHOP_NAME}
+          t={t}
+          lang={lang}
+        />
+      </div>
+
+      {/* Trésorerie : solde détenu par compte de paiement (indépendant du mois) */}
+      <TreasurySection t={t} />
+
       {/* Sélecteur de mois */}
       <div className="mb-4 flex items-center gap-2">
         <button
@@ -214,6 +244,104 @@ export default function FinancesPage() {
         {t('net_profit_formula')}
       </p>
     </AppShell>
+  )
+}
+
+/** Logo (ou icône de repli) et libellé i18n de chaque compte de trésorerie. */
+const TREASURY_META: Record<
+  TreasuryMethod,
+  { logo?: string; icon?: LucideIcon; labelKey: string }
+> = {
+  especes: { icon: Coins, labelKey: 'pay_especes' },
+  bankily: { logo: '/payment-logos/bankily.jpg', labelKey: 'pay_bankily' },
+  click: { logo: '/payment-logos/click.jpg', labelKey: 'pay_click' },
+  sedad: { logo: '/payment-logos/sedad.jpg', labelKey: 'pay_sedad' },
+  amanety: { logo: '/payment-logos/amanety.jpg', labelKey: 'pay_amanety' },
+  masrivi: { logo: '/payment-logos/masrivi.jpg', labelKey: 'pay_masrivi' },
+  bik: { logo: '/payment-logos/bik.jpg', labelKey: 'pay_bik' },
+}
+
+function TreasurySection({ t }: { t: (k: string) => string }) {
+  const { accounts, total } = useMemo(() => computeTreasury(), [])
+
+  return (
+    <section className="mb-6">
+      <div className="mb-3 flex items-center gap-2">
+        <Landmark className="h-4 w-4 text-brand" />
+        <h2 className="font-heading text-base font-bold text-foreground">
+          {t('treasury')}
+        </h2>
+      </div>
+
+      {/* Total général */}
+      <div className="mb-3 rounded-3xl border border-brand/30 bg-brand/5 p-5 shadow-soft">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand/15 text-brand">
+            <Wallet className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-muted-foreground">
+              {t('treasury_total')}
+            </p>
+            <p className="font-heading text-3xl font-extrabold tabular-nums text-brand">
+              {formatMRU(total)}{' '}
+              <span className="text-base font-medium text-muted-foreground">
+                {t('mru')}
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Un compte = une carte */}
+      <div className="grid grid-cols-2 gap-3">
+        {accounts.map((a) => {
+          const meta = TREASURY_META[a.method]
+          const Icon = meta.icon
+          const negative = a.balance < 0
+          return (
+            <div
+              key={a.method}
+              className="rounded-2xl border border-border bg-card p-4 shadow-soft"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-card">
+                  {meta.logo ? (
+                    <img
+                      src={meta.logo || "/placeholder.svg"}
+                      alt={t(meta.labelKey)}
+                      className="h-full w-full object-contain"
+                    />
+                  ) : Icon ? (
+                    <span className="flex h-full w-full items-center justify-center bg-accent text-brand">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                  ) : null}
+                </div>
+                <p className="min-w-0 truncate text-sm font-semibold text-foreground">
+                  {t(meta.labelKey)}
+                </p>
+              </div>
+              <p
+                className={cn(
+                  'mt-3 font-heading text-xl font-extrabold tabular-nums',
+                  negative ? 'text-destructive' : 'text-foreground',
+                )}
+              >
+                {formatMRU(a.balance)}{' '}
+                <span className="text-xs font-medium text-muted-foreground">
+                  {t('mru')}
+                </span>
+              </p>
+            </div>
+          )
+        })}
+      </div>
+
+      <p className="mt-3 text-center text-xs text-muted-foreground">
+        {t('treasury_hint')}
+      </p>
+    </section>
   )
 }
 

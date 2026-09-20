@@ -4,9 +4,10 @@ import { useMemo, useState } from 'react'
 import { AppShell } from '@/components/app-shell'
 import { useApp } from '@/lib/app-context'
 import { formatTime } from '@/lib/format'
-import { ALERTS } from '@/lib/mock-data'
-import type { Alert } from '@/lib/types'
+import { ALERTS, PRODUCTS, SUPPLIERS } from '@/lib/mock-data'
+import type { Alert, Product } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { PurchaseOrderSheet } from '@/components/stock/purchase-order-sheet'
 import {
   Bell,
   BellOff,
@@ -15,7 +16,10 @@ import {
   HandCoins,
   RotateCcw,
   CheckCheck,
+  ClipboardList,
 } from 'lucide-react'
+
+const SHOP_NAME = 'SMART REGLILI'
 
 type FilterKey = 'all' | 'stock' | 'expiry' | 'debt' | 'return'
 
@@ -30,6 +34,8 @@ export default function AlertsPage() {
   const { t, lang, dir } = useApp()
   const [items, setItems] = useState<Alert[]>(ALERTS)
   const [filter, setFilter] = useState<FilterKey>('all')
+  // Produit pour lequel on rédige un bon de commande (null = feuille fermée).
+  const [orderProduct, setOrderProduct] = useState<Product | null>(null)
 
   const filters: { key: FilterKey; label: string }[] = [
     { key: 'all', label: t('al_all') },
@@ -132,42 +138,72 @@ export default function AlertsPage() {
           {visible.map((a) => {
             const Icon = TYPE_ICON[a.type]
             const c = levelClasses(a.level)
+            // Bouton "bon de commande" uniquement pour une alerte de stock
+            // rattachée à un produit connu.
+            const orderable =
+              a.type === 'stock' && a.productId
+                ? PRODUCTS.find((p) => p.id === a.productId) ?? null
+                : null
             return (
               <li
                 key={a.id}
                 className={cn(
-                  'flex items-start gap-3 rounded-2xl border bg-card p-4 shadow-soft',
+                  'rounded-2xl border bg-card p-4 shadow-soft',
                   c.ring,
                 )}
               >
-                <span
-                  className={cn(
-                    'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
-                    c.icon,
-                  )}
-                >
-                  <Icon className="h-5 w-5" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium leading-snug text-foreground text-pretty">
-                    {a.message}
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {formatTime(a.date, lang)}
-                  </p>
+                <div className="flex items-start gap-3">
+                  <span
+                    className={cn(
+                      'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
+                      c.icon,
+                    )}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium leading-snug text-foreground text-pretty">
+                      {a.message}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {formatTime(a.date, lang)}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setItems((prev) => prev.filter((x) => x.id !== a.id))}
+                    aria-label={t('al_mark_read')}
+                    className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-brand/10 hover:text-brand"
+                  >
+                    <CheckCheck className="h-4 w-4" />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setItems((prev) => prev.filter((x) => x.id !== a.id))}
-                  aria-label={t('al_mark_read')}
-                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-brand/10 hover:text-brand"
-                >
-                  <CheckCheck className="h-4 w-4" />
-                </button>
+
+                {orderable && (
+                  <button
+                    type="button"
+                    onClick={() => setOrderProduct(orderable)}
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-brand/30 bg-brand/5 py-2.5 text-sm font-semibold text-brand transition-colors hover:bg-brand/10"
+                  >
+                    <ClipboardList className="h-4 w-4" />
+                    {t('po_create')}
+                  </button>
+                )}
               </li>
             )
           })}
         </ul>
+      )}
+
+      {orderProduct && (
+        <PurchaseOrderSheet
+          product={orderProduct}
+          suppliers={SUPPLIERS}
+          shopName={SHOP_NAME}
+          t={t}
+          onClose={() => setOrderProduct(null)}
+          onSent={() => setOrderProduct(null)}
+        />
       )}
     </AppShell>
   )

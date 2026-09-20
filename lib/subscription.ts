@@ -19,6 +19,17 @@ import { useCallback, useEffect, useState } from 'react'
 export const TRIAL_DAYS = 14
 export const PRICE_MRU = 500 // prix mensuel
 
+/**
+ * Interrupteur global du blocage par abonnement.
+ *
+ * - `false` (actuel) : personne n'est jamais bloqué. On peut entrer et tester
+ *   librement toute l'application. Tout le code du blocage reste en place.
+ * - `true`  : réactive le blocage réel (essai de 14 jours puis paiement).
+ *   À basculer sur `true` UNIQUEMENT quand l'abonnement sera géré côté
+ *   backend, sinon un simple vidage du navigateur contourne le blocage.
+ */
+export const SUBSCRIPTION_ENFORCED = false
+
 const K_TRIAL_START = 'sr_trial_start'
 const K_ACTIVE = 'sr_sub_active'
 const K_EXPIRY = 'sr_sub_expiry'
@@ -74,6 +85,18 @@ function daysUntil(iso: string): number {
 /** Lit l'état brut depuis localStorage (safe SSR). */
 function read(): SubscriptionState {
   if (typeof window === 'undefined') return INITIAL_STATE
+
+  // Blocage désactivé : accès libre tant que le backend n'est pas branché.
+  if (!SUBSCRIPTION_ENFORCED) {
+    return {
+      status: 'trial',
+      daysLeft: TRIAL_DAYS,
+      blocked: false,
+      trialStart: localStorage.getItem(K_TRIAL_START),
+      expiry: null,
+      ready: true,
+    }
+  }
 
   // Initialise le début d'essai au premier accès.
   let trialStart = localStorage.getItem(K_TRIAL_START)

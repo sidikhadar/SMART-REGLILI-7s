@@ -9,7 +9,6 @@ export type PaymentMethod =
   | 'bik'
   | 'click'
   | 'masrivi'
-  | 'bamis'
   | 'amanety'
   | 'credit'
   | 'partiel'
@@ -58,6 +57,15 @@ export interface Product {
   image?: string
   lots: Lot[]
   lowStockThreshold: number
+  /**
+   * Seuil d'alerte péremption : quantité restante en dessous de laquelle on
+   * n'alerte PAS sur une date d'expiration proche (ex: inutile d'alerter pour
+   * 2 unités, mais oui pour un carton entier). Défaut 0 = alerter quelle que
+   * soit la quantité si non renseigné.
+   */
+  expiryAlertThreshold?: number
+  /** Emplacement physique en boutique (ex: "Rayon 3 - Case B2"). */
+  location?: string
   /** Variantes de vente. La 1ère est l'unité de base (factor 1). */
   variants?: ProductVariant[]
 }
@@ -108,6 +116,8 @@ export interface Expense {
   amount: number
   category: string
   date: string
+  /** Compte de paiement utilisé pour régler la dépense. Défaut : espèces. */
+  method?: PaymentMethod
 }
 
 export interface Supplier {
@@ -177,4 +187,19 @@ export interface Alert {
   level: 'info' | 'warning' | 'danger'
   message: string
   date: string
+  /** Produit concerné (permet de générer un bon de commande depuis l'alerte). */
+  productId?: string
+}
+
+/**
+ * Bon de commande fournisseur, généré depuis une alerte de stock bas.
+ * Bloc indépendant : ne modifie pas la gestion des lots ni du stock.
+ */
+export interface PurchaseOrder {
+  id: string
+  productId: string
+  supplierId: string
+  quantity: number
+  date: string // ISO datetime
+  status: 'draft' | 'sent'
 }

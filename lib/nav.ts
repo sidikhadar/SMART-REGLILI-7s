@@ -18,7 +18,6 @@ import {
   ShieldCheck,
   RotateCcw,
   Store,
-  ReceiptText,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -44,7 +43,6 @@ export const NAV_ITEMS: NavItem[] = [
   { href: '/alerts', key: 'alerts', icon: Bell, roles: ALL, group: 'main', bottom: true },
 
   // --- Gestion ---
-  { href: '/sales', key: 'sales_all', icon: ReceiptText, roles: ALL, group: 'manage' },
   { href: '/clients', key: 'clients', icon: Users, roles: ALL, group: 'manage' },
   { href: '/debts', key: 'debts', icon: HandCoins, roles: ALL, group: 'manage' },
   { href: '/returns', key: 'product_return', icon: RotateCcw, roles: ALL, group: 'manage' },
@@ -52,7 +50,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: '/suppliers', key: 'suppliers', icon: Truck, roles: BOSS, group: 'manage' },
   { href: '/warehouses', key: 'warehouses', icon: Warehouse, roles: BOSS, group: 'manage' },
   { href: '/employees', key: 'employees', icon: UserCog, roles: BOSS, group: 'manage' },
-  { href: '/invoices', key: 'invoices', icon: FileText, roles: BOSS, group: 'manage' },
+  { href: '/invoices', key: 'invoices', icon: FileText, roles: ALL, group: 'manage' },
 
   // --- Système ---
   { href: '/finances', key: 'finances', icon: Wallet, roles: BOSS, group: 'system' },

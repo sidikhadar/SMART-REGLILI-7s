@@ -1,11 +1,12 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { FileText, Search, ChevronRight, User, Wallet, ReceiptText } from 'lucide-react'
+import { FileText, Search, ChevronRight, User, Wallet, ReceiptText, CalendarDays } from 'lucide-react'
 import { useApp } from '@/lib/app-context'
 import { AppShell } from '@/components/app-shell'
 import { StatusBadge } from '@/components/invoices/status-badge'
 import { InvoiceDetail } from '@/components/invoices/invoice-detail'
+import { ExportMenu } from '@/components/export-menu'
 import { buildInvoices, summarize, type InvoiceStatus } from '@/lib/invoice-utils'
 import { formatMRU, formatDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -14,25 +15,79 @@ const SHOP_NAME = 'SMART REGLILI'
 type Filter = 'all' | InvoiceStatus
 
 export default function InvoicesPage() {
-  const { t, lang } = useApp()
-  const invoices = useMemo(() => buildInvoices(), [])
+  const { t, lang, role, userName } = useApp()
+  const allInvoices = useMemo(() => buildInvoices(), [])
+
+  // Le caissier ne voit que ses propres ventes (factures dont le caissier
+  // correspond à l'utilisateur connecté). Le patron/owner voit tout.
+  const invoices = useMemo(
+    () =>
+      role === 'caissier'
+        ? allInvoices.filter((inv) => inv.cashier === userName)
+        : allInvoices,
+    [allInvoices, role, userName],
+  )
   const summary = useMemo(() => summarize(invoices), [invoices])
 
   const [filter, setFilter] = useState<Filter>('all')
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
+  // Filtre par date optionnel et flexible : Année + Mois + Jour (optionnels)
+  const [year, setYear] = useState<string>('all')
+  const [month, setMonth] = useState<string>('all')
+  const [day, setDay] = useState<string>('all')
+
+  // Années présentes dans les factures visibles (récentes d'abord)
+  const years = useMemo(() => {
+    const set = new Set(invoices.map((inv) => new Date(inv.date).getFullYear()))
+    return [...set].sort((a, b) => b - a)
+  }, [invoices])
+
+  const monthNames = useMemo(() => {
+    const locale = lang === 'ar' ? 'ar-MA' : lang === 'en' ? 'en-US' : 'fr-FR'
+    return Array.from({ length: 12 }, (_, i) =>
+      new Date(2000, i, 1).toLocaleDateString(locale, { month: 'long' }),
+    )
+  }, [lang])
+
+  const daysInMonth = useMemo(() => {
+    if (year === 'all' || month === 'all') return 31
+    return new Date(Number(year), Number(month) + 1, 0).getDate()
+  }, [year, month])
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     return invoices.filter((inv) => {
       if (filter !== 'all' && inv.status !== filter) return false
+      const d = new Date(inv.date)
+      if (year !== 'all' && d.getFullYear() !== Number(year)) return false
+      if (month !== 'all' && d.getMonth() !== Number(month)) return false
+      if (day !== 'all' && d.getDate() !== Number(day)) return false
       if (!q) return true
       return (
         inv.number.toLowerCase().includes(q) ||
         inv.clientName.toLowerCase().includes(q)
       )
     })
-  }, [invoices, filter, query])
+  }, [invoices, filter, query, year, month, day])
+
+  const hasDateFilter = year !== 'all'
+
+  // Nom de fichier d'export reflétant la période filtrée (sinon « tout »)
+  const exportFilename = useMemo(() => {
+    const parts = ['factures']
+    if (year !== 'all') parts.push(year)
+    if (month !== 'all') parts.push(String(Number(month) + 1).padStart(2, '0'))
+    if (day !== 'all') parts.push(String(day).padStart(2, '0'))
+    return parts.join('-')
+  }, [year, month, day])
+
+  function resetDateFilter() {
+    setYear('all')
+    setMonth('all')
+    setDay('all')
+  }
 
   const selected = invoices.find((i) => i.id === selectedId) ?? null
 
@@ -45,7 +100,17 @@ export default function InvoicesPage() {
 
   return (
     <AppShell title={t('invoices')}>
-      <p className="mb-4 text-sm text-muted-foreground">{t('inv_subtitle')}</p>
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <p className="text-sm text-muted-foreground">{t('inv_subtitle')}</p>
+        <ExportMenu
+          invoices={filtered}
+          filename={exportFilename}
+          title={t('exp_title_invoices')}
+          shopName={SHOP_NAME}
+          t={t}
+          lang={lang}
+        />
+      </div>
 
       {/* Résumé */}
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -106,6 +171,78 @@ export default function InvoicesPage() {
             {f.label}
           </button>
         ))}
+      </div>
+
+      {/* Filtre par date optionnel et flexible : Année + Mois + Jour */}
+      <div className="mb-4 rounded-2xl border border-border bg-card p-4 shadow-soft">
+        <div className="mb-1 flex items-center justify-between gap-2">
+          <span className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+            <CalendarDays className="h-3.5 w-3.5" /> {t('sales_filter_period')}
+          </span>
+          {hasDateFilter && (
+            <button
+              type="button"
+              onClick={resetDateFilter}
+              className="shrink-0 text-xs font-semibold text-brand hover:underline"
+            >
+              {t('sales_clear')}
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <select
+            value={year}
+            onChange={(e) => {
+              setYear(e.target.value)
+              if (e.target.value === 'all') {
+                setMonth('all')
+                setDay('all')
+              }
+            }}
+            className="min-h-11 w-full rounded-xl border border-border bg-background px-2 text-sm font-medium text-foreground outline-none transition-colors focus:border-brand"
+            aria-label={t('sales_year')}
+          >
+            <option value="all">{t('sales_all_periods')}</option>
+            {years.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={month}
+            onChange={(e) => {
+              setMonth(e.target.value)
+              setDay('all')
+            }}
+            disabled={year === 'all'}
+            className="min-h-11 w-full rounded-xl border border-border bg-background px-2 text-sm font-medium text-foreground outline-none transition-colors focus:border-brand disabled:opacity-50"
+            aria-label={t('sales_month')}
+          >
+            <option value="all">{t('sales_month')}</option>
+            {monthNames.map((name, i) => (
+              <option key={i} value={i}>
+                {name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={day}
+            onChange={(e) => setDay(e.target.value)}
+            disabled={month === 'all'}
+            className="min-h-11 w-full rounded-xl border border-border bg-background px-2 text-sm font-medium text-foreground outline-none transition-colors focus:border-brand disabled:opacity-50"
+            aria-label={t('sales_day_optional')}
+          >
+            <option value="all">{t('sales_day_all')}</option>
+            {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((dNum) => (
+              <option key={dNum} value={dNum}>
+                {dNum}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Liste */}
