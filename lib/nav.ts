@@ -52,7 +52,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: '/suppliers', key: 'suppliers', icon: Truck, roles: BOSS, group: 'manage' },
   { href: '/warehouses', key: 'warehouses', icon: Warehouse, roles: BOSS, group: 'manage' },
   { href: '/employees', key: 'employees', icon: UserCog, roles: BOSS, group: 'manage' },
-  { href: '/invoices', key: 'invoices', icon: FileText, roles: BOSS, group: 'manage' },
+  { href: '/invoices', key: 'invoices', icon: FileText, roles: ALL, group: 'manage' },
 
   // --- Système ---
   { href: '/finances', key: 'finances', icon: Wallet, roles: BOSS, group: 'system' },
