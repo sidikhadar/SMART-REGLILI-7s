@@ -74,7 +74,7 @@ export function TopProductsSheet({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-foreground/40 p-0 backdrop-blur-sm sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/40 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
@@ -82,11 +82,11 @@ export function TopProductsSheet({
         role="dialog"
         aria-modal="true"
         aria-label={t('top_products_all')}
-        className="min-h-dvh w-full max-w-lg animate-slide-in-up bg-card p-5 shadow-soft-lg sm:min-h-0 sm:rounded-3xl"
+        className="flex max-h-[92dvh] w-full max-w-lg animate-slide-in-up flex-col overflow-hidden rounded-t-3xl bg-card shadow-soft-lg sm:max-h-[85dvh] sm:rounded-3xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* En-tête */}
-        <div className="mb-4 flex items-start justify-between gap-3">
+        {/* En-tête (fixe) */}
+        <div className="flex items-start justify-between gap-3 border-b border-border p-5">
           <div className="flex min-w-0 items-center gap-3">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent text-brand">
               <TrendingUp className="h-6 w-6" />
@@ -110,6 +110,8 @@ export function TopProductsSheet({
           </button>
         </div>
 
+        {/* Corps défilant */}
+        <div className="flex-1 overflow-y-auto p-5">
         {!hasSales ? (
           <div className="flex flex-col items-center gap-3 py-16 text-center">
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-muted text-muted-foreground">
@@ -209,6 +211,7 @@ export function TopProductsSheet({
             })}
           </ul>
         )}
+        </div>
       </div>
     </div>
   )
