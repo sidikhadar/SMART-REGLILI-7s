@@ -28,13 +28,14 @@ import {
 } from '@/lib/mock-data'
 import { formatMRU, formatTime, productStock } from '@/lib/format'
 import { InvoiceDetail } from '@/components/invoices/invoice-detail'
+import { TopProductsSheet } from '@/components/dashboard/top-products-sheet'
 import { buildInvoices } from '@/lib/invoice-utils'
 import { cn } from '@/lib/utils'
 
 const SHOP_NAME = 'SMART REGLILI'
 
 export default function DashboardPage() {
-  const { t, lang, userName, role, addToCart } = useApp()
+  const { t, lang, dir, userName, role, addToCart } = useApp()
   const router = useRouter()
   const isCaissier = role === 'caissier'
 
@@ -84,6 +85,7 @@ export default function DashboardPage() {
   const invoices = useMemo(() => buildInvoices(), [])
   const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null)
   const selectedInvoice = invoices.find((i) => i.id === selectedSaleId) ?? null
+  const [showTopProducts, setShowTopProducts] = useState(false)
 
   return (
     <AppShell title={t('dashboard')}>
@@ -190,12 +192,13 @@ export default function DashboardPage() {
         <section className="rounded-2xl border border-border bg-card p-4 shadow-soft">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-heading text-base font-bold text-foreground">{t('top_products')}</h2>
-            <Link
-              href="/stock"
+            <button
+              type="button"
+              onClick={() => setShowTopProducts(true)}
               className="flex items-center gap-1 text-xs font-medium text-brand hover:underline"
             >
               {t('view_all')} <ArrowRight className="h-3.5 w-3.5 flip-rtl" />
-            </Link>
+            </button>
           </div>
           <ul className="space-y-3">
             {topProducts.map(({ product, qty }, i) => (
@@ -347,6 +350,17 @@ export default function DashboardPage() {
           t={t}
           lang={lang}
           onClose={() => setSelectedSaleId(null)}
+        />
+      )}
+
+      {/* Tous les produits classés par ventes */}
+      {showTopProducts && (
+        <TopProductsSheet
+          products={PRODUCTS}
+          sales={SALES}
+          t={t}
+          dir={dir}
+          onClose={() => setShowTopProducts(false)}
         />
       )}
     </AppShell>
