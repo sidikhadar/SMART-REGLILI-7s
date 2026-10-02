@@ -202,7 +202,11 @@ export function AuthFooter() {
         </span>
         <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
           <Headphones className="h-3.5 w-3.5 shrink-0 text-brand sm:h-4 sm:w-4" aria-hidden />
-          {t('support_label')} : +33 7 58 66 46 84
+          <span>{t('support_label')}</span>
+          <span aria-hidden="true">:</span>
+          <a href="tel:+33758664684" className="hover:text-foreground">
+            +33 7 58 66 46 84
+          </a>
         </span>
         <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
           <Globe className="h-3.5 w-3.5 shrink-0 text-brand sm:h-4 sm:w-4" aria-hidden />
